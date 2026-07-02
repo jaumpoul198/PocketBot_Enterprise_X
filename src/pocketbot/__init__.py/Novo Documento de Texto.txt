@@ -1,0 +1,17 @@
+
+PocketBot Enterprise X
+
+
+from .version import (
+    __author__,
+    __description__,
+    __project__,
+    __version__,
+)
+
+__all__ = [
+    __version__,
+    __author__,
+    __project__,
+    __description__,
+]

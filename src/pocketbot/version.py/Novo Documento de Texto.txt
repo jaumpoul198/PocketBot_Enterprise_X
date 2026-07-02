@@ -1,0 +1,9 @@
+"""
+PocketBot Enterprise X
+Version Information
+"""
+
+__version__ = "0.1.0"
+__author__ = "João Paulo Oliveira"
+__project__ = "PocketBot Enterprise X"
+__description__ = "Enterprise AI Trading Platform for Pocket Option OTC"
