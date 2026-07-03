@@ -1,43 +1,16 @@
 """
 PocketBot Enterprise X
-Core - Result Pattern
+Core Package
 """
 
-from __future__ import annotations
+from .logger import get_logger
+from .paths import ProjectPaths
+from .result import Result
+from .settings import Settings
 
-from dataclasses import dataclass
-from typing import Generic, TypeVar
-
-
-T = TypeVar("T")
-
-
-@dataclass(slots=True)
-class Result(Generic[T]):
-    """
-    Representa o resultado padronizado de uma operação.
-    """
-
-    success: bool
-    data: T | None = None
-    message: str = ""
-
-    @property
-    def failed(self) -> bool:
-        return not self.success
-
-    @classmethod
-    def ok(cls, data: T | None = None, message: str = "") -> "Result[T]":
-        return cls(
-            success=True,
-            data=data,
-            message=message,
-        )
-
-    @classmethod
-    def fail(cls, message: str) -> "Result[T]":
-        return cls(
-            success=False,
-            data=None,
-            message=message,
-        )
+__all__ = [
+    "get_logger",
+    "ProjectPaths",
+    "Result",
+    "Settings",
+]

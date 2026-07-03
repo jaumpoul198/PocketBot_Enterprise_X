@@ -1,8 +1,6 @@
 """
 PocketBot Enterprise X
 Core - Exceptions
-
-Exceções centralizadas do sistema.
 """
 
 from __future__ import annotations
@@ -10,7 +8,7 @@ from __future__ import annotations
 
 class PocketBotError(Exception):
     """
-    Exceção base do PocketBot.
+    ExceÃ§Ã£o base do PocketBot.
     """
 
     default_message = "Ocorreu um erro interno no PocketBot."
@@ -22,10 +20,10 @@ class PocketBotError(Exception):
 
 class ConfigurationError(PocketBotError):
     """
-    Erro de configuração.
+    Erro relacionado Ã s configuraÃ§Ãµes do sistema.
     """
 
-    default_message = "Erro na configuração do sistema."
+    default_message = "Erro na configuraÃ§Ã£o do sistema."
 
 
 class DatabaseError(PocketBotError):
@@ -33,7 +31,15 @@ class DatabaseError(PocketBotError):
     Erro relacionado ao banco de dados.
     """
 
-    default_message = "Erro ao acessar o banco de dados."
+    default_message = "Erro de banco de dados."
+
+
+class ValidationError(PocketBotError):
+    """
+    Erro de validaÃ§Ã£o.
+    """
+
+    default_message = "Erro de validaÃ§Ã£o."
 
 
 class MarketError(PocketBotError):
@@ -41,28 +47,28 @@ class MarketError(PocketBotError):
     Erro relacionado ao mercado.
     """
 
-    default_message = "Erro ao obter dados do mercado."
+    default_message = "Erro de mercado."
 
 
 class StrategyError(PocketBotError):
     """
-    Erro relacionado às estratégias.
+    Erro relacionado Ã s estratÃ©gias.
     """
 
-    default_message = "Erro na execução da estratégia."
+    default_message = "Erro de estratÃ©gia."
 
 
-class AIEngineError(PocketBotError):
+class ExecutionError(PocketBotError):
     """
-    Erro relacionado ao motor de IA.
-    """
-
-    default_message = "Erro no mecanismo de Inteligência Artificial."
-
-
-class ValidationError(PocketBotError):
-    """
-    Erro de validação.
+    Erro relacionado Ã  execuÃ§Ã£o de operaÃ§Ãµes.
     """
 
-    default_message = "Falha na validação dos dados."
+    default_message = "Erro de execuÃ§Ã£o."
+
+
+class AIError(PocketBotError):
+    """
+    Erro relacionado aos mÃ³dulos de IA.
+    """
+
+    default_message = "Erro no mÃ³dulo de inteligÃªncia artificial."

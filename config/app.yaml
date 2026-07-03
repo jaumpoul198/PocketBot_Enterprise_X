@@ -1,0 +1,13 @@
+application:
+  name: PocketBot Enterprise X
+
+  version: 0.1.0
+
+environment:
+  mode: development
+
+logging:
+  level: INFO
+
+timezone:
+  value: America/Sao_Paulo

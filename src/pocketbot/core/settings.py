@@ -5,23 +5,28 @@ Core - Settings
 
 from __future__ import annotations
 
-import os
 from dataclasses import dataclass
 
 
 @dataclass(slots=True)
 class Settings:
     """
-    Configurações básicas da aplicação.
+    ConfiguraÃ§Ãµes globais da aplicaÃ§Ã£o.
     """
 
+    debug: bool = False
+    environment: str = "development"
+
     app_name: str = "PocketBot Enterprise X"
-    environment: str = os.getenv("APP_ENV", "development")
-    log_level: str = os.getenv("LOG_LEVEL", "INFO")
-    database_url: str = os.getenv(
-        "DATABASE_URL",
-        "sqlite:///database/pocketbot.db",
-    )
 
+    version: str = "0.1.0"
 
-settings = Settings()
+    timezone: str = "America/Sao_Paulo"
+
+    log_level: str = "INFO"
+
+    database_url: str = "sqlite:///pocketbot.db"
+
+    cache_enabled: bool = True
+
+    learning_enabled: bool = True
