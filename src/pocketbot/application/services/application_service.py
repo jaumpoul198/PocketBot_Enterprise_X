@@ -1,0 +1,79 @@
+"""
+PocketBot Enterprise X
+
+Application Service.
+"""
+
+from __future__ import annotations
+
+from pocketbot.confluence.engine import ConfluenceEngine
+from pocketbot.indicators.pipeline import IndicatorPipeline
+from pocketbot.market.interfaces import MarketProvider
+from pocketbot.score.engine import ScoreEngine
+from pocketbot.trading.engine import TradeEngine
+from pocketbot.trading.result import TradeResult
+
+
+class ApplicationService:
+    """
+    Main application orchestration service.
+
+        Market
+            ↓
+        Indicator Pipeline
+            ↓
+        Confluence Engine
+            ↓
+        Score Engine
+            ↓
+        Trade Engine
+    """
+
+    def __init__(
+        self,
+        market: MarketProvider,
+        pipeline: IndicatorPipeline,
+        confluence: ConfluenceEngine,
+        score_engine: ScoreEngine,
+        trade_engine: TradeEngine,
+    ) -> None:
+
+        self._market = market
+        self._pipeline = pipeline
+        self._confluence = confluence
+        self._score = score_engine
+        self._trade = trade_engine
+
+    def analyse(
+        self,
+        asset: str,
+        timeframe: int,
+        candles: int,
+    ) -> TradeResult:
+        """
+        Executes the complete trading workflow.
+        """
+
+        market_data = self._market.get_candles(
+            asset=asset,
+            timeframe=timeframe,
+            count=candles,
+        )
+
+        indicator_results = self._pipeline.run(
+            market_data,
+        )
+
+        validated = self._confluence.evaluate(
+            indicator_results,
+        )
+
+        score = self._score.calculate(
+            validated,
+        )
+
+        return self._trade.process(
+            asset=asset,
+            timeframe=timeframe,
+            score=score,
+        )

@@ -9,13 +9,13 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 from pocketbot.indicators.base.result import IndicatorResult
-from pocketbot.confluence.scorer import ConfluenceScorer
 from pocketbot.confluence.validator import ConfluenceValidator
+from pocketbot.confluence.scorer import ConfluenceScorer
 
 
 class ConfluenceEngine:
     """
-    Calculates the final confluence score.
+    Calculates the overall confluence from indicator results.
     """
 
     def __init__(self) -> None:
@@ -26,6 +26,7 @@ class ConfluenceEngine:
         self,
         results: Sequence[IndicatorResult],
     ) -> float:
+
         if not self._validator.validate(results):
             return 0.0
 

@@ -1,7 +1,7 @@
 """
 PocketBot Enterprise X
 
-Confluence scorer.
+Confluence Scorer.
 """
 
 from __future__ import annotations
@@ -13,7 +13,7 @@ from pocketbot.indicators.base.result import IndicatorResult
 
 class ConfluenceScorer:
     """
-    Calculates the overall confidence score.
+    Calculates the weighted confidence score.
     """
 
     def calculate(
@@ -21,12 +21,17 @@ class ConfluenceScorer:
         results: Sequence[IndicatorResult],
     ) -> float:
 
-        if not results:
-            return 0.0
-
-        total_weight = sum(r.weight for r in results)
+        total_weight = sum(
+            result.weight
+            for result in results
+        )
 
         if total_weight == 0:
             return 0.0
 
-        return sum(r.confidence * r.weight for r in results) / total_weight
+        weighted_score = sum(
+            result.confidence * result.weight
+            for result in results
+        )
+
+        return weighted_score / total_weight

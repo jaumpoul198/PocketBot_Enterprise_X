@@ -1,7 +1,7 @@
 """
 PocketBot Enterprise X
 
-Indicator execution pipeline.
+Indicator Pipeline.
 """
 
 from __future__ import annotations
@@ -15,7 +15,7 @@ from pocketbot.indicators.manager import IndicatorManager
 
 class IndicatorPipeline:
     """
-    Executa um pipeline completo de indicadores.
+    Pipeline de execução de indicadores.
     """
 
     def __init__(
@@ -29,6 +29,7 @@ class IndicatorPipeline:
         indicators: Sequence[str],
         candles: Sequence[Candle],
     ) -> list[IndicatorResult]:
+
         return self._manager.run(
             indicators,
             candles,

@@ -12,7 +12,8 @@ from pocketbot.indicators.registry import IndicatorRegistry
 
 class IndicatorFactory:
     """
-    Responsável por criar instâncias de indicadores registrados.
+    Factory responsável por criar instâncias
+    dos indicadores registrados.
     """
 
     def __init__(
@@ -27,11 +28,9 @@ class IndicatorFactory:
         **kwargs: object,
     ) -> Indicator:
         """
-        Cria uma instância de um indicador.
+        Cria uma instância do indicador.
         """
 
         indicator_class = self._registry.get(name)
 
-        instance = indicator_class(**kwargs)
-
-        return instance
+        return indicator_class(**kwargs)

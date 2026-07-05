@@ -1,7 +1,7 @@
 """
 PocketBot Enterprise X
 
-Indicator manager.
+Indicator Manager.
 """
 
 from __future__ import annotations
@@ -15,7 +15,7 @@ from pocketbot.indicators.engine import IndicatorEngine
 
 class IndicatorManager:
     """
-    Gerencia a execução de indicadores.
+    Executa múltiplos indicadores.
     """
 
     def __init__(

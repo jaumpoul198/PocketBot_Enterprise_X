@@ -1,7 +1,7 @@
 """
 PocketBot Enterprise X
 
-Indicator execution engine.
+Indicator Engine.
 """
 
 from __future__ import annotations
@@ -15,7 +15,7 @@ from pocketbot.indicators.factory import IndicatorFactory
 
 class IndicatorEngine:
     """
-    Executa indicadores registrados.
+    Executa um único indicador.
     """
 
     def __init__(
@@ -26,17 +26,14 @@ class IndicatorEngine:
 
     def execute(
         self,
-        name: str,
+        indicator: str,
         candles: Sequence[Candle],
         **kwargs: object,
     ) -> IndicatorResult:
-        """
-        Executa um indicador.
-        """
 
-        indicator = self._factory.create(
-            name=name,
+        instance = self._factory.create(
+            indicator,
             **kwargs,
         )
 
-        return indicator.calculate(candles)
+        return instance.calculate(candles)

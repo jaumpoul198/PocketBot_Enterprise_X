@@ -6,13 +6,14 @@ Indicator Registry.
 
 from __future__ import annotations
 
+from collections.abc import Iterator
+
 from pocketbot.indicators.base.indicator import Indicator
 
 
 class IndicatorRegistry:
     """
-    Registry responsável por armazenar todos os indicadores
-    disponíveis no sistema.
+    Stores all available indicator classes.
     """
 
     def __init__(self) -> None:
@@ -20,67 +21,59 @@ class IndicatorRegistry:
 
     def register(
         self,
+        name: str,
         indicator: type[Indicator],
     ) -> None:
         """
-        Registra um indicador.
+        Registers an indicator class.
         """
 
-        name = indicator.__name__
+        key = name.upper()
 
-        if name in self._registry:
-            raise ValueError(f"Indicator '{name}' already registered.")
+        if key in self._registry:
+            raise ValueError(
+                f"Indicator '{name}' is already registered."
+            )
 
-        self._registry[name] = indicator
-
-    def unregister(
-        self,
-        name: str,
-    ) -> None:
-        """
-        Remove um indicador.
-        """
-
-        self._registry.pop(name, None)
+        self._registry[key] = indicator
 
     def get(
         self,
         name: str,
     ) -> type[Indicator]:
         """
-        Obtém um indicador pelo nome.
+        Returns an indicator class.
         """
 
+        key = name.upper()
+
         try:
-            return self._registry[name]
+            return self._registry[key]
+
         except KeyError as exc:
-            raise ValueError(f"Indicator '{name}' not found.") from exc
+            raise KeyError(
+                f"Indicator '{name}' is not registered."
+            ) from exc
 
     def exists(
         self,
         name: str,
     ) -> bool:
         """
-        Verifica se existe.
+        Checks whether an indicator is registered.
         """
 
-        return name in self._registry
+        return name.upper() in self._registry
 
-    def all(
-        self,
-    ) -> dict[str, type[Indicator]]:
+    def names(self) -> list[str]:
         """
-        Retorna todos os indicadores.
+        Returns all registered indicator names.
         """
 
-        return dict(self._registry)
-
-    def clear(self) -> None:
-        """
-        Limpa o registry.
-        """
-
-        self._registry.clear()
+        return sorted(self._registry.keys())
 
     def __len__(self) -> int:
         return len(self._registry)
+
+    def __iter__(self) -> Iterator[type[Indicator]]:
+        return iter(self._registry.values())
