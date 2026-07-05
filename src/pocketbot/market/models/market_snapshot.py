@@ -8,7 +8,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime
 
-from pocketbot.domain.entities.candle import Candle
+from pocketbot.domain.candle import Candle
 
 
 @dataclass(slots=True)

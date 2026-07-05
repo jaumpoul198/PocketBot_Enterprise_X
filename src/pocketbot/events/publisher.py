@@ -12,11 +12,7 @@ class EventPublisher:
     def __init__(self, event_bus: EventBus) -> None:
         self._event_bus = event_bus
 
-    def publish(
-        self,
-        name: str,
-        payload: dict,
-    ) -> None:
+    def publish(self, name: str, payload: dict[str, object]) -> None:
         self._event_bus.publish(
             Event(
                 name=name,

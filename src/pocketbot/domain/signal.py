@@ -33,7 +33,7 @@ class Signal:
 
     reason: str = ""
 
-    metadata: dict = field(default_factory=dict)
+    metadata: dict[str, object] = field(default_factory=dict)
 
     @property
     def valid(self) -> bool:
