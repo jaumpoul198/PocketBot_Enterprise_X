@@ -10,9 +10,9 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any
 
+from pocketbot.decision.result import DecisionResult
 from pocketbot.execution.order import ExecutionOrder
 from pocketbot.risk.result import RiskResult
-from pocketbot.decision.result import DecisionResult
 
 
 @dataclass(frozen=True, slots=True)

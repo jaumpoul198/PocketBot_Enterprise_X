@@ -31,9 +31,7 @@ class IndicatorRegistry:
         key = name.upper()
 
         if key in self._registry:
-            raise ValueError(
-                f"Indicator '{name}' is already registered."
-            )
+            raise ValueError(f"Indicator '{name}' is already registered.")
 
         self._registry[key] = indicator
 
@@ -51,9 +49,7 @@ class IndicatorRegistry:
             return self._registry[key]
 
         except KeyError as exc:
-            raise KeyError(
-                f"Indicator '{name}' is not registered."
-            ) from exc
+            raise KeyError(f"Indicator '{name}' is not registered.") from exc
 
     def exists(
         self,

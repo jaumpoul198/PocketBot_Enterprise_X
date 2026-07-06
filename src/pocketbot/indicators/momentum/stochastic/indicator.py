@@ -39,11 +39,9 @@ class StochasticIndicator(Indicator):
     ) -> IndicatorResult:
 
         if len(candles) < self._period:
-            raise ValueError(
-                "Insufficient candles for Stochastic calculation."
-            )
+            raise ValueError("Insufficient candles for Stochastic calculation.")
 
-        window = candles[-self._period:]
+        window = candles[-self._period :]
 
         highest = max(float(c.high) for c in window)
         lowest = min(float(c.low) for c in window)

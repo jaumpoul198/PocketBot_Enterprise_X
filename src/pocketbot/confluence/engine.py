@@ -8,9 +8,9 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
-from pocketbot.indicators.base.result import IndicatorResult
-from pocketbot.confluence.validator import ConfluenceValidator
 from pocketbot.confluence.scorer import ConfluenceScorer
+from pocketbot.confluence.validator import ConfluenceValidator
+from pocketbot.indicators.base.result import IndicatorResult
 
 
 class ConfluenceEngine:

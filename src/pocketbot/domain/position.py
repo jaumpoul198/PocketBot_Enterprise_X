@@ -2,7 +2,6 @@
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional
 
 
 @dataclass(slots=True)
@@ -23,7 +22,7 @@ class Position:
 
     expiration: datetime
 
-    current_price: Optional[float] = None
+    current_price: float | None = None
 
     profit: float = 0.0
 

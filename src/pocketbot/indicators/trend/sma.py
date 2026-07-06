@@ -38,14 +38,9 @@ class SMAIndicator(Indicator):
     ) -> IndicatorResult:
 
         if len(candles) < self._period:
-            raise ValueError(
-                "Insufficient candles for SMA calculation."
-            )
+            raise ValueError("Insufficient candles for SMA calculation.")
 
-        closes = [
-            float(candle.close)
-            for candle in candles
-        ]
+        closes = [float(candle.close) for candle in candles]
 
         value = simple_moving_average(
             values=closes,

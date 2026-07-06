@@ -32,7 +32,4 @@ class WeightNormalizer:
         if total_weight <= 0:
             return [1.0 / len(results)] * len(results)
 
-        return [
-            result.weight / total_weight
-            for result in results
-        ]
+        return [result.weight / total_weight for result in results]

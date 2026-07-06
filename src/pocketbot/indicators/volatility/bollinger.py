@@ -39,9 +39,7 @@ class BollingerIndicator(Indicator):
     ) -> IndicatorResult:
 
         if len(candles) < self._period:
-            raise ValueError(
-                "Insufficient candles for Bollinger calculation."
-            )
+            raise ValueError("Insufficient candles for Bollinger calculation.")
 
         closes = [float(c.close) for c in candles]
 
@@ -50,12 +48,9 @@ class BollingerIndicator(Indicator):
             self._period,
         )
 
-        window = closes[-self._period:]
+        window = closes[-self._period :]
 
-        variance = sum(
-            (price - sma) ** 2
-            for price in window
-        ) / self._period
+        variance = sum((price - sma) ** 2 for price in window) / self._period
 
         std = sqrt(variance)
 

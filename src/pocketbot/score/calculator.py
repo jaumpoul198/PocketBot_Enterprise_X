@@ -9,7 +9,6 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 from pocketbot.indicators.base.result import IndicatorResult
-
 from pocketbot.score.confidence import ConfidenceCalculator
 from pocketbot.score.normalizer import WeightNormalizer
 from pocketbot.score.result import ScoreResult

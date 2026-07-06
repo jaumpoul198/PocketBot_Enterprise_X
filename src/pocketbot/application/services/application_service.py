@@ -17,16 +17,6 @@ from pocketbot.trading.result import TradeResult
 class ApplicationService:
     """
     Main application orchestration service.
-
-        Market
-            ↓
-        Indicator Pipeline
-            ↓
-        Confluence Engine
-            ↓
-        Score Engine
-            ↓
-        Trade Engine
     """
 
     def __init__(
@@ -37,7 +27,6 @@ class ApplicationService:
         score_engine: ScoreEngine,
         trade_engine: TradeEngine,
     ) -> None:
-
         self._market = market
         self._pipeline = pipeline
         self._confluence = confluence
@@ -50,9 +39,6 @@ class ApplicationService:
         timeframe: int,
         candles: int,
     ) -> TradeResult:
-        """
-        Executes the complete trading workflow.
-        """
 
         market_data = self._market.get_candles(
             asset=asset,
@@ -60,17 +46,28 @@ class ApplicationService:
             count=candles,
         )
 
-        indicator_results = self._pipeline.run(
-            market_data,
+        indicator_results = self._pipeline.execute(
+            indicators=[
+                "EMA",
+                "SMA",
+                "MACD",
+                "ATR",
+                "BOLLINGER",
+                "RSI",
+                "STOCHASTIC",
+            ],
+            candles=market_data,
         )
 
-        validated = self._confluence.evaluate(
+        confluence = self._confluence.calculate(
             indicator_results,
         )
 
         score = self._score.calculate(
-            validated,
+            indicator_results,
         )
+
+        score.metadata["confluence"] = confluence
 
         return self._trade.process(
             asset=asset,
