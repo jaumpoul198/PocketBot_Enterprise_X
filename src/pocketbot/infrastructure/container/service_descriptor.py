@@ -19,13 +19,6 @@ if TYPE_CHECKING:
         ServiceProvider,
     )
 
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from pocketbot.infrastructure.container.service_provider import (
-        ServiceProvider,
-    )
-
 FactoryType = Callable[[ServiceProvider], Any]
 
 @dataclass(slots=True)
