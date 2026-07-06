@@ -8,7 +8,8 @@ Service registration descriptor.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Any
 
 from pocketbot.infrastructure.container.service_lifetime import ServiceLifetime
 
@@ -19,7 +20,9 @@ if TYPE_CHECKING:
         ServiceProvider,
     )
 
-FactoryType = Callable[[ServiceProvider], Any]
+from collections.abc import Callable
+
+FactoryType = Callable[[Any], Any]
 
 @dataclass(slots=True)
 class ServiceDescriptor:

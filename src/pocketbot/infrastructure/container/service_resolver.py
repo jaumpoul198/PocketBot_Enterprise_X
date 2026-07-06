@@ -41,6 +41,7 @@ class ServiceResolver:
                     implementation_type,
                 )
             )
+
             raise CircularDependencyError(
                 f"Circular dependency detected: {chain}"
             )
@@ -51,19 +52,33 @@ class ServiceResolver:
             constructor = implementation_type.__init__
             signature = inspect.signature(constructor)
 
+            type_hints = inspect.get_annotations(
+                constructor,
+                eval_str=True,
+            )
+
             kwargs: dict[str, Any] = {}
 
             for name, parameter in signature.parameters.items():
+
                 if name == "self":
                     continue
 
-                annotation = parameter.annotation
+                if parameter.kind in (
+                    inspect.Parameter.VAR_POSITIONAL,
+                    inspect.Parameter.VAR_KEYWORD,
+                ):
+                    continue
+
+                annotation = type_hints.get(
+                    name,
+                    parameter.annotation,
+                )
 
                 if annotation is inspect.Parameter.empty:
                     raise ServiceResolutionError(
-                        f"Constructor parameter "
-                        f"'{name}' of "
-                        f"'{implementation_type.__name__}' "
+                        f"Constructor parameter '{name}' "
+                        f"of '{implementation_type.__name__}' "
                         "must have a type annotation."
                     )
 

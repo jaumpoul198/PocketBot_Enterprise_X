@@ -7,7 +7,7 @@ Service collection implementation.
 
 from __future__ import annotations
 
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from typing import Any
 
 from pocketbot.infrastructure.container.interfaces import (
@@ -15,6 +15,7 @@ from pocketbot.infrastructure.container.interfaces import (
     IServiceProvider,
 )
 from pocketbot.infrastructure.container.service_descriptor import (
+    FactoryType,
     ServiceDescriptor,
 )
 from pocketbot.infrastructure.container.service_lifetime import (
@@ -47,33 +48,57 @@ class ServiceCollection(IServiceCollection):
         self,
         service_type: type[Any],
         implementation_type: type[Any] | None = None,
+        *,
+        factory: FactoryType | None = None,
     ) -> None:
         self._add(
-            service_type,
-            implementation_type,
-            ServiceLifetime.SINGLETON,
+            service_type=service_type,
+            implementation_type=implementation_type,
+            lifetime=ServiceLifetime.SINGLETON,
+            factory=factory,
         )
 
     def add_scoped(
         self,
         service_type: type[Any],
         implementation_type: type[Any] | None = None,
+        *,
+        factory: FactoryType | None = None,
     ) -> None:
         self._add(
-            service_type,
-            implementation_type,
-            ServiceLifetime.SCOPED,
+            service_type=service_type,
+            implementation_type=implementation_type,
+            lifetime=ServiceLifetime.SCOPED,
+            factory=factory,
         )
 
     def add_transient(
         self,
         service_type: type[Any],
         implementation_type: type[Any] | None = None,
+        *,
+        factory: FactoryType | None = None,
     ) -> None:
         self._add(
-            service_type,
-            implementation_type,
-            ServiceLifetime.TRANSIENT,
+            service_type=service_type,
+            implementation_type=implementation_type,
+            lifetime=ServiceLifetime.TRANSIENT,
+            factory=factory,
+        )
+
+    def add_instance(
+        self,
+        service_type: type[Any],
+        instance: Any,
+    ) -> None:
+        """
+        Registers an existing singleton instance.
+        """
+        self._descriptors[service_type] = ServiceDescriptor(
+            service_type=service_type,
+            implementation_type=type(instance),
+            lifetime=ServiceLifetime.SINGLETON,
+            implementation_instance=instance,
         )
 
     def _add(
@@ -81,6 +106,8 @@ class ServiceCollection(IServiceCollection):
         service_type: type[Any],
         implementation_type: type[Any] | None,
         lifetime: ServiceLifetime,
+        *,
+        factory: FactoryType | None = None,
     ) -> None:
         implementation = implementation_type or service_type
 
@@ -88,6 +115,7 @@ class ServiceCollection(IServiceCollection):
             service_type=service_type,
             implementation_type=implementation,
             lifetime=lifetime,
+            implementation_factory=factory,
         )
 
     def build_provider(self) -> IServiceProvider:
