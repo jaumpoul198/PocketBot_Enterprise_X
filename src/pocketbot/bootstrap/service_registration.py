@@ -6,32 +6,25 @@ Service Registration Bootstrap.
 
 from __future__ import annotations
 
-from pocketbot.application.runtime.application_runtime import (
-    ApplicationRuntime,
-)
+from pathlib import Path
 
-from pocketbot.application.services.application_service import (
-    ApplicationService,
-)
-
-from pocketbot.application.runtime.application_runtime import (
-    ApplicationRuntime,
-)
-from pocketbot.infrastructure.container.interfaces import (
-    IServiceProvider,
+from pocketbot.application.hosting.hosted_service_manager import (
+    HostedServiceManager,
 )
 
 from pocketbot.application.lifecycle.lifecycle_manager import (
     LifecycleManager,
 )
-from pocketbot.application.lifecycle.shutdown import (
-    Shutdown,
+from pocketbot.application.lifecycle.shutdown import Shutdown
+from pocketbot.application.lifecycle.startup import Startup
+from pocketbot.application.runtime.application_runtime import (
+    ApplicationRuntime,
 )
-from pocketbot.application.lifecycle.startup import (
-    Startup,
+from pocketbot.application.services.application_service import (
+    ApplicationService,
 )
-
 from pocketbot.bootstrap.indicator_loader import load_indicators
+from pocketbot.config.service import ConfigService
 from pocketbot.confluence.engine import ConfluenceEngine
 from pocketbot.decision.engine import DecisionEngine
 from pocketbot.execution.engine import ExecutionEngine
@@ -40,6 +33,9 @@ from pocketbot.indicators.factory import IndicatorFactory
 from pocketbot.indicators.manager import IndicatorManager
 from pocketbot.indicators.pipeline import IndicatorPipeline
 from pocketbot.indicators.registry import IndicatorRegistry
+from pocketbot.infrastructure.container.interfaces import (
+    IServiceProvider,
+)
 from pocketbot.infrastructure.container.service_collection import (
     ServiceCollection,
 )
@@ -64,6 +60,13 @@ def register_services(
     services.add_instance(
         IndicatorRegistry,
         indicator_registry,
+    )
+
+    services.add_singleton(
+        ConfigService,
+        factory=lambda _: ConfigService(
+            Path("config"),
+        ),
     )
 
     services.add_singleton(
@@ -110,6 +113,10 @@ def register_services(
         MarketProvider,
         DefaultMarketProvider,
     )
+
+    services.add_singleton(
+        HostedServiceManager,
+)
 
     services.add_singleton(
         Startup,
