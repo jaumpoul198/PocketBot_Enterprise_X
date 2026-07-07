@@ -21,6 +21,16 @@ from pocketbot.infrastructure.container.interfaces import (
     IServiceProvider,
 )
 
+from pocketbot.application.lifecycle.lifecycle_manager import (
+    LifecycleManager,
+)
+from pocketbot.application.lifecycle.shutdown import (
+    Shutdown,
+)
+from pocketbot.application.lifecycle.startup import (
+    Startup,
+)
+
 from pocketbot.bootstrap.indicator_loader import load_indicators
 from pocketbot.confluence.engine import ConfluenceEngine
 from pocketbot.decision.engine import DecisionEngine
@@ -99,6 +109,18 @@ def register_services(
     services.add_singleton(
         MarketProvider,
         DefaultMarketProvider,
+    )
+
+    services.add_singleton(
+        Startup,
+    )
+
+    services.add_singleton(
+        Shutdown,
+    )
+
+    services.add_singleton(
+        LifecycleManager,
     )
 
     services.add_singleton(
