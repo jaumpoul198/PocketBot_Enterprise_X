@@ -6,6 +6,9 @@ Application Runtime.
 
 from __future__ import annotations
 
+from pocketbot.application.lifecycle.lifecycle_manager import (
+    LifecycleManager,
+)
 from pocketbot.application.services.application_service import (
     ApplicationService,
 )
@@ -22,8 +25,10 @@ class ApplicationRuntime:
     def __init__(
         self,
         provider: IServiceProvider,
+        lifecycle: LifecycleManager,
     ) -> None:
         self._provider = provider
+        self._lifecycle = lifecycle
         self._running = False
 
     def start(self) -> None:
@@ -34,6 +39,8 @@ class ApplicationRuntime:
         self._provider.get_service(
             ApplicationService,
         )
+
+        self._lifecycle.start()
 
         self._running = True
 
@@ -48,6 +55,8 @@ class ApplicationRuntime:
         """
         Stops application runtime.
         """
+
+        self._lifecycle.stop()
 
         self._running = False
 

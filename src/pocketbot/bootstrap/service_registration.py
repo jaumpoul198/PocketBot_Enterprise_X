@@ -40,6 +40,9 @@ from pocketbot.infrastructure.container.service_collection import (
     ServiceCollection,
 )
 from pocketbot.market.interfaces import MarketProvider
+from pocketbot.market.services.market_connection_service import (
+    MarketConnectionService,
+)
 from pocketbot.market.providers.default_provider import (
     DefaultMarketProvider,
 )
@@ -115,8 +118,20 @@ def register_services(
     )
 
     services.add_singleton(
-        HostedServiceManager,
+        MarketConnectionService,
 )
+
+    services.add_singleton(
+    HostedServiceManager,
+    factory=lambda provider: HostedServiceManager(
+        services=[
+            provider.get_service(
+                MarketConnectionService,
+            ),
+        ],
+    ),
+)
+
 
     services.add_singleton(
         Startup,

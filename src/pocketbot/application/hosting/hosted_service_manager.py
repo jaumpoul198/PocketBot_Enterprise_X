@@ -6,6 +6,8 @@ Hosted Service Manager.
 
 from __future__ import annotations
 
+from collections.abc import Iterable
+
 from pocketbot.application.hosting.interfaces import (
     HostedService,
 )
@@ -18,8 +20,14 @@ class HostedServiceManager:
 
     def __init__(
         self,
+        services: Iterable[HostedService] | None = None,
     ) -> None:
         self._services: list[HostedService] = []
+
+        if services is not None:
+            self._services.extend(
+                services,
+            )
 
     def add(
         self,
@@ -29,7 +37,9 @@ class HostedServiceManager:
         Registers a hosted service.
         """
 
-        self._services.append(service)
+        self._services.append(
+            service,
+        )
 
     def start(self) -> None:
         """
@@ -42,6 +52,9 @@ class HostedServiceManager:
     def stop(self) -> None:
         """
         Stops all hosted services.
+
+        Services are stopped in reverse order
+        to preserve dependency lifecycle.
         """
 
         for service in reversed(self._services):
