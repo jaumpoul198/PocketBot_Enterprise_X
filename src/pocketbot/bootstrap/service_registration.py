@@ -6,9 +6,21 @@ Service Registration Bootstrap.
 
 from __future__ import annotations
 
+from pocketbot.application.runtime.application_runtime import (
+    ApplicationRuntime,
+)
+
 from pocketbot.application.services.application_service import (
     ApplicationService,
 )
+
+from pocketbot.application.runtime.application_runtime import (
+    ApplicationRuntime,
+)
+from pocketbot.infrastructure.container.interfaces import (
+    IServiceProvider,
+)
+
 from pocketbot.bootstrap.indicator_loader import load_indicators
 from pocketbot.confluence.engine import ConfluenceEngine
 from pocketbot.decision.engine import DecisionEngine
@@ -91,4 +103,13 @@ def register_services(
 
     services.add_singleton(
         ApplicationService,
+    )
+
+    services.add_singleton(
+        IServiceProvider,
+        factory=lambda provider: provider,
+    )
+
+    services.add_singleton(
+        ApplicationRuntime,
     )
