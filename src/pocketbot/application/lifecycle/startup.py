@@ -6,8 +6,8 @@ Application Startup Lifecycle.
 
 from __future__ import annotations
 
-from pocketbot.infrastructure.container.interfaces import (
-    IServiceProvider,
+from pocketbot.application.hosting.hosted_service_manager import (
+    HostedServiceManager,
 )
 
 
@@ -18,13 +18,13 @@ class Startup:
 
     def __init__(
         self,
-        provider: IServiceProvider,
+        hosted_services: HostedServiceManager,
     ) -> None:
-        self._provider = provider
+        self._hosted_services = hosted_services
 
     def execute(self) -> None:
         """
         Executes startup sequence.
         """
 
-        self._provider
+        self._hosted_services.start()
