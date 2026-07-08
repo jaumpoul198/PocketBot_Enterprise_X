@@ -36,30 +36,28 @@ class MarketService:
         count: int,
     ) -> list[Candle]:
 
-        cached = self._cache.load(
+        candles = self._cache.load(
             asset,
             timeframe,
         )
 
-        if cached:
-            return cached
+        if not candles:
+            candles = self._collector.collect(
+                asset,
+                timeframe,
+                count,
+            )
 
-        candles = self._collector.collect(
-            asset,
-            timeframe,
-            count,
-        )
+            if not self._validator.validate(
+                candles,
+            ):
+                return []
 
-        if not self._validator.validate(
-            candles,
-        ):
-            return []
-
-        self._cache.save(
-            asset,
-            timeframe,
-            candles,
-        )
+            self._cache.save(
+                asset,
+                timeframe,
+                candles,
+            )
 
         snapshot = MarketSnapshot(
             asset=asset,
