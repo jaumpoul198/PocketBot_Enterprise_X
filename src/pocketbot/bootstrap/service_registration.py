@@ -11,7 +11,6 @@ from pathlib import Path
 from pocketbot.application.hosting.hosted_service_manager import (
     HostedServiceManager,
 )
-
 from pocketbot.application.lifecycle.lifecycle_manager import (
     LifecycleManager,
 )
@@ -39,12 +38,26 @@ from pocketbot.infrastructure.container.interfaces import (
 from pocketbot.infrastructure.container.service_collection import (
     ServiceCollection,
 )
-from pocketbot.market.interfaces import MarketProvider
-from pocketbot.market.services.market_connection_service import (
-    MarketConnectionService,
+from pocketbot.market.cache.in_memory_market_cache import (
+    InMemoryMarketCache,
+)
+from pocketbot.market.collectors.default_market_collector import (
+    DefaultMarketCollector,
+)
+from pocketbot.market.interfaces import (
+    MarketCache,
+    MarketCollector,
+    MarketProvider,
+    MarketValidator,
 )
 from pocketbot.market.providers.default_provider import (
     DefaultMarketProvider,
+)
+from pocketbot.market.services.market_connection_service import (
+    MarketConnectionService,
+)
+from pocketbot.market.validators.default_market_validator import (
+    DefaultMarketValidator,
 )
 from pocketbot.risk.engine import RiskEngine
 from pocketbot.score.engine import ScoreEngine
@@ -118,20 +131,34 @@ def register_services(
     )
 
     services.add_singleton(
-        MarketConnectionService,
-)
+        MarketCache,
+        InMemoryMarketCache,
+    )
 
     services.add_singleton(
-    HostedServiceManager,
-    factory=lambda provider: HostedServiceManager(
-        services=[
-            provider.get_service(
-                MarketConnectionService,
-            ),
-        ],
-    ),
-)
+        MarketValidator,
+        DefaultMarketValidator,
+    )
 
+    services.add_singleton(
+        MarketCollector,
+        DefaultMarketCollector,
+    )
+
+    services.add_singleton(
+        MarketConnectionService,
+    )
+
+    services.add_singleton(
+        HostedServiceManager,
+        factory=lambda provider: HostedServiceManager(
+            services=[
+                provider.get_service(
+                    MarketConnectionService,
+                ),
+            ],
+        ),
+    )
 
     services.add_singleton(
         Startup,

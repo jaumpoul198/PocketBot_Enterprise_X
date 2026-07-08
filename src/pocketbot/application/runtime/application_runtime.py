@@ -9,6 +9,9 @@ from __future__ import annotations
 from pocketbot.application.lifecycle.lifecycle_manager import (
     LifecycleManager,
 )
+from pocketbot.application.runtime.state import (
+    ApplicationState,
+)
 from pocketbot.application.services.application_service import (
     ApplicationService,
 )
@@ -29,7 +32,7 @@ class ApplicationRuntime:
     ) -> None:
         self._provider = provider
         self._lifecycle = lifecycle
-        self._running = False
+        self._state = ApplicationState.CREATED
 
     def start(self) -> None:
         """
@@ -40,9 +43,11 @@ class ApplicationRuntime:
             ApplicationService,
         )
 
+        self._state = ApplicationState.STARTING
+
         self._lifecycle.start()
 
-        self._running = True
+        self._state = ApplicationState.RUNNING
 
     def run(self) -> None:
         """
@@ -56,14 +61,24 @@ class ApplicationRuntime:
         Stops application runtime.
         """
 
+        self._state = ApplicationState.STOPPING
+
         self._lifecycle.stop()
 
-        self._running = False
+        self._state = ApplicationState.STOPPED
 
     @property
     def is_running(self) -> bool:
         """
-        Returns runtime state.
+        Returns whether the application is running.
         """
 
-        return self._running
+        return self._state == ApplicationState.RUNNING
+
+    @property
+    def state(self) -> ApplicationState:
+        """
+        Returns the current application state.
+        """
+
+        return self._state
