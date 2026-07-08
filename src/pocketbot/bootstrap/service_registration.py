@@ -22,6 +22,9 @@ from pocketbot.application.runtime.application_runtime import (
 from pocketbot.application.services.application_service import (
     ApplicationService,
 )
+from pocketbot.application.services.market_service import (
+    MarketService,
+)
 from pocketbot.bootstrap.indicator_loader import load_indicators
 from pocketbot.config.service import ConfigService
 from pocketbot.confluence.engine import ConfluenceEngine
@@ -41,9 +44,6 @@ from pocketbot.infrastructure.container.service_collection import (
 from pocketbot.market.cache.in_memory_market_cache import (
     InMemoryMarketCache,
 )
-from pocketbot.market.repositories.in_memory_market_repository import (
-    InMemoryMarketRepository,
-)
 from pocketbot.market.collectors.default_market_collector import (
     DefaultMarketCollector,
 )
@@ -56,6 +56,9 @@ from pocketbot.market.interfaces import (
 )
 from pocketbot.market.providers.default_provider import (
     DefaultMarketProvider,
+)
+from pocketbot.market.repositories.in_memory_market_repository import (
+    InMemoryMarketRepository,
 )
 from pocketbot.market.services.market_connection_service import (
     MarketConnectionService,
@@ -129,6 +132,8 @@ def register_services(
         TradeEngine,
     )
 
+    # Market services
+
     services.add_singleton(
         MarketProvider,
         DefaultMarketProvider,
@@ -152,6 +157,10 @@ def register_services(
     services.add_singleton(
         MarketCollector,
         DefaultMarketCollector,
+    )
+
+    services.add_singleton(
+        MarketService,
     )
 
     services.add_singleton(
