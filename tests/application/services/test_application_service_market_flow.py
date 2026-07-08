@@ -3,6 +3,9 @@ from datetime import datetime
 from pocketbot.application.services.application_service import (
     ApplicationService,
 )
+from pocketbot.application.services.market_service import (
+    MarketService,
+)
 from pocketbot.bootstrap.indicator_loader import load_indicators
 from pocketbot.confluence.engine import ConfluenceEngine
 from pocketbot.decision.engine import DecisionEngine
@@ -16,14 +19,14 @@ from pocketbot.indicators.pipeline import IndicatorPipeline
 from pocketbot.market.cache.in_memory_market_cache import (
     InMemoryMarketCache,
 )
-from pocketbot.market.repositories.in_memory_market_repository import (
-    InMemoryMarketRepository,
-)
 from pocketbot.market.collectors.default_market_collector import (
     DefaultMarketCollector,
 )
-from pocketbot.market.providers.default_provider import (
-    DefaultMarketProvider,
+from pocketbot.market.interfaces.market_collector import (
+    MarketCollector,
+)
+from pocketbot.market.repositories.in_memory_market_repository import (
+    InMemoryMarketRepository,
 )
 from pocketbot.market.validators.default_market_validator import (
     DefaultMarketValidator,
@@ -33,13 +36,18 @@ from pocketbot.score.engine import ScoreEngine
 from pocketbot.trading.engine import TradeEngine
 
 
-class MockMarketProvider(DefaultMarketProvider):
-    def get_candles(
+class MockMarketCollector(MarketCollector):
+    def __init__(self) -> None:
+        self.called = False
+
+    def collect(
         self,
         asset: str,
         timeframe: int,
         count: int,
     ) -> list[Candle]:
+        self.called = True
+
         return [
             Candle(
                 symbol=asset,
@@ -55,21 +63,18 @@ class MockMarketProvider(DefaultMarketProvider):
         ]
 
 
-def test_application_service_uses_market_collector() -> None:
-    collector = DefaultMarketCollector(
-        MockMarketProvider(),
-        DefaultMarketValidator(),
-        InMemoryMarketCache(),
-        InMemoryMarketRepository(),
-    )
+def test_application_service_uses_market_service() -> None:
+    collector = MockMarketCollector()
 
-    registry = load_indicators()
+    market_service = MarketService(
+        collector,
+    )
 
     pipeline = IndicatorPipeline(
         IndicatorManager(
             IndicatorEngine(
                 IndicatorFactory(
-                    registry,
+                    load_indicators(),
                 ),
             ),
         ),
@@ -82,7 +87,7 @@ def test_application_service_uses_market_collector() -> None:
     )
 
     service = ApplicationService(
-        collector,
+        market_service,
         pipeline,
         ConfluenceEngine(),
         ScoreEngine(),
@@ -95,4 +100,5 @@ def test_application_service_uses_market_collector() -> None:
         100,
     )
 
+    assert collector.called is True
     assert result is not None
