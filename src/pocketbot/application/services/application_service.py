@@ -6,9 +6,11 @@ Application Service.
 
 from __future__ import annotations
 
+from pocketbot.application.services.market_service import (
+    MarketService,
+)
 from pocketbot.confluence.engine import ConfluenceEngine
 from pocketbot.indicators.pipeline import IndicatorPipeline
-from pocketbot.market.interfaces import MarketCollector
 from pocketbot.score.engine import ScoreEngine
 from pocketbot.trading.engine import TradeEngine
 from pocketbot.trading.result import TradeResult
@@ -21,12 +23,13 @@ class ApplicationService:
 
     def __init__(
         self,
-        market: MarketCollector,
+        market: MarketService,
         pipeline: IndicatorPipeline,
         confluence: ConfluenceEngine,
         score_engine: ScoreEngine,
         trade_engine: TradeEngine,
     ) -> None:
+
         self._market = market
         self._pipeline = pipeline
         self._confluence = confluence
@@ -40,7 +43,7 @@ class ApplicationService:
         candles: int,
     ) -> TradeResult:
 
-        market_data = self._market.collect(
+        market_data = self._market.refresh_market(
             asset=asset,
             timeframe=timeframe,
             count=candles,

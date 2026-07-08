@@ -12,14 +12,16 @@ from pocketbot.confluence.engine import ConfluenceEngine
 from pocketbot.decision.engine import DecisionEngine
 from pocketbot.execution.engine import ExecutionEngine
 from pocketbot.indicators.pipeline import IndicatorPipeline
-from pocketbot.market.interfaces import MarketCollector
+from pocketbot.application.services.market_service import (
+    MarketService,
+)
 from pocketbot.risk.engine import RiskEngine
 from pocketbot.score.engine import ScoreEngine
 from pocketbot.trading.engine import TradeEngine
 
 
 def build_application_service(
-    market: MarketCollector,
+    market: MarketService,
 ) -> ApplicationService:
     """
     Builds the complete application service.
