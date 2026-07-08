@@ -6,21 +6,38 @@ from pocketbot.application.services.application_service import (
 from pocketbot.application.services.market_service import (
     MarketService,
 )
-from pocketbot.bootstrap.indicator_loader import load_indicators
-from pocketbot.confluence.engine import ConfluenceEngine
-from pocketbot.decision.engine import DecisionEngine
-from pocketbot.domain.candle import Candle
-from pocketbot.domain.value_objects.price import Price
-from pocketbot.execution.engine import ExecutionEngine
-from pocketbot.indicators.engine import IndicatorEngine
-from pocketbot.indicators.factory import IndicatorFactory
-from pocketbot.indicators.manager import IndicatorManager
-from pocketbot.indicators.pipeline import IndicatorPipeline
+from pocketbot.bootstrap.indicator_loader import (
+    load_indicators,
+)
+from pocketbot.confluence.engine import (
+    ConfluenceEngine,
+)
+from pocketbot.decision.engine import (
+    DecisionEngine,
+)
+from pocketbot.domain.candle import (
+    Candle,
+)
+from pocketbot.domain.value_objects.price import (
+    Price,
+)
+from pocketbot.execution.engine import (
+    ExecutionEngine,
+)
+from pocketbot.indicators.engine import (
+    IndicatorEngine,
+)
+from pocketbot.indicators.factory import (
+    IndicatorFactory,
+)
+from pocketbot.indicators.manager import (
+    IndicatorManager,
+)
+from pocketbot.indicators.pipeline import (
+    IndicatorPipeline,
+)
 from pocketbot.market.cache.in_memory_market_cache import (
     InMemoryMarketCache,
-)
-from pocketbot.market.collectors.default_market_collector import (
-    DefaultMarketCollector,
 )
 from pocketbot.market.interfaces.market_collector import (
     MarketCollector,
@@ -31,9 +48,15 @@ from pocketbot.market.repositories.in_memory_market_repository import (
 from pocketbot.market.validators.default_market_validator import (
     DefaultMarketValidator,
 )
-from pocketbot.risk.engine import RiskEngine
-from pocketbot.score.engine import ScoreEngine
-from pocketbot.trading.engine import TradeEngine
+from pocketbot.risk.engine import (
+    RiskEngine,
+)
+from pocketbot.score.engine import (
+    ScoreEngine,
+)
+from pocketbot.trading.engine import (
+    TradeEngine,
+)
 
 
 class MockMarketCollector(MarketCollector):
@@ -68,6 +91,9 @@ def test_application_service_uses_market_service() -> None:
 
     market_service = MarketService(
         collector,
+        InMemoryMarketCache(),
+        InMemoryMarketRepository(),
+        DefaultMarketValidator(),
     )
 
     pipeline = IndicatorPipeline(

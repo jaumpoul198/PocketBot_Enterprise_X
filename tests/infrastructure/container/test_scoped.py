@@ -1,4 +1,6 @@
-from pocketbot.infrastructure.container.service_collection import ServiceCollection
+from pocketbot.infrastructure.container.service_collection import (
+    ServiceCollection,
+)
 
 
 class Database:
