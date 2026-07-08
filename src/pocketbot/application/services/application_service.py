@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from pocketbot.confluence.engine import ConfluenceEngine
 from pocketbot.indicators.pipeline import IndicatorPipeline
-from pocketbot.market.interfaces import MarketProvider
+from pocketbot.market.interfaces import MarketCollector
 from pocketbot.score.engine import ScoreEngine
 from pocketbot.trading.engine import TradeEngine
 from pocketbot.trading.result import TradeResult
@@ -21,7 +21,7 @@ class ApplicationService:
 
     def __init__(
         self,
-        market: MarketProvider,
+        market: MarketCollector,
         pipeline: IndicatorPipeline,
         confluence: ConfluenceEngine,
         score_engine: ScoreEngine,
@@ -40,7 +40,7 @@ class ApplicationService:
         candles: int,
     ) -> TradeResult:
 
-        market_data = self._market.get_candles(
+        market_data = self._market.collect(
             asset=asset,
             timeframe=timeframe,
             count=candles,
