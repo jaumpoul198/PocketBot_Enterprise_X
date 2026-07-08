@@ -16,6 +16,9 @@ from pocketbot.indicators.pipeline import IndicatorPipeline
 from pocketbot.market.cache.in_memory_market_cache import (
     InMemoryMarketCache,
 )
+from pocketbot.market.repositories.in_memory_market_repository import (
+    InMemoryMarketRepository,
+)
 from pocketbot.market.collectors.default_market_collector import (
     DefaultMarketCollector,
 )
@@ -57,6 +60,7 @@ def test_application_service_uses_market_collector() -> None:
         MockMarketProvider(),
         DefaultMarketValidator(),
         InMemoryMarketCache(),
+        InMemoryMarketRepository(),
     )
 
     registry = load_indicators()

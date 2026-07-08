@@ -1,3 +1,6 @@
+from pocketbot.market.repositories.in_memory_market_repository import (
+    InMemoryMarketRepository,
+)
 from pocketbot.market.cache.in_memory_market_cache import (
     InMemoryMarketCache,
 )
@@ -16,11 +19,13 @@ def test_market_collector_collects_and_caches_candles() -> None:
     provider = DefaultMarketProvider()
     validator = DefaultMarketValidator()
     cache = InMemoryMarketCache()
+    repository = InMemoryMarketRepository()
 
     collector = DefaultMarketCollector(
         provider,
         validator,
         cache,
+        repository,
     )
 
     candles = collector.collect(

@@ -4,6 +4,9 @@ from pocketbot.infrastructure.container.service_collection import (
 from pocketbot.market.cache.in_memory_market_cache import (
     InMemoryMarketCache,
 )
+from pocketbot.market.repositories.in_memory_market_repository import (
+    InMemoryMarketRepository,
+)
 from pocketbot.market.collectors.default_market_collector import (
     DefaultMarketCollector,
 )
@@ -11,6 +14,7 @@ from pocketbot.market.interfaces import (
     MarketCache,
     MarketCollector,
     MarketProvider,
+    MarketRepository,
     MarketValidator,
 )
 from pocketbot.market.providers.default_provider import (
@@ -32,6 +36,11 @@ def test_market_collector_resolution() -> None:
     services.add_singleton(
         MarketCache,
         InMemoryMarketCache,
+    )
+
+    services.add_singleton(
+        MarketRepository,
+        InMemoryMarketRepository,
     )
 
     services.add_singleton(
