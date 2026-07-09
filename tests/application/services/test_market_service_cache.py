@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from pocketbot.market.models.market_snapshot import MarketSnapshot
+
 from pocketbot.application.services.market_service import (
     MarketService,
 )
@@ -73,7 +75,7 @@ class MockCache(MarketCache):
 class MockRepository(MarketRepository):
     def save(
         self,
-        snapshot,
+        snapshot: MarketSnapshot,
     ) -> None:
         pass
 
@@ -81,8 +83,25 @@ class MockRepository(MarketRepository):
         self,
         asset: str,
         timeframe: int,
-    ):
+    ) -> MarketSnapshot | None:
         return None
+
+    def get_last_n(
+        self,
+        asset: str,
+        timeframe: int,
+        limit: int,
+    ) -> list[MarketSnapshot]:
+        return []
+
+    def get_between(
+        self,
+        asset: str,
+        timeframe: int,
+        start: datetime,
+        end: datetime,
+    ) -> list[MarketSnapshot]:
+        return []
 
     def clear(
         self,

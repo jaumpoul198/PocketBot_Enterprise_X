@@ -22,6 +22,9 @@ from pocketbot.application.runtime.application_runtime import (
 from pocketbot.application.services.application_service import (
     ApplicationService,
 )
+from pocketbot.application.services.market_query_service import (
+    MarketQueryService,
+)
 from pocketbot.application.services.market_service import (
     MarketService,
 )
@@ -161,6 +164,10 @@ def register_services(
 
     services.add_singleton(
         MarketService,
+    )
+
+    services.add_singleton(
+        MarketQueryService,
     )
 
     services.add_singleton(

@@ -17,6 +17,7 @@ from pocketbot.market.interfaces.market_repository import (
 from pocketbot.market.interfaces.market_validator import (
     MarketValidator,
 )
+from pocketbot.market.models.market_snapshot import MarketSnapshot
 
 
 class MockCollector(MarketCollector):
@@ -64,7 +65,9 @@ class MockCache(MarketCache):
     ) -> list[Candle]:
         return []
 
-    def clear(self) -> None:
+    def clear(
+        self,
+    ) -> None:
         pass
 
 
@@ -74,7 +77,7 @@ class MockRepository(MarketRepository):
 
     def save(
         self,
-        snapshot,
+        snapshot: MarketSnapshot,
     ) -> None:
         self.saved = True
 
@@ -82,10 +85,29 @@ class MockRepository(MarketRepository):
         self,
         asset: str,
         timeframe: int,
-    ):
+    ) -> MarketSnapshot | None:
         return None
 
-    def clear(self) -> None:
+    def get_last_n(
+        self,
+        asset: str,
+        timeframe: int,
+        limit: int,
+    ) -> list[MarketSnapshot]:
+        return []
+
+    def get_between(
+        self,
+        asset: str,
+        timeframe: int,
+        start: datetime,
+        end: datetime,
+    ) -> list[MarketSnapshot]:
+        return []
+
+    def clear(
+        self,
+    ) -> None:
         pass
 
 
