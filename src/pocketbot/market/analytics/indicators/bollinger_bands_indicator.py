@@ -13,7 +13,7 @@ from pocketbot.market.analytics.indicators.base_indicator import (
 @dataclass(frozen=True, slots=True)
 class BollingerBandsResult:
     """
-    Resultado do indicador Bollinger Bands.
+    Resultado do cálculo Bollinger Bands.
     """
 
     middle: float
@@ -23,22 +23,14 @@ class BollingerBandsResult:
     lower: float
 
 
-class BollingerBandsIndicator(
-    BaseIndicator[BollingerBandsResult]
-):
+class BollingerBandsIndicator(BaseIndicator):
     """
-    Calcula Bollinger Bands.
+    Indicador Bollinger Bands.
 
-    Fórmula:
-
-    Middle Band:
-        SMA(period)
-
-    Upper Band:
-        SMA + (desvio padrão * multiplicador)
-
-    Lower Band:
-        SMA - (desvio padrão * multiplicador)
+    Calcula:
+    - Média móvel simples
+    - Banda superior
+    - Banda inferior
     """
 
     def __init__(
@@ -79,7 +71,7 @@ class BollingerBandsIndicator(
         middle = (
             sum(prices)
             /
-            self.period
+            len(prices)
         )
 
         variance = (
@@ -88,27 +80,19 @@ class BollingerBandsIndicator(
                 for price in prices
             )
             /
-            self.period
+            len(prices)
         )
 
         deviation = sqrt(
             variance
         )
 
-        upper = (
-            middle
-            +
-            deviation * self.multiplier
-        )
-
-        lower = (
-            middle
-            -
-            deviation * self.multiplier
-        )
-
         return BollingerBandsResult(
             middle=middle,
-            upper=upper,
-            lower=lower,
+            upper=middle + (
+                deviation * self.multiplier
+            ),
+            lower=middle - (
+                deviation * self.multiplier
+            ),
         )
