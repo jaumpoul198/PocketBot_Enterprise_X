@@ -4,6 +4,7 @@ from pocketbot.market.strategy.models import (
     StrategySignal,
 )
 from pocketbot.market.strategy.service import StrategyService
+from pocketbot.market.strategy.selector.models import StrategyScore
 
 
 class BuyStrategy(BaseStrategy):
@@ -11,7 +12,6 @@ class BuyStrategy(BaseStrategy):
     @property
     def name(self) -> str:
         return "buy"
-
 
     def analyze(self, market_data) -> StrategyResult:
         return StrategyResult(
@@ -26,7 +26,6 @@ class SellStrategy(BaseStrategy):
     @property
     def name(self) -> str:
         return "sell"
-
 
     def analyze(self, market_data) -> StrategyResult:
         return StrategyResult(
@@ -50,3 +49,29 @@ def test_strategy_service_executes_all_strategies():
     assert len(results) == 2
     assert results[0].signal == StrategySignal.BUY
     assert results[1].signal == StrategySignal.SELL
+
+
+def test_strategy_service_selects_best_strategy():
+
+    service = StrategyService(
+        strategies=[
+            BuyStrategy(),
+            SellStrategy(),
+        ]
+    )
+
+    scores = [
+        StrategyScore(
+            strategy_name="buy",
+            win_rate=0.60,
+        ),
+        StrategyScore(
+            strategy_name="sell",
+            win_rate=0.90,
+        ),
+    ]
+
+    result = service.select_best_strategy(scores)
+
+    assert result.strategy_name == "sell"
+    assert result.win_rate == 0.90
