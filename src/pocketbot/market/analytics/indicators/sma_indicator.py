@@ -1,27 +1,48 @@
 """
 PocketBot Enterprise X
-Base Indicator Contract
+Simple Moving Average Indicator
 """
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
+from dataclasses import dataclass
 
 from pocketbot.domain.candle import Candle
+from pocketbot.market.analytics.indicators.base_indicator import (
+    BaseIndicator,
+)
 
 
-class BaseIndicator(ABC):
+@dataclass(slots=True, frozen=True)
+class SMAIndicator(BaseIndicator):
     """
-    Contrato base para indicadores de mercado.
+    Simple Moving Average indicator.
     """
 
-    @abstractmethod
+    period: int
+
+    def __post_init__(self) -> None:
+        if self.period <= 0:
+            raise ValueError(
+                "SMA period must be greater than zero"
+            )
+
     def calculate(
         self,
         candles: list[Candle],
     ) -> float | None:
         """
-        Calcula o valor do indicador.
+        Calculates simple moving average.
         """
 
-        raise NotImplementedError
+        if len(candles) < self.period:
+            return None
+
+        selected = candles[-self.period:]
+
+        total = sum(
+            float(candle.close)
+            for candle in selected
+        )
+
+        return total / self.period
