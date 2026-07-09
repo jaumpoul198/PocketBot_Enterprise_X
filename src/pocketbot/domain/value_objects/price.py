@@ -12,8 +12,16 @@ class Price:
     value: float
 
     def __post_init__(self) -> None:
-        if self.value <= 0:
+        normalized_value = float(self.value)
+
+        if normalized_value <= 0:
             raise ValueError("Price must be greater than zero.")
+
+        object.__setattr__(
+            self,
+            "value",
+            normalized_value,
+        )
 
     def __float__(self) -> float:
         return self.value
@@ -24,24 +32,29 @@ class Price:
     def __lt__(self, other: object) -> bool:
         if not isinstance(other, Price):
             return NotImplemented
+
         return self.value < other.value
 
     def __le__(self, other: object) -> bool:
         if not isinstance(other, Price):
             return NotImplemented
+
         return self.value <= other.value
 
     def __gt__(self, other: object) -> bool:
         if not isinstance(other, Price):
             return NotImplemented
+
         return self.value > other.value
 
     def __ge__(self, other: object) -> bool:
         if not isinstance(other, Price):
             return NotImplemented
+
         return self.value >= other.value
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Price):
             return NotImplemented
+
         return self.value == other.value
