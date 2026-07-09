@@ -8,7 +8,7 @@ class StrategyService:
         self._strategies = strategies
 
 
-    def analyze(self, market_data) -> list[StrategyResult]:
+    def analyze(self, market_data: object) -> list[StrategyResult]:
         return [
             strategy.analyze(market_data)
             for strategy in self._strategies

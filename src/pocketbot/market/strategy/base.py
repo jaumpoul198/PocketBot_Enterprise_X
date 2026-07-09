@@ -15,8 +15,8 @@ class BaseStrategy(ABC):
 
 
     @abstractmethod
-    def analyze(self, market_data) -> StrategyResult:
+    def analyze(self, market_data: object) -> StrategyResult:
         """
-        Analyze market data and generate a strategy result.
+        Analyze market data and generate strategy result.
         """
         ...
