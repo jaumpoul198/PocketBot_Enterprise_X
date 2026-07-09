@@ -66,6 +66,25 @@ from pocketbot.market.repositories.in_memory_market_repository import (
 from pocketbot.market.services.market_connection_service import (
     MarketConnectionService,
 )
+from pocketbot.market.strategy.breakout import (
+    BreakoutStrategy,
+)
+from pocketbot.market.strategy.mean_reversion import (
+    MeanReversionStrategy,
+)
+from pocketbot.market.strategy.momentum import (
+    MomentumStrategy,
+)
+from pocketbot.market.strategy.selector.selector import (
+    StrategySelectorEngine,
+)
+
+from pocketbot.market.strategy.selector.ranking import (
+    StrategyRankingEngine,
+)
+from pocketbot.market.strategy.service import (
+    StrategyService,
+)
 from pocketbot.market.validators.default_market_validator import (
     DefaultMarketValidator,
 )
@@ -173,7 +192,51 @@ def register_services(
     services.add_singleton(
         MarketConnectionService,
     )
+    # Strategy services
 
+    services.add_singleton(
+        MomentumStrategy,
+    )
+
+    services.add_singleton(
+        MeanReversionStrategy,
+    )
+
+    services.add_singleton(
+        BreakoutStrategy,
+    )
+
+    services.add_singleton(
+        StrategyRankingEngine,
+    )
+
+    services.add_singleton(
+        StrategySelectorEngine,
+        factory=lambda provider: StrategySelectorEngine(
+            ranking_engine=provider.get_service(
+                StrategyRankingEngine,
+            ),
+        ),
+    )
+    services.add_singleton(
+        StrategyService,
+        factory=lambda provider: StrategyService(
+            strategies=[
+                provider.get_service(
+                    MomentumStrategy,
+                ),
+                provider.get_service(
+                    MeanReversionStrategy,
+                ),
+                provider.get_service(
+                    BreakoutStrategy,
+                ),
+            ],
+            selector=provider.get_service(
+                StrategySelectorEngine,
+            ),
+        ),
+    )
     services.add_singleton(
         HostedServiceManager,
         factory=lambda provider: HostedServiceManager(
