@@ -1,11 +1,9 @@
 """
 PocketBot Enterprise X
-MACD Indicator
+Moving Average Convergence Divergence Indicator
 """
 
 from __future__ import annotations
-
-from dataclasses import dataclass
 
 from pocketbot.domain.candle import Candle
 from pocketbot.market.analytics.indicators.base_indicator import (
@@ -13,32 +11,36 @@ from pocketbot.market.analytics.indicators.base_indicator import (
 )
 
 
-@dataclass(slots=True, frozen=True)
-class MACDIndicator(BaseIndicator):
+class MACDIndicator(BaseIndicator[float]):
     """
-    Moving Average Convergence Divergence.
+    MACD simplificado.
 
-    MACD = EMA rápida - EMA lenta
+    MACD = média rápida - média lenta
     """
 
-    fast_period: int
-    slow_period: int
+    def __init__(
+        self,
+        fast_period: int = 12,
+        slow_period: int = 26,
+    ) -> None:
 
-    def __post_init__(self) -> None:
-        if self.fast_period <= 0:
+        if fast_period <= 0:
             raise ValueError(
-                "Fast period must be greater than zero"
+                "Fast period must be positive."
             )
 
-        if self.slow_period <= 0:
+        if slow_period <= 0:
             raise ValueError(
-                "Slow period must be greater than zero"
+                "Slow period must be positive."
             )
 
-        if self.fast_period >= self.slow_period:
+        if fast_period >= slow_period:
             raise ValueError(
-                "Fast period must be smaller than slow period"
+                "Fast period must be lower than slow period."
             )
+
+        self.fast_period = fast_period
+        self.slow_period = slow_period
 
     def calculate(
         self,
@@ -48,24 +50,17 @@ class MACDIndicator(BaseIndicator):
         if len(candles) < self.slow_period:
             return None
 
-        fast_prices = [
-            float(candle.close)
-            for candle in candles[-self.fast_period:]
+        closes = [
+            candle.close.value
+            for candle in candles
         ]
 
-        slow_prices = [
-            float(candle.close)
-            for candle in candles[-self.slow_period:]
-        ]
+        fast_average = sum(
+            closes[-self.fast_period:]
+        ) / self.fast_period
 
-        fast_average = (
-            sum(fast_prices)
-            / self.fast_period
-        )
-
-        slow_average = (
-            sum(slow_prices)
-            / self.slow_period
-        )
+        slow_average = sum(
+            closes[-self.slow_period:]
+        ) / self.slow_period
 
         return fast_average - slow_average

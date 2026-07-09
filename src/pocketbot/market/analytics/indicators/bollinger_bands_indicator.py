@@ -1,10 +1,14 @@
+"""
+PocketBot Enterprise X
+Bollinger Bands Indicator
+"""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
-from math import sqrt
+import statistics
 
 from pocketbot.domain.candle import Candle
-
 from pocketbot.market.analytics.indicators.base_indicator import (
     BaseIndicator,
 )
@@ -13,45 +17,39 @@ from pocketbot.market.analytics.indicators.base_indicator import (
 @dataclass(frozen=True, slots=True)
 class BollingerBandsResult:
     """
-    Resultado do cálculo Bollinger Bands.
+    Resultado do indicador Bollinger Bands.
     """
-
-    middle: float
-
-    upper: float
 
     lower: float
+    middle: float
+    upper: float
 
 
-class BollingerBandsIndicator(BaseIndicator):
+class BollingerBandsIndicator(
+    BaseIndicator[BollingerBandsResult]
+):
     """
-    Indicador Bollinger Bands.
+    Bollinger Bands.
 
     Calcula:
-    - Média móvel simples
-    - Banda superior
     - Banda inferior
+    - Média móvel
+    - Banda superior
     """
 
     def __init__(
         self,
         period: int,
-        multiplier: float,
+        multiplier: float = 2.0,
     ) -> None:
 
         if period <= 0:
             raise ValueError(
-                "Period must be positive"
-            )
-
-        if multiplier <= 0:
-            raise ValueError(
-                "Multiplier must be positive"
+                "Period must be positive."
             )
 
         self.period = period
         self.multiplier = multiplier
-
 
     def calculate(
         self,
@@ -61,38 +59,35 @@ class BollingerBandsIndicator(BaseIndicator):
         if len(candles) < self.period:
             return None
 
-        selected = candles[-self.period:]
-
-        prices = [
-            float(candle.close.value)
-            for candle in selected
+        closes = [
+            candle.close.value
+            for candle in candles[-self.period:]
         ]
 
         middle = (
-            sum(prices)
+            sum(closes)
             /
-            len(prices)
+            self.period
         )
 
-        variance = (
-            sum(
-                (price - middle) ** 2
-                for price in prices
-            )
-            /
-            len(prices)
+        deviation = statistics.stdev(
+            closes
         )
 
-        deviation = sqrt(
-            variance
+        upper = (
+            middle
+            +
+            self.multiplier * deviation
+        )
+
+        lower = (
+            middle
+            -
+            self.multiplier * deviation
         )
 
         return BollingerBandsResult(
+            lower=lower,
             middle=middle,
-            upper=middle + (
-                deviation * self.multiplier
-            ),
-            lower=middle - (
-                deviation * self.multiplier
-            ),
+            upper=upper,
         )

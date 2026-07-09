@@ -5,44 +5,46 @@ Simple Moving Average Indicator
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-
 from pocketbot.domain.candle import Candle
 from pocketbot.market.analytics.indicators.base_indicator import (
     BaseIndicator,
 )
 
 
-@dataclass(slots=True, frozen=True)
-class SMAIndicator(BaseIndicator):
+class SMAIndicator(BaseIndicator[float]):
     """
-    Simple Moving Average indicator.
+    Simple Moving Average (SMA).
+
+    Calcula a média simples dos últimos candles.
     """
 
-    period: int
+    def __init__(
+        self,
+        period: int,
+    ) -> None:
 
-    def __post_init__(self) -> None:
-        if self.period <= 0:
+        if period <= 0:
             raise ValueError(
-                "SMA period must be greater than zero"
+                "Period must be positive."
             )
+
+        self.period = period
 
     def calculate(
         self,
         candles: list[Candle],
     ) -> float | None:
-        """
-        Calculates simple moving average.
-        """
 
         if len(candles) < self.period:
             return None
 
-        selected = candles[-self.period:]
+        selected_candles = candles[
+            -self.period:
+        ]
 
         total = sum(
-            float(candle.close)
-            for candle in selected
+            candle.close.value
+            for candle in selected_candles
         )
 
         return total / self.period
