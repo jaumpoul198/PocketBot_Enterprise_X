@@ -1,19 +1,33 @@
 """
 PocketBot Enterprise X
+Application Service
 
-Application Service.
+Main application orchestration service.
 """
 
 from __future__ import annotations
 
+from pocketbot.application.pipeline.service import (
+    TradingPipelineService,
+)
 from pocketbot.application.services.market_service import (
     MarketService,
 )
-from pocketbot.confluence.engine import ConfluenceEngine
-from pocketbot.indicators.pipeline import IndicatorPipeline
-from pocketbot.score.engine import ScoreEngine
-from pocketbot.trading.engine import TradeEngine
-from pocketbot.trading.result import TradeResult
+from pocketbot.confluence.engine import (
+    ConfluenceEngine,
+)
+from pocketbot.indicators.pipeline import (
+    IndicatorPipeline,
+)
+from pocketbot.score.engine import (
+    ScoreEngine,
+)
+from pocketbot.trading.engine import (
+    TradeEngine,
+)
+from pocketbot.trading.result import (
+    TradeResult,
+)
 
 
 class ApplicationService:
@@ -28,6 +42,7 @@ class ApplicationService:
         confluence: ConfluenceEngine,
         score_engine: ScoreEngine,
         trade_engine: TradeEngine,
+        trading_pipeline: TradingPipelineService | None = None,
     ) -> None:
 
         self._market = market
@@ -35,6 +50,7 @@ class ApplicationService:
         self._confluence = confluence
         self._score = score_engine
         self._trade = trade_engine
+        self._trading_pipeline = trading_pipeline
 
     def analyse(
         self,
@@ -42,35 +58,35 @@ class ApplicationService:
         timeframe: int,
         candles: int,
     ) -> TradeResult:
+        """
+        Executes legacy analysis flow.
 
-        market_data = self._market.refresh_market(
+        TradingPipelineService is optional and does not
+        replace the existing application contract yet.
+        """
+
+        market_candles = self._market.refresh_market(
             asset=asset,
             timeframe=timeframe,
             count=candles,
         )
 
-        indicator_results = self._pipeline.execute(
-            indicators=[
-                "EMA",
-                "SMA",
-                "MACD",
-                "ATR",
-                "BOLLINGER",
-                "RSI",
-                "STOCHASTIC",
+        indicators = self._pipeline.execute(
+            [
+                "rsi",
+                "ema",
+                "macd",
             ],
-            candles=market_data,
+            market_candles,
         )
 
         confluence = self._confluence.calculate(
-            indicator_results,
+            indicators,
         )
 
         score = self._score.calculate(
-            indicator_results,
+            indicators,
         )
-
-        score.metadata["confluence"] = confluence
 
         return self._trade.process(
             asset=asset,

@@ -11,6 +11,9 @@ from pathlib import Path
 from pocketbot.application.hosting.hosted_service_manager import (
     HostedServiceManager,
 )
+from pocketbot.application.pipeline.service import (
+    TradingPipelineService,
+)
 from pocketbot.application.lifecycle.lifecycle_manager import (
     LifecycleManager,
 )
@@ -43,6 +46,9 @@ from pocketbot.infrastructure.container.interfaces import (
 )
 from pocketbot.infrastructure.container.service_collection import (
     ServiceCollection,
+)
+from pocketbot.application.pipeline.service import (
+    TradingPipelineService,
 )
 from pocketbot.market.cache.in_memory_market_cache import (
     InMemoryMarketCache,
@@ -187,6 +193,10 @@ def register_services(
 
     services.add_singleton(
         MarketQueryService,
+    )
+
+    services.add_singleton(
+        TradingPipelineService,
     )
 
     services.add_singleton(

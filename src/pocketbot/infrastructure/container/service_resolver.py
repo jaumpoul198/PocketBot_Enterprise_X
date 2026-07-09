@@ -8,7 +8,8 @@ Service resolver responsible for constructor injection.
 from __future__ import annotations
 
 import inspect
-from typing import Any
+import types
+from typing import Any, Union, get_args, get_origin
 
 from pocketbot.infrastructure.container.exceptions import (
     CircularDependencyError,
@@ -23,6 +24,33 @@ class ServiceResolver:
 
     def __init__(self) -> None:
         self._resolution_stack: list[type[Any]] = []
+
+    @staticmethod
+    def _unwrap_optional(
+        annotation: Any,
+    ) -> tuple[Any, bool]:
+        """
+        Extracts the real type from Optional[T] / T | None.
+        """
+
+        origin = get_origin(annotation)
+
+        if origin is Union or isinstance(
+            annotation,
+            types.UnionType,
+        ):
+            args = get_args(annotation)
+
+            non_none_types = [
+                arg
+                for arg in args
+                if arg is not type(None)
+            ]
+
+            if len(non_none_types) == 1:
+                return non_none_types[0], True
+
+        return annotation, False
 
     def create_instance(
         self,
@@ -82,7 +110,19 @@ class ServiceResolver:
                         "must have a type annotation."
                     )
 
-                dependency = provider.get_service(annotation)
+                dependency_type, optional = self._unwrap_optional(
+                    annotation
+                )
+
+                try:
+                    dependency = provider.get_service(
+                        dependency_type
+                    )
+                except ServiceResolutionError:
+                    if optional:
+                        dependency = None
+                    else:
+                        raise
 
                 kwargs[name] = dependency
 

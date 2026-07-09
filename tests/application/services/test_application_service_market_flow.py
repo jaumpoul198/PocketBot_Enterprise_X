@@ -60,8 +60,12 @@ from pocketbot.trading.engine import (
 
 
 class MockMarketCollector(MarketCollector):
+
     def __init__(self) -> None:
         self.called = False
+        self.asset = ""
+        self.timeframe = 0
+        self.count = 0
 
     def collect(
         self,
@@ -69,24 +73,28 @@ class MockMarketCollector(MarketCollector):
         timeframe: int,
         count: int,
     ) -> list[Candle]:
+
         self.called = True
+        self.asset = asset
+        self.timeframe = timeframe
+        self.count = count
 
         return [
             Candle(
                 symbol=asset,
                 timeframe=str(timeframe),
-                open=Price(100.0),
-                high=Price(105.0),
-                low=Price(95.0),
-                close=Price(102.0),
+                open=Price(100.0 + i),
+                high=Price(105.0 + i),
+                low=Price(95.0 + i),
+                close=Price(102.0 + i),
                 volume=1000.0,
                 timestamp=datetime.now(),
             )
-            for _ in range(count)
+            for i in range(100)
         ]
 
-
 def test_application_service_uses_market_service() -> None:
+
     collector = MockMarketCollector()
 
     market_service = MarketService(
@@ -121,10 +129,11 @@ def test_application_service_uses_market_service() -> None:
     )
 
     result = service.analyse(
-        "BTCUSDT",
-        60,
-        100,
+        asset="BTCUSDT",
+        timeframe=60,
+        candles=100,
     )
 
     assert collector.called is True
-    assert result is not None
+    assert collector.asset == "BTCUSDT"
+    assert collector.timeframe == 60
