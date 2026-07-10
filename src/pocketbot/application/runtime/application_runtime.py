@@ -9,11 +9,11 @@ from __future__ import annotations
 from pocketbot.application.lifecycle.lifecycle_manager import (
     LifecycleManager,
 )
+from pocketbot.application.orchestrator.trading_orchestrator import (
+    TradingOrchestrator,
+)
 from pocketbot.application.runtime.state import (
     ApplicationState,
-)
-from pocketbot.application.services.application_service import (
-    ApplicationService,
 )
 from pocketbot.infrastructure.container.interfaces import (
     IServiceProvider,
@@ -40,7 +40,7 @@ class ApplicationRuntime:
         """
 
         self._provider.get_service(
-            ApplicationService,
+            TradingOrchestrator,
         )
 
         self._state = ApplicationState.STARTING
