@@ -13,8 +13,8 @@ from pocketbot.application.pipeline.models import (
     TradingRequest,
     TradingResult,
 )
-from pocketbot.application.services.application_service import (
-    ApplicationService,
+from pocketbot.application.pipeline.protocols import (
+    TradingPipelineProtocol,
 )
 
 
@@ -25,12 +25,10 @@ class TradingApplicationFlow:
 
     def __init__(
         self,
-        application_service: ApplicationService,
+        pipeline: TradingPipelineProtocol,
     ) -> None:
 
-        self._application_service = (
-            application_service
-        )
+        self._pipeline = pipeline
 
     def execute(
         self,
@@ -40,6 +38,6 @@ class TradingApplicationFlow:
         Executes the trading application flow.
         """
 
-        return self._application_service.execute_pipeline(
+        return self._pipeline.execute(
             request,
         )
