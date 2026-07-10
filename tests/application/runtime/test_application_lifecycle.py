@@ -39,3 +39,27 @@ def test_application_runtime_lifecycle() -> None:
 
     assert not runtime.is_running
     assert not market.is_connected()
+
+from pocketbot.application.orchestrator.trading_orchestrator import (
+    TradingOrchestrator,
+)
+
+
+def test_application_runtime_resolves_trading_orchestrator() -> None:
+    """
+    Validates trading orchestrator availability during application runtime.
+    """
+
+    provider = build_application()
+
+    runtime = provider.get_service(
+        ApplicationRuntime,
+    )
+
+    assert runtime is not None
+
+    orchestrator = provider.get_service(
+        TradingOrchestrator,
+    )
+
+    assert orchestrator is not None
