@@ -24,7 +24,7 @@ class TradingSessionStatus(str, Enum):
     RUNNING = "running"
     COMPLETED = "completed"
     FAILED = "failed"
-
+    CLOSED = "closed"
 
 @dataclass
 class TradingSession:

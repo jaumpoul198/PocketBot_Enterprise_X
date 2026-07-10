@@ -85,10 +85,17 @@ class TradingSessionManager:
         session: TradingSession,
     ) -> None:
         """
-        Close a trading session.
+        Close a completed or failed trading session.
         """
 
         if session.status is TradingSessionStatus.RUNNING:
             raise InvalidTradingSessionError(
                 "Cannot close a running session."
             )
+
+        if session.status is TradingSessionStatus.CLOSED:
+            raise InvalidTradingSessionError(
+                "Session already closed."
+            )
+
+        session.status = TradingSessionStatus.CLOSED
