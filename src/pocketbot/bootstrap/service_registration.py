@@ -321,6 +321,21 @@ def register_services(
     )
 
     services.add_singleton(
+        ApplicationRuntime,
+        factory=lambda provider: ApplicationRuntime(
+            provider=provider.get_service(
+                IServiceProvider,
+            ),
+            lifecycle=provider.get_service(
+                LifecycleManager,
+            ),
+            session_manager=provider.get_service(
+                TradingSessionManager,
+            ),
+        ),
+    )
+
+    services.add_singleton(
         IServiceProvider,
         factory=lambda provider: provider,
     )
