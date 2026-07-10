@@ -37,6 +37,9 @@ from pocketbot.application.services.market_query_service import (
 from pocketbot.application.services.market_service import (
     MarketService,
 )
+from pocketbot.application.session.trading_session_manager import (
+    TradingSessionManager,
+)
 from pocketbot.bootstrap.indicator_loader import load_indicators
 from pocketbot.config.service import ConfigService
 from pocketbot.confluence.engine import ConfluenceEngine
@@ -270,8 +273,7 @@ def register_services(
         TradingApplicationFlow,
         factory=lambda provider: TradingApplicationFlow(
             pipeline=provider.get_service(
-                TradingPipelineService,
-            ),
+                TradingPipelineService,            ),
             recorder=provider.get_service(
                 TradingDecisionRecorder,
             ),
@@ -285,6 +287,10 @@ def register_services(
                 TradingApplicationFlow,
             ),
         ),
+    )
+
+    services.add_singleton(
+        TradingSessionManager,
     )
 
     services.add_singleton(
