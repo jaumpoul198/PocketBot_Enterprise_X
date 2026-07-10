@@ -16,6 +16,12 @@ from pocketbot.application.pipeline.models import (
 from pocketbot.application.pipeline.protocols import (
     TradingPipelineProtocol,
 )
+from pocketbot.trading.models.trade_decision import (
+    TradeDecision,
+)
+from pocketbot.trading.services.trading_decision_recorder import (
+    TradingDecisionRecorder,
+)
 
 
 class TradingApplicationFlow:
@@ -26,9 +32,11 @@ class TradingApplicationFlow:
     def __init__(
         self,
         pipeline: TradingPipelineProtocol,
+        recorder: TradingDecisionRecorder,
     ) -> None:
 
         self._pipeline = pipeline
+        self._recorder = recorder
 
     def execute(
         self,
@@ -38,6 +46,24 @@ class TradingApplicationFlow:
         Executes the trading application flow.
         """
 
-        return self._pipeline.execute(
+        result = self._pipeline.execute(
             request,
         )
+
+        decision = TradeDecision(
+            asset=result.market.asset,
+            decision=result.decision.signal.value,
+            strategy=(
+                result.strategy.signal.value
+                if result.strategy is not None
+                else None
+            ),
+            score=result.score.score,
+            timestamp=result.score.timestamp,
+        )
+
+        self._recorder.record(
+            decision,
+        )
+
+        return result

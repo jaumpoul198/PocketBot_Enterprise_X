@@ -299,10 +299,12 @@ def register_services(
         factory=lambda provider: TradingApplicationFlow(
             pipeline=provider.get_service(
                 TradingPipelineService,
+        ),
+            recorder=provider.get_service(
+                TradingDecisionRecorder,
             ),
         ),
     )
-
     services.add_singleton(
         TradeDecisionRepository,
         InMemoryTradeDecisionRepository,
