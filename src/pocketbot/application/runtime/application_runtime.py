@@ -9,8 +9,8 @@ from __future__ import annotations
 from pocketbot.application.lifecycle.lifecycle_manager import (
     LifecycleManager,
 )
-from pocketbot.application.orchestrator.trading_orchestrator import (
-    TradingOrchestrator,
+from pocketbot.application.session.trading_session_manager import (
+    TradingSessionManager,
 )
 from pocketbot.application.runtime.state import (
     ApplicationState,
@@ -40,7 +40,7 @@ class ApplicationRuntime:
         """
 
         self._provider.get_service(
-            TradingOrchestrator,
+            TradingSessionManager,
         )
 
         self._state = ApplicationState.STARTING
