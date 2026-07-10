@@ -22,10 +22,14 @@ from pocketbot.application.services.market_query_service import (
 from pocketbot.decision.engine import DecisionEngine
 from pocketbot.indicators.pipeline import IndicatorPipeline
 from pocketbot.market.strategy.service import StrategyService
-from pocketbot.score.engine import ScoreEngine
 from pocketbot.risk.interfaces.risk_service import (
     RiskService,
 )
+from pocketbot.risk.models.risk_assessment import (
+    RiskStatus,
+)
+from pocketbot.score.engine import ScoreEngine
+
 
 class TradingPipelineService(
     TradingPipelineProtocol,
@@ -42,7 +46,7 @@ class TradingPipelineService(
         strategy_service: StrategyService,
         decision_engine: DecisionEngine,
         risk_service: RiskService,
-        ) -> None:
+    ) -> None:
 
         self._market_query_service = (
             market_query_service
@@ -61,6 +65,7 @@ class TradingPipelineService(
         self._decision_engine = (
             decision_engine
         )
+
         self._risk_service = risk_service
 
     def execute(
@@ -104,7 +109,7 @@ class TradingPipelineService(
             if strategies
             else None
         )
-        
+
         decision = (
             self._decision_engine.decide(
                 score,
@@ -117,6 +122,11 @@ class TradingPipelineService(
             current_exposure=0.0,
         )
 
+        metadata = {}
+
+        if risk.status is RiskStatus.REJECTED:
+            metadata["blocked_by_risk"] = True
+
         return TradingResult(
             market=snapshot,
             indicators=indicators,
@@ -124,4 +134,5 @@ class TradingPipelineService(
             strategy=strategy,
             decision=decision,
             risk=risk,
+            metadata=metadata,
         )
