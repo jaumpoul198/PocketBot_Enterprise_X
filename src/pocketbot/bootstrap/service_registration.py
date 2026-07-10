@@ -100,7 +100,15 @@ from pocketbot.market.validators.default_market_validator import (
 from pocketbot.risk.engine import RiskEngine
 from pocketbot.score.engine import ScoreEngine
 from pocketbot.trading.engine import TradeEngine
-
+from pocketbot.trading.interfaces.trade_decision_repository import (
+    TradeDecisionRepository,
+)
+from pocketbot.trading.repositories.in_memory_trade_decision_repository import (
+    InMemoryTradeDecisionRepository,
+)
+from pocketbot.trading.services.trading_decision_recorder import (
+    TradingDecisionRecorder,
+)
 
 def register_services(
     services: ServiceCollection,
@@ -293,6 +301,15 @@ def register_services(
                 TradingPipelineService,
             ),
         ),
+    )
+
+    services.add_singleton(
+        TradeDecisionRepository,
+        InMemoryTradeDecisionRepository,
+    )
+
+    services.add_singleton(
+        TradingDecisionRecorder,
     )
 
     services.add_singleton(
