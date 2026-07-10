@@ -100,6 +100,12 @@ from pocketbot.market.validators.default_market_validator import (
     DefaultMarketValidator,
 )
 from pocketbot.risk.engine import RiskEngine
+from pocketbot.risk.interfaces.risk_service import (
+    RiskService,
+)
+from pocketbot.risk.services.default_risk_service import (
+    DefaultRiskService,
+)
 from pocketbot.score.engine import ScoreEngine
 from pocketbot.trading.engine import TradeEngine
 from pocketbot.trading.interfaces.trade_decision_repository import (
@@ -111,7 +117,6 @@ from pocketbot.trading.repositories.in_memory_trade_decision_repository import (
 from pocketbot.trading.services.trading_decision_recorder import (
     TradingDecisionRecorder,
 )
-
 
 def register_services(
     services: ServiceCollection,
@@ -164,6 +169,11 @@ def register_services(
 
     services.add_singleton(
         RiskEngine,
+    )
+
+    services.add_singleton(
+        RiskService,
+        DefaultRiskService,
     )
 
     services.add_singleton(
@@ -273,7 +283,8 @@ def register_services(
         TradingApplicationFlow,
         factory=lambda provider: TradingApplicationFlow(
             pipeline=provider.get_service(
-                TradingPipelineService,            ),
+                TradingPipelineService,
+            ),
             recorder=provider.get_service(
                 TradingDecisionRecorder,
             ),
@@ -321,6 +332,11 @@ def register_services(
     )
 
     services.add_singleton(
+        IServiceProvider,
+        factory=lambda provider: provider,
+    )
+
+    services.add_singleton(
         ApplicationRuntime,
         factory=lambda provider: ApplicationRuntime(
             provider=provider.get_service(
@@ -333,13 +349,4 @@ def register_services(
                 TradingSessionManager,
             ),
         ),
-    )
-
-    services.add_singleton(
-        IServiceProvider,
-        factory=lambda provider: provider,
-    )
-
-    services.add_singleton(
-        ApplicationRuntime,
     )
