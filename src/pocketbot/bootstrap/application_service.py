@@ -6,18 +6,39 @@ Application Service Bootstrap.
 
 from __future__ import annotations
 
-from pocketbot.application.services.application_service import ApplicationService
-from pocketbot.bootstrap.application import build_indicator_pipeline
-from pocketbot.confluence.engine import ConfluenceEngine
-from pocketbot.decision.engine import DecisionEngine
-from pocketbot.execution.engine import ExecutionEngine
-from pocketbot.indicators.pipeline import IndicatorPipeline
+from pocketbot.application.services.application_service import (
+    ApplicationService,
+)
 from pocketbot.application.services.market_service import (
     MarketService,
 )
-from pocketbot.risk.engine import RiskEngine
-from pocketbot.score.engine import ScoreEngine
-from pocketbot.trading.engine import TradeEngine
+from pocketbot.bootstrap.application import (
+    build_indicator_pipeline,
+)
+from pocketbot.confluence.engine import (
+    ConfluenceEngine,
+)
+from pocketbot.decision.engine import (
+    DecisionEngine,
+)
+from pocketbot.execution.engine import (
+    ExecutionEngine,
+)
+from pocketbot.indicators.pipeline import (
+    IndicatorPipeline,
+)
+from pocketbot.risk.engine import (
+    RiskEngine,
+)
+from pocketbot.risk.services.default_risk_service import (
+    DefaultRiskService,
+)
+from pocketbot.score.engine import (
+    ScoreEngine,
+)
+from pocketbot.trading.engine import (
+    TradeEngine,
+)
 
 
 def build_application_service(
@@ -27,11 +48,17 @@ def build_application_service(
     Builds the complete application service.
     """
 
-    pipeline: IndicatorPipeline = build_indicator_pipeline()
+    pipeline: IndicatorPipeline = (
+        build_indicator_pipeline()
+    )
 
     decision_engine = DecisionEngine()
 
-    risk_engine = RiskEngine()
+    risk_service = DefaultRiskService()
+
+    risk_engine = RiskEngine(
+        risk_service,
+    )
 
     execution_engine = ExecutionEngine()
 
