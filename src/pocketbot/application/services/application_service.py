@@ -7,6 +7,10 @@ Main application orchestration service.
 
 from __future__ import annotations
 
+from pocketbot.application.pipeline.models import (
+    TradingRequest,
+    TradingResult,
+)
 from pocketbot.application.pipeline.service import (
     TradingPipelineService,
 )
@@ -92,4 +96,24 @@ class ApplicationService:
             asset=asset,
             timeframe=timeframe,
             score=score,
+        )
+
+    def execute_pipeline(
+        self,
+        request: TradingRequest,
+    ) -> TradingResult:
+        """
+        Executes modern trading pipeline flow.
+
+        Keeps the TradingPipelineService optional
+        for backwards compatibility.
+        """
+
+        if self._trading_pipeline is None:
+            raise RuntimeError(
+                "Trading pipeline is not available."
+            )
+
+        return self._trading_pipeline.execute(
+            request,
         )
