@@ -15,6 +15,10 @@ from pocketbot.application.pipeline.models import (
     TradingRequest,
     TradingResult,
 )
+from pocketbot.risk.models.risk_assessment import (
+    RiskAssessment,
+    RiskStatus,
+)
 from pocketbot.decision.result import DecisionResult
 from pocketbot.domain.enums import SignalType
 from pocketbot.market.models.market_snapshot import MarketSnapshot
@@ -62,6 +66,10 @@ class FakeTradingPipeline:
                 score=80.0,
                 confidence=0.9,
                 approved=True,
+                reason="test",
+            ),   
+             risk=RiskAssessment(
+                status=RiskStatus.APPROVED,
                 reason="test",
             ),
         )

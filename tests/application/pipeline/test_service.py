@@ -15,6 +15,10 @@ from pocketbot.market.strategy.models import (
     StrategyResult,
     StrategySignal,
 )
+from pocketbot.risk.models.risk_assessment import (
+    RiskAssessment,
+    RiskStatus,
+)
 from pocketbot.score.result import ScoreResult
 
 
@@ -25,6 +29,7 @@ def test_trading_pipeline_executes_complete_flow():
     score_engine = Mock()
     strategy_service = Mock()
     decision_engine = Mock()
+    risk_service = Mock()
 
     snapshot = MarketSnapshot(
         asset="BTCUSDT",
@@ -59,12 +64,18 @@ def test_trading_pipeline_executes_complete_flow():
         reason="Approved",
     )
 
+    risk_service.evaluate.return_value = RiskAssessment(
+        status=RiskStatus.APPROVED,
+        reason="Approved",
+    )
+
     pipeline = TradingPipelineService(
         market_service,
         indicator_pipeline,
         score_engine,
         strategy_service,
         decision_engine,
+        risk_service,
     )
 
     result = pipeline.execute(

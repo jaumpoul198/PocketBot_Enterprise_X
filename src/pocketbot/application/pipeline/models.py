@@ -13,6 +13,9 @@ from pocketbot.decision.result import DecisionResult
 from pocketbot.indicators.base.result import IndicatorResult
 from pocketbot.market.models.market_snapshot import MarketSnapshot
 from pocketbot.market.strategy.models import StrategyResult
+from pocketbot.risk.models.risk_assessment import (
+    RiskAssessment,
+)
 from pocketbot.score.result import ScoreResult
 
 
@@ -30,6 +33,7 @@ class TradingRequest:
         default_factory=list,
     )
 
+
 @dataclass(frozen=True, slots=True)
 class TradingResult:
     """
@@ -46,4 +50,8 @@ class TradingResult:
 
     decision: DecisionResult
 
-    metadata: dict[str, Any] = field(default_factory=dict)
+    risk: RiskAssessment
+
+    metadata: dict[str, Any] = field(
+        default_factory=dict,
+    )

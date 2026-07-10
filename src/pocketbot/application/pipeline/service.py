@@ -23,7 +23,9 @@ from pocketbot.decision.engine import DecisionEngine
 from pocketbot.indicators.pipeline import IndicatorPipeline
 from pocketbot.market.strategy.service import StrategyService
 from pocketbot.score.engine import ScoreEngine
-
+from pocketbot.risk.interfaces.risk_service import (
+    RiskService,
+)
 
 class TradingPipelineService(
     TradingPipelineProtocol,
@@ -39,7 +41,8 @@ class TradingPipelineService(
         score_engine: ScoreEngine,
         strategy_service: StrategyService,
         decision_engine: DecisionEngine,
-    ) -> None:
+        risk_service: RiskService,
+        ) -> None:
 
         self._market_query_service = (
             market_query_service
@@ -58,6 +61,7 @@ class TradingPipelineService(
         self._decision_engine = (
             decision_engine
         )
+        self._risk_service = risk_service
 
     def execute(
         self,
@@ -100,11 +104,17 @@ class TradingPipelineService(
             if strategies
             else None
         )
+        
         decision = (
             self._decision_engine.decide(
                 score,
                 strategy,
             )
+        )
+
+        risk = self._risk_service.evaluate(
+            position_size=1.0,
+            current_exposure=0.0,
         )
 
         return TradingResult(
@@ -113,4 +123,5 @@ class TradingPipelineService(
             score=score,
             strategy=strategy,
             decision=decision,
+            risk=risk,
         )
