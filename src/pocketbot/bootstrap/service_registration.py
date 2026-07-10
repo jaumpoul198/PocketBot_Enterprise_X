@@ -8,17 +8,23 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from pocketbot.application.flows.trading_flow import (
+    TradingApplicationFlow,
+)
 from pocketbot.application.hosting.hosted_service_manager import (
     HostedServiceManager,
-)
-from pocketbot.application.pipeline.service import (
-    TradingPipelineService,
 )
 from pocketbot.application.lifecycle.lifecycle_manager import (
     LifecycleManager,
 )
 from pocketbot.application.lifecycle.shutdown import Shutdown
 from pocketbot.application.lifecycle.startup import Startup
+from pocketbot.application.orchestrator.trading_orchestrator import (
+    TradingOrchestrator,
+)
+from pocketbot.application.pipeline.service import (
+    TradingPipelineService,
+)
 from pocketbot.application.runtime.application_runtime import (
     ApplicationRuntime,
 )
@@ -30,9 +36,6 @@ from pocketbot.application.services.market_query_service import (
 )
 from pocketbot.application.services.market_service import (
     MarketService,
-)
-from pocketbot.application.flows.trading_flow import (
-    TradingApplicationFlow,
 )
 from pocketbot.bootstrap.indicator_loader import load_indicators
 from pocketbot.config.service import ConfigService
@@ -49,9 +52,6 @@ from pocketbot.infrastructure.container.interfaces import (
 )
 from pocketbot.infrastructure.container.service_collection import (
     ServiceCollection,
-)
-from pocketbot.application.pipeline.service import (
-    TradingPipelineService,
 )
 from pocketbot.market.cache.in_memory_market_cache import (
     InMemoryMarketCache,
@@ -84,12 +84,11 @@ from pocketbot.market.strategy.mean_reversion import (
 from pocketbot.market.strategy.momentum import (
     MomentumStrategy,
 )
-from pocketbot.market.strategy.selector.selector import (
-    StrategySelectorEngine,
-)
-
 from pocketbot.market.strategy.selector.ranking import (
     StrategyRankingEngine,
+)
+from pocketbot.market.strategy.selector.selector import (
+    StrategySelectorEngine,
 )
 from pocketbot.market.strategy.service import (
     StrategyService,
@@ -109,6 +108,7 @@ from pocketbot.trading.repositories.in_memory_trade_decision_repository import (
 from pocketbot.trading.services.trading_decision_recorder import (
     TradingDecisionRecorder,
 )
+
 
 def register_services(
     services: ServiceCollection,
@@ -171,8 +171,6 @@ def register_services(
         TradeEngine,
     )
 
-    # Market services
-
     services.add_singleton(
         MarketProvider,
         DefaultMarketProvider,
@@ -213,7 +211,6 @@ def register_services(
     services.add_singleton(
         MarketConnectionService,
     )
-    # Strategy services
 
     services.add_singleton(
         MomentumStrategy,
@@ -239,6 +236,7 @@ def register_services(
             ),
         ),
     )
+
     services.add_singleton(
         StrategyService,
         factory=lambda provider: StrategyService(
@@ -258,6 +256,37 @@ def register_services(
             ),
         ),
     )
+
+    services.add_singleton(
+        TradeDecisionRepository,
+        InMemoryTradeDecisionRepository,
+    )
+
+    services.add_singleton(
+        TradingDecisionRecorder,
+    )
+
+    services.add_singleton(
+        TradingApplicationFlow,
+        factory=lambda provider: TradingApplicationFlow(
+            pipeline=provider.get_service(
+                TradingPipelineService,
+            ),
+            recorder=provider.get_service(
+                TradingDecisionRecorder,
+            ),
+        ),
+    )
+
+    services.add_singleton(
+        TradingOrchestrator,
+        factory=lambda provider: TradingOrchestrator(
+            flow=provider.get_service(
+                TradingApplicationFlow,
+            ),
+        ),
+    )
+
     services.add_singleton(
         HostedServiceManager,
         factory=lambda provider: HostedServiceManager(
@@ -283,35 +312,6 @@ def register_services(
 
     services.add_singleton(
         ApplicationService,
-    )
-
-    services.add_singleton(
-        IServiceProvider,
-        factory=lambda provider: provider,
-    )
-
-    services.add_singleton(
-        ApplicationService,
-    )
-
-    services.add_singleton(
-        TradingApplicationFlow,
-        factory=lambda provider: TradingApplicationFlow(
-            pipeline=provider.get_service(
-                TradingPipelineService,
-        ),
-            recorder=provider.get_service(
-                TradingDecisionRecorder,
-            ),
-        ),
-    )
-    services.add_singleton(
-        TradeDecisionRepository,
-        InMemoryTradeDecisionRepository,
-    )
-
-    services.add_singleton(
-        TradingDecisionRecorder,
     )
 
     services.add_singleton(
