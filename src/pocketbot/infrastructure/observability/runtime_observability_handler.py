@@ -6,6 +6,8 @@ Runtime Observability Handler.
 
 from __future__ import annotations
 
+from collections.abc import Callable
+
 from pocketbot.core.logger import get_logger
 from pocketbot.events.event import Event
 from pocketbot.events.handlers import EventHandler
@@ -37,6 +39,24 @@ class RuntimeObservabilityHandler(EventHandler):
         self._metrics = metrics
         self._audit = audit
 
+    def _safe_execute(
+        self,
+        operation: Callable[[], None],
+        operation_name: str,
+    ) -> None:
+        """
+        Executes observability operations without affecting runtime flow.
+        """
+
+        try:
+            operation()
+
+        except Exception:
+            logger.exception(
+                "Observability operation failed | operation=%s",
+                operation_name,
+            )
+
     def handle(
         self,
         event: Event,
@@ -45,32 +65,44 @@ class RuntimeObservabilityHandler(EventHandler):
         Processes runtime lifecycle events.
         """
 
-        self._metrics.increment(
-            event.name,
-        )
-
         severity = AuditSeverity.INFO
 
         if event.name == "application.startup.failed":
             severity = AuditSeverity.ERROR
 
-        logger.info(
-            "Runtime event received | event=%s payload=%s",
-            event.name,
-            event.payload,
+        self._safe_execute(
+            lambda: self._metrics.increment(
+                event.name,
+            ),
+            "metrics",
+        )
+
+        self._safe_execute(
+            lambda: logger.info(
+                "Runtime event received | event=%s payload=%s",
+                event.name,
+                event.payload,
+            ),
+            "logging",
         )
 
         if severity == AuditSeverity.ERROR:
-            logger.error(
-                "Runtime startup failed | payload=%s",
-                event.payload,
+            self._safe_execute(
+                lambda: logger.error(
+                    "Runtime startup failed | payload=%s",
+                    event.payload,
+                ),
+                "error_logging",
             )
 
-        self._audit.record(
-            AuditEvent(
-                event_name=event.name,
-                source="runtime",
-                severity=severity,
-                metadata=event.payload,
-            )
+        self._safe_execute(
+            lambda: self._audit.record(
+                AuditEvent(
+                    event_name=event.name,
+                    source="runtime",
+                    severity=severity,
+                    metadata=event.payload,
+                )
+            ),
+            "audit",
         )
