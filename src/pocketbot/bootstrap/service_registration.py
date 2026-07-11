@@ -17,6 +17,8 @@ from pocketbot.application.hosting.hosted_service_manager import (
 from pocketbot.application.lifecycle.lifecycle_manager import (
     LifecycleManager,
 )
+from pocketbot.score.engine import ScoreEngine
+from pocketbot.trading.engine import TradeEngine
 from pocketbot.application.lifecycle.shutdown import Shutdown
 from pocketbot.application.lifecycle.startup import Startup
 from pocketbot.application.orchestrator.trading_orchestrator import (
@@ -99,15 +101,19 @@ from pocketbot.market.strategy.service import (
 from pocketbot.market.validators.default_market_validator import (
     DefaultMarketValidator,
 )
-from pocketbot.risk.engine import RiskEngine
+from pocketbot.risk.adapters.risk_engine_adapter import (
+    RiskEngineAdapter,
+)
 from pocketbot.risk.interfaces.risk_service import (
     RiskService,
 )
 from pocketbot.risk.services.default_risk_service import (
     DefaultRiskService,
 )
-from pocketbot.score.engine import ScoreEngine
-from pocketbot.trading.engine import TradeEngine
+from pocketbot.trading.engine import (
+    RiskEvaluator,
+    TradeEngine,
+)
 from pocketbot.trading.interfaces.trade_decision_repository import (
     TradeDecisionRepository,
 )
@@ -168,12 +174,39 @@ def register_services(
     )
 
     services.add_singleton(
-        RiskEngine,
+        RiskService,
+        DefaultRiskService,
+    )
+
+    services.add_singleton(
+        RiskEngineAdapter,
+    )
+
+    services.add_singleton(
+        RiskEvaluator,
+        factory=lambda provider: RiskEngineAdapter(
+            provider.get_service(
+                RiskService,
+            ),
+        ),
+     )
+
+    services.add_singleton(
+        DecisionEngine,
     )
 
     services.add_singleton(
         RiskService,
         DefaultRiskService,
+    )
+
+    services.add_singleton(
+        RiskEvaluator,
+        factory=lambda provider: RiskEngineAdapter(
+            provider.get_service(
+                RiskService,
+            ),
+        ),
     )
 
     services.add_singleton(
@@ -185,23 +218,12 @@ def register_services(
     )
 
     services.add_singleton(
+        TradingPipelineService,
+    )
+
+    services.add_singleton(
         MarketProvider,
         DefaultMarketProvider,
-    )
-
-    services.add_singleton(
-        MarketCache,
-        InMemoryMarketCache,
-    )
-
-    services.add_singleton(
-        MarketRepository,
-        InMemoryMarketRepository,
-    )
-
-    services.add_singleton(
-        MarketValidator,
-        DefaultMarketValidator,
     )
 
     services.add_singleton(
@@ -210,19 +232,16 @@ def register_services(
     )
 
     services.add_singleton(
-        MarketService,
-    )
-
-    services.add_singleton(
-        MarketQueryService,
-    )
-
-    services.add_singleton(
-        TradingPipelineService,
+        MarketValidator,
+        DefaultMarketValidator,
     )
 
     services.add_singleton(
         MarketConnectionService,
+    )
+
+    services.add_singleton(
+        MarketQueryService,
     )
 
     services.add_singleton(
@@ -268,6 +287,20 @@ def register_services(
                 StrategySelectorEngine,
             ),
         ),
+    )
+
+    services.add_singleton(
+        MarketRepository,
+        InMemoryMarketRepository,
+    )
+
+    services.add_singleton(
+        MarketCache,
+        InMemoryMarketCache,
+    )
+
+    services.add_singleton(
+        MarketService,
     )
 
     services.add_singleton(

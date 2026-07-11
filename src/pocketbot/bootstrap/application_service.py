@@ -27,8 +27,11 @@ from pocketbot.execution.engine import (
 from pocketbot.indicators.pipeline import (
     IndicatorPipeline,
 )
-from pocketbot.risk.engine import (
-    RiskEngine,
+from pocketbot.risk.adapters.risk_engine_adapter import (
+    RiskEngineAdapter,
+)
+from pocketbot.risk.services.default_risk_service import (
+    DefaultRiskService,
 )
 from pocketbot.risk.services.default_risk_service import (
     DefaultRiskService,
@@ -56,10 +59,9 @@ def build_application_service(
 
     risk_service = DefaultRiskService()
 
-    risk_engine = RiskEngine(
-        risk_service,
+    risk_engine = RiskEngineAdapter(
+        DefaultRiskService(),
     )
-
     execution_engine = ExecutionEngine()
 
     trade_engine = TradeEngine(
