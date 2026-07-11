@@ -127,6 +127,9 @@ from pocketbot.events import (
     EventBus,
     EventPublisher,
 )
+from pocketbot.infrastructure.audit import (
+    AuditRegistry,
+)
 from pocketbot.infrastructure.container.interfaces import (
     IServiceProvider,
 )
@@ -152,6 +155,10 @@ def register_services(
 
     services.add_singleton(
         MetricsRegistry,
+    )
+
+    services.add_singleton(
+        AuditRegistry,
     )
 
     services.add_instance(
