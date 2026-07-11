@@ -176,7 +176,16 @@ class ServiceProvider(IServiceProvider):
                     "Factory is not available."
                 )
 
-            return factory(self)
+            try:
+                return factory(self)
+
+            except ServiceResolutionError:
+                raise
+
+            except Exception as exc:
+                raise ServiceResolutionError(
+                    f"Failed creating service '{descriptor.service_type.__name__}'"
+                ) from exc
 
         implementation = descriptor.implementation_type
 
