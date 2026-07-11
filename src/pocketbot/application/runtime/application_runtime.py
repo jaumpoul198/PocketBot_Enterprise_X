@@ -5,6 +5,7 @@ Application Runtime.
 """
 
 from __future__ import annotations
+
 from pocketbot.events.publisher import EventPublisher
 
 from pocketbot.application.lifecycle.lifecycle_manager import (
@@ -50,9 +51,25 @@ class ApplicationRuntime:
 
         self._state = ApplicationState.STARTING
 
-        self._lifecycle.start()
+        try:
+            self._lifecycle.start()
 
-        self._state = ApplicationState.RUNNING
+            self._state = ApplicationState.RUNNING
+
+            self._publisher.publish(
+                "application.started",
+                {},
+            )
+
+        except Exception as exc:
+            self._publisher.publish(
+                "application.startup.failed",
+                {
+                    "error": str(exc),
+                },
+            )
+
+            raise
 
     def run(
         self,
@@ -80,9 +97,24 @@ class ApplicationRuntime:
 
         self._state = ApplicationState.STOPPING
 
+        self._publisher.publish(
+            "application.shutdown.requested",
+            {},
+        )
+
         self._lifecycle.stop()
 
         self._state = ApplicationState.STOPPED
+
+        self._publisher.publish(
+            "application.shutdown.completed",
+            {},
+        )
+
+        self._publisher.publish(
+            "application.stopped",
+            {},
+        )
 
     @property
     def is_running(self) -> bool:
