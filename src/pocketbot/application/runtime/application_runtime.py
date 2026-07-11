@@ -5,6 +5,7 @@ Application Runtime.
 """
 
 from __future__ import annotations
+from pocketbot.events.publisher import EventPublisher
 
 from pocketbot.application.lifecycle.lifecycle_manager import (
     LifecycleManager,
@@ -34,11 +35,13 @@ class ApplicationRuntime:
         provider: IServiceProvider,
         lifecycle: LifecycleManager,
         session_manager: TradingSessionManager,
+        publisher: EventPublisher,
     ) -> None:
         self._provider = provider
         self._lifecycle = lifecycle
         self._session_manager = session_manager
         self._state = ApplicationState.CREATED
+        self._publisher = publisher
 
     def start(self) -> None:
         """

@@ -123,6 +123,10 @@ from pocketbot.trading.repositories.in_memory_trade_decision_repository import (
 from pocketbot.trading.services.trading_decision_recorder import (
     TradingDecisionRecorder,
 )
+from pocketbot.events import (
+    EventBus,
+    EventPublisher,
+)
 
 def register_services(
     services: ServiceCollection,
@@ -365,6 +369,14 @@ def register_services(
     )
 
     services.add_singleton(
+        EventBus,
+    )
+
+    services.add_singleton(
+        EventPublisher,
+    )
+
+    services.add_singleton(
         IServiceProvider,
         factory=lambda provider: provider,
     )
@@ -381,5 +393,8 @@ def register_services(
             session_manager=provider.get_service(
                 TradingSessionManager,
             ),
+            publisher=provider.get_service(
+                EventPublisher,
+            ),
         ),
-    )
+     )
