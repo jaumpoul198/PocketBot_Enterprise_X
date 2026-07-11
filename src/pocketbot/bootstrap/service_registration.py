@@ -58,6 +58,9 @@ from pocketbot.infrastructure.container.interfaces import (
 from pocketbot.infrastructure.container.service_collection import (
     ServiceCollection,
 )
+from pocketbot.infrastructure.observability import (
+    RuntimeObservabilityHandler,
+)
 from pocketbot.market.cache.in_memory_market_cache import (
     InMemoryMarketCache,
 )
@@ -140,6 +143,24 @@ from pocketbot.infrastructure.metrics import (
     MetricsRegistry,
 )
 
+def _build_event_bus(
+    provider: IServiceProvider,
+) -> EventBus:
+    """
+    Builds EventBus with global infrastructure handlers.
+    """
+
+    event_bus = EventBus()
+
+    event_bus.add_global_handler(
+        provider.get_service(
+            RuntimeObservabilityHandler,
+        ),
+    )
+
+    return event_bus
+
+
 def register_services(
     services: ServiceCollection,
 ) -> None:
@@ -159,6 +180,10 @@ def register_services(
 
     services.add_singleton(
         AuditRegistry,
+    )
+
+    services.add_singleton(
+        RuntimeObservabilityHandler,
     )
 
     services.add_instance(
@@ -394,6 +419,9 @@ def register_services(
 
     services.add_singleton(
         EventBus,
+        factory=lambda provider: _build_event_bus(
+            provider,
+        ),
     )
 
     services.add_singleton(

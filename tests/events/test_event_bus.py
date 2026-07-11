@@ -56,3 +56,22 @@ def test_event_bus_wraps_handler_failure() -> None:
                 payload={},
             )
         )
+
+
+def test_event_bus_executes_global_handler() -> None:
+    bus = EventBus()
+
+    handler = SuccessfulHandler()
+
+    bus.add_global_handler(
+        handler,
+    )
+
+    bus.publish(
+        Event(
+            name="application.started",
+            payload={},
+        )
+    )
+
+    assert handler.called is True

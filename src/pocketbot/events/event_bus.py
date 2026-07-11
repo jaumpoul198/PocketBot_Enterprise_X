@@ -19,6 +19,7 @@ class EventBus:
 
     def __init__(self) -> None:
         self._handlers: dict[str, list[EventHandler]] = defaultdict(list)
+        self._global_handlers: list[EventHandler] = []
 
     def subscribe(
         self,
@@ -27,13 +28,25 @@ class EventBus:
     ) -> None:
         self._handlers[event_name].append(handler)
 
+    def add_global_handler(
+        self,
+        handler: EventHandler,
+    ) -> None:
+        """
+        Register a handler that receives all events.
+        """
+        self._global_handlers.append(handler)
+
     def publish(
         self,
         event: Event,
     ) -> None:
         handlers = self._handlers.get(event.name, [])
 
-        for handler in handlers:
+        for handler in [
+            *handlers,
+            *self._global_handlers,
+        ]:
             try:
                 handler.handle(event)
 
