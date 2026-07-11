@@ -6,7 +6,7 @@ Market Snapshot
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 
 from pocketbot.domain.candle import Candle
 
@@ -23,7 +23,7 @@ class MarketSnapshot:
 
     candles: list[Candle] = field(default_factory=list)
 
-    timestamp: datetime = field(default_factory=datetime.utcnow)
+    timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     provider: str = ""
 

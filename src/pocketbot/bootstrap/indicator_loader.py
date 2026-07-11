@@ -6,19 +6,16 @@ Indicator Loader.
 
 from __future__ import annotations
 
-from pocketbot.indicators.registry import IndicatorRegistry
-
-from pocketbot.indicators.trend.ema import EMAIndicator
-from pocketbot.indicators.trend.sma import SMAIndicator
-from pocketbot.indicators.trend.macd import MACDIndicator
-
-from pocketbot.indicators.volatility.atr import ATRIndicator
-from pocketbot.indicators.volatility.bollinger import BollingerIndicator
-
 from pocketbot.indicators.momentum.rsi import RSIIndicator
 from pocketbot.indicators.momentum.stochastic import (
     StochasticIndicator,
 )
+from pocketbot.indicators.registry import IndicatorRegistry
+from pocketbot.indicators.trend.ema import EMAIndicator
+from pocketbot.indicators.trend.macd import MACDIndicator
+from pocketbot.indicators.trend.sma import SMAIndicator
+from pocketbot.indicators.volatility.atr import ATRIndicator
+from pocketbot.indicators.volatility.bollinger import BollingerIndicator
 
 
 def load_indicators() -> IndicatorRegistry:

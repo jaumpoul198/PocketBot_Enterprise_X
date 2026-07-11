@@ -45,9 +45,7 @@ class ConfidenceCalculator:
             return 0.0
 
         if len(results) != len(weights):
-            raise ValueError(
-                "results and weights must have the same size."
-            )
+            raise ValueError("results and weights must have the same size.")
 
         confidence = sum(
             result.confidence * weight

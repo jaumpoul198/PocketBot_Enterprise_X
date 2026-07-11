@@ -22,7 +22,7 @@ class Result(Generic[T]):
     error: str | None = None
 
     @classmethod
-    def ok(cls, value: T | None = None) -> "Result[T]":
+    def ok(cls, value: T | None = None) -> Result[T]:
         return cls(
             success=True,
             value=value,
@@ -30,7 +30,7 @@ class Result(Generic[T]):
         )
 
     @classmethod
-    def fail(cls, error: str) -> "Result[T]":
+    def fail(cls, error: str) -> Result[T]:
         return cls(
             success=False,
             value=None,

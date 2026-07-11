@@ -39,9 +39,7 @@ class RSIIndicator(Indicator):
     ) -> IndicatorResult:
 
         if len(candles) < self._period + 1:
-            raise ValueError(
-                "Insufficient candles for RSI calculation."
-            )
+            raise ValueError("Insufficient candles for RSI calculation.")
 
         closes = [float(c.close) for c in candles]
 
@@ -58,8 +56,8 @@ class RSIIndicator(Indicator):
                 gains.append(0.0)
                 losses.append(abs(delta))
 
-        avg_gain = sum(gains[-self._period:]) / self._period
-        avg_loss = sum(losses[-self._period:]) / self._period
+        avg_gain = sum(gains[-self._period :]) / self._period
+        avg_loss = sum(losses[-self._period :]) / self._period
 
         if avg_loss == 0:
             value = 100.0

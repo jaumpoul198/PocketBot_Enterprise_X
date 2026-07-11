@@ -35,9 +35,7 @@ class ATRIndicator(Indicator):
     ) -> IndicatorResult:
 
         if len(candles) < self._period + 1:
-            raise ValueError(
-                "Insufficient candles for ATR calculation."
-            )
+            raise ValueError("Insufficient candles for ATR calculation.")
 
         true_ranges: list[float] = []
 
@@ -58,7 +56,7 @@ class ATRIndicator(Indicator):
 
             previous_close = float(candle.close)
 
-        value = sum(true_ranges[-self._period:]) / self._period
+        value = sum(true_ranges[-self._period :]) / self._period
 
         return IndicatorResult(
             name=self.name,

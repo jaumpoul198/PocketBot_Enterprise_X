@@ -40,9 +40,7 @@ class MACDIndicator(Indicator):
     ) -> IndicatorResult:
 
         if len(candles) < self._slow:
-            raise ValueError(
-                "Insufficient candles for MACD calculation."
-            )
+            raise ValueError("Insufficient candles for MACD calculation.")
 
         closes = [float(c.close) for c in candles]
 

@@ -6,11 +6,26 @@ Trade Engine.
 
 from __future__ import annotations
 
+from typing import Protocol
+
 from pocketbot.decision.engine import DecisionEngine
+from pocketbot.decision.result import DecisionResult
 from pocketbot.execution.engine import ExecutionEngine
-from pocketbot.risk.engine import RiskEngine
+from pocketbot.risk.result import RiskResult
 from pocketbot.score.result import ScoreResult
 from pocketbot.trading.result import TradeResult
+
+
+class RiskEvaluator(Protocol):
+    """
+    Contract for risk evaluation used by TradeEngine.
+    """
+
+    def evaluate(
+        self,
+        decision: DecisionResult,
+    ) -> RiskResult:
+        ...
 
 
 class TradeEngine:
@@ -21,7 +36,7 @@ class TradeEngine:
     def __init__(
         self,
         decision: DecisionEngine,
-        risk: RiskEngine,
+        risk: RiskEvaluator,
         execution: ExecutionEngine,
     ) -> None:
 
@@ -36,9 +51,13 @@ class TradeEngine:
         score: ScoreResult,
     ) -> TradeResult:
 
-        decision = self._decision.decide(score)
+        decision = self._decision.decide(
+            score,
+        )
 
-        risk = self._risk.evaluate(decision)
+        risk = self._risk.evaluate(
+            decision,
+        )
 
         execution = self._execution.execute(
             asset=asset,

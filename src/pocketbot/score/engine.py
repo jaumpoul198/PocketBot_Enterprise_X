@@ -14,7 +14,7 @@ from pocketbot.score.result import ScoreResult
 
 class ScoreEngine:
     """
-    Converts validated indicator results into a ScoreResult.
+    Converts indicator results into a ScoreResult.
     """
 
     def calculate(
@@ -31,10 +31,7 @@ class ScoreEngine:
                 indicators=0,
             )
 
-        total_weight = sum(
-            result.weight
-            for result in results
-        )
+        total_weight = sum(result.weight for result in results)
 
         if total_weight <= 0:
             return ScoreResult(
@@ -45,32 +42,22 @@ class ScoreEngine:
                 indicators=len(results),
             )
 
-        weighted_score = sum(
-            result.score * result.weight
-            for result in results
+        weighted_confidence = sum(
+            result.confidence * result.weight for result in results
         )
 
-        score = weighted_score / total_weight
+        weighted_strength = sum(result.strength * result.weight for result in results)
 
-        score = max(
-            0.0,
-            min(
-                100.0,
-                round(score, 2),
-            ),
-        )
+        confidence = weighted_confidence / total_weight
 
-        confidence = round(score / 100.0, 4)
+        strength = weighted_strength / total_weight
 
-        strength = round(
-            weighted_score / (100.0 * total_weight),
-            4,
-        )
+        score = round(confidence * 100.0, 2)
 
         return ScoreResult(
             score=score,
-            confidence=confidence,
-            strength=strength,
+            confidence=round(confidence, 4),
+            strength=round(strength, 4),
             weight_sum=total_weight,
             indicators=len(results),
         )

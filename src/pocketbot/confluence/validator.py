@@ -24,7 +24,4 @@ class ConfluenceValidator:
         if not results:
             return False
 
-        return all(
-            result.confidence >= 0.0
-            for result in results
-        )
+        return all(result.confidence >= 0.0 for result in results)
