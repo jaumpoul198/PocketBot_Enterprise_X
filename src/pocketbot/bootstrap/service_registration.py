@@ -130,6 +130,9 @@ from pocketbot.events import (
 from pocketbot.infrastructure.container.interfaces import (
     IServiceProvider,
 )
+from pocketbot.infrastructure.health import (
+    HealthRegistry,
+)
 from pocketbot.infrastructure.metrics import (
     MetricsRegistry,
 )
@@ -142,6 +145,10 @@ def register_services(
     """
 
     indicator_registry = load_indicators()
+
+    services.add_singleton(
+        HealthRegistry,
+    )
 
     services.add_singleton(
         MetricsRegistry,
