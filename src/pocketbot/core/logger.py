@@ -1,47 +1,27 @@
 """
 PocketBot Enterprise X
-Core - Logger
 
-Sistema centralizado de logs.
+Core Logger Compatibility Layer.
 """
 
 from __future__ import annotations
 
-import logging
-from pathlib import Path
+from logging import Logger
 
-LOG_DIR = Path("logs")
-LOG_DIR.mkdir(parents=True, exist_ok=True)
+from pocketbot.infrastructure.logging.logger import (
+    get_logger as _get_logger,
+)
 
 
-def get_logger(name: str) -> logging.Logger:
+def get_logger(
+    name: str,
+) -> Logger:
     """
-    Retorna um logger configurado.
+    Returns application logger.
+
+    Compatibility wrapper for existing imports.
     """
 
-    logger = logging.getLogger(name)
-
-    if logger.handlers:
-        return logger
-
-    logger.setLevel(logging.INFO)
-
-    formatter = logging.Formatter(
-        "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
+    return _get_logger(
+        name,
     )
-
-    console_handler = logging.StreamHandler()
-    console_handler.setFormatter(formatter)
-
-    file_handler = logging.FileHandler(
-        LOG_DIR / "pocketbot.log",
-        encoding="utf-8",
-    )
-    file_handler.setFormatter(formatter)
-
-    logger.addHandler(console_handler)
-    logger.addHandler(file_handler)
-
-    logger.propagate = False
-
-    return logger
