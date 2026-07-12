@@ -2,9 +2,15 @@ from __future__ import annotations
 
 import os
 
-from pocketbot.production.config.environments import resolve_environment
-from pocketbot.production.config.profiles import default_profile
-from pocketbot.production.config.settings import ProductionSettings
+from pocketbot.production.config.environments import (
+    resolve_environment,
+)
+from pocketbot.production.config.settings import (
+    ProductionSettings,
+)
+from pocketbot.production.config.validator import (
+    validate_production_settings,
+)
 
 
 def load_production_settings() -> ProductionSettings:
@@ -19,15 +25,18 @@ def load_production_settings() -> ProductionSettings:
     debug = (
         debug_override.lower() == "true"
         if debug_override is not None
-        else default_profile.debug
+        else environment.debug
     )
 
-    return ProductionSettings(
+    settings = ProductionSettings(
         environment=environment.name,
         debug=debug,
         service_name=os.getenv(
             "POCKETBOT_SERVICE_NAME",
-            default_profile.service_name,
+            "pocketbot",
         ),
-        environment_config=environment,
     )
+
+    validate_production_settings(settings)
+
+    return settings
