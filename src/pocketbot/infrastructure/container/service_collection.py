@@ -35,7 +35,16 @@ class ServiceCollection(IServiceCollection):
         self._descriptors: dict[type[Any], ServiceDescriptor] = {}
 
     def __iter__(self) -> Iterator[ServiceDescriptor]:
-        return iter(self._descriptors.values())
+        return iter(
+            ServiceDescriptor(
+                service_type=descriptor.service_type,
+                implementation_type=descriptor.implementation_type,
+                lifetime=descriptor.lifetime,
+                implementation_instance=descriptor.implementation_instance,
+                implementation_factory=descriptor.implementation_factory,
+            )
+            for descriptor in self._descriptors.values()
+        )
 
     def __len__(self) -> int:
         return len(self._descriptors)
