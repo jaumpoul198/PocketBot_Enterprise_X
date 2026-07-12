@@ -72,4 +72,6 @@ class IndicatorRegistry:
         return len(self._registry)
 
     def __iter__(self) -> Iterator[type[Indicator]]:
-        return iter(self._registry.values())
+        return iter(
+            list(self._registry.values()),
+        )
