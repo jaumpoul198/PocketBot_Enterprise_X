@@ -10,6 +10,9 @@ from __future__ import annotations
 from collections.abc import Callable, Iterator
 from typing import Any
 
+from pocketbot.infrastructure.container.exceptions import (
+    ServiceRegistrationError,
+)
 from pocketbot.infrastructure.container.interfaces import (
     IServiceCollection,
     IServiceProvider,
@@ -109,6 +112,14 @@ class ServiceCollection(IServiceCollection):
         *,
         factory: FactoryType | None = None,
     ) -> None:
+        if factory is not None and implementation_type is not None:
+            raise ServiceRegistrationError(
+                "Factory and implementation type cannot be registered together."
+            )
+
+        if factory is None and implementation_type is None:
+            implementation_type = service_type
+
         implementation = implementation_type or service_type
 
         self._descriptors[service_type] = ServiceDescriptor(
