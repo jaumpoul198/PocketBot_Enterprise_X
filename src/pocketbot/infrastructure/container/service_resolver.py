@@ -126,7 +126,16 @@ class ServiceResolver:
 
                 kwargs[name] = dependency
 
-            return implementation_type(**kwargs)
+            try:
+                return implementation_type(**kwargs)
+
+            except ServiceResolutionError:
+                raise
+
+            except Exception as exc:
+                raise ServiceResolutionError(
+                    f"Failed creating service '{implementation_type.__name__}'"
+                ) from exc
 
         finally:
             self._resolution_stack.pop()
