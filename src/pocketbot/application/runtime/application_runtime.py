@@ -107,7 +107,6 @@ class ApplicationRuntime:
         try:
             self._lifecycle.stop()
 
-            self._provider.dispose()
 
         except Exception as exc:
             self._state = ApplicationState.FAILED
