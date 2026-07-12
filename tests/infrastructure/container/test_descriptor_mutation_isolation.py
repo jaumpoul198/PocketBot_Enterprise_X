@@ -49,3 +49,20 @@ def test_service_collection_iteration_exposes_isolated_descriptors():
         services.descriptors[Database].lifetime
         == ServiceLifetime.SINGLETON
     )
+
+
+def test_provider_descriptor_exposure_is_isolated():
+    services = ServiceCollection()
+
+    services.add_singleton(Database)
+
+    provider = services.build_provider()
+
+    descriptor = provider.get_descriptor(Database)
+
+    descriptor.lifetime = ServiceLifetime.TRANSIENT
+
+    assert (
+        provider.get_descriptor(Database).lifetime
+        == ServiceLifetime.SINGLETON
+    )

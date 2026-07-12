@@ -217,4 +217,10 @@ class ServiceProvider(IServiceProvider):
                 f"Service '{service_type.__name__}' is not registered."
             )
 
-        return descriptor
+        return ServiceDescriptor(
+            service_type=descriptor.service_type,
+            implementation_type=descriptor.implementation_type,
+            lifetime=descriptor.lifetime,
+            implementation_instance=descriptor.implementation_instance,
+            implementation_factory=descriptor.implementation_factory,
+        )
