@@ -4,8 +4,8 @@ from pocketbot.production.config.environments import (
     resolve_environment,
 )
 from pocketbot.production.config.secrets import (
-    EnvironmentSecretProvider,
     SecretProvider,
+    resolve_secret_provider,
 )
 from pocketbot.production.config.settings import (
     ProductionSettings,
@@ -21,7 +21,7 @@ def load_production_settings(
     provider = (
         secret_provider
         if secret_provider is not None
-        else EnvironmentSecretProvider()
+        else resolve_secret_provider()
     )
 
     environment = resolve_environment(
