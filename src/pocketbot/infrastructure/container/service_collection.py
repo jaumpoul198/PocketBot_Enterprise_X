@@ -142,4 +142,15 @@ class ServiceCollection(IServiceCollection):
             ServiceProvider,
         )
 
-        return ServiceProvider(self._descriptors.copy())
+        descriptors = {
+            service_type: ServiceDescriptor(
+                service_type=descriptor.service_type,
+                implementation_type=descriptor.implementation_type,
+                lifetime=descriptor.lifetime,
+                implementation_instance=descriptor.implementation_instance,
+                implementation_factory=descriptor.implementation_factory,
+            )
+            for service_type, descriptor in self._descriptors.items()
+        }
+
+        return ServiceProvider(descriptors)
