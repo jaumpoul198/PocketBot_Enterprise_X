@@ -21,10 +21,6 @@ from pocketbot.application.runtime.state import (
 from pocketbot.application.session.trading_session_manager import (
     TradingSessionManager,
 )
-from pocketbot.infrastructure.container.interfaces import (
-    IServiceProvider,
-)
-
 
 class ApplicationRuntime:
     """
@@ -33,12 +29,10 @@ class ApplicationRuntime:
 
     def __init__(
         self,
-        provider: IServiceProvider,
         lifecycle: LifecycleManager,
         session_manager: TradingSessionManager,
         publisher: EventPublisher,
     ) -> None:
-        self._provider = provider
         self._lifecycle = lifecycle
         self._session_manager = session_manager
         self._state = ApplicationState.CREATED
