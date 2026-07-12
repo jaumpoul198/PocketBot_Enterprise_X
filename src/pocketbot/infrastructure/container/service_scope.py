@@ -45,21 +45,6 @@ class ServiceScope(IServiceScope):
 
         return self._provider
 
-    @property
-    def instances(self) -> dict[type[Any], Any]:
-        """
-        Returns the scoped instances cache.
-
-        Internal scope resolution requires direct access,
-        therefore this remains an internal cache contract.
-        """
-        if self._disposed:
-            raise ScopeDisposedError(
-                "This service scope has already been disposed."
-            )
-
-        return self._instances
-
     def get_instance(
         self,
         service_type: type[Any],
