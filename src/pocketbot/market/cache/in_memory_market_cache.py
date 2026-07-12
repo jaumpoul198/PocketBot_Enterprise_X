@@ -6,6 +6,8 @@ In Memory Market Cache.
 
 from __future__ import annotations
 
+from copy import deepcopy
+
 from pocketbot.domain.candle import Candle
 from pocketbot.market.interfaces.market_cache import (
     MarketCache,
@@ -15,6 +17,8 @@ from pocketbot.market.interfaces.market_cache import (
 class InMemoryMarketCache(MarketCache):
     """
     In-memory implementation of market cache.
+
+    Cache state is isolated from external references.
     """
 
     def __init__(self) -> None:
@@ -35,7 +39,7 @@ class InMemoryMarketCache(MarketCache):
 
         self._cache[
             (asset, timeframe)
-        ] = candles
+        ] = deepcopy(candles)
 
     def load(
         self,
@@ -46,9 +50,11 @@ class InMemoryMarketCache(MarketCache):
         Loads candles from memory.
         """
 
-        return self._cache.get(
-            (asset, timeframe),
-            [],
+        return deepcopy(
+            self._cache.get(
+                (asset, timeframe),
+                [],
+            )
         )
 
     def clear(self) -> None:
