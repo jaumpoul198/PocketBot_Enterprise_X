@@ -60,6 +60,29 @@ class ServiceScope(IServiceScope):
 
         return self._instances
 
+    def get_instance(
+        self,
+        service_type: type[Any],
+    ) -> Any | None:
+        if self._disposed:
+            raise ScopeDisposedError(
+                "This service scope has already been disposed."
+            )
+
+        return self._instances.get(service_type)
+
+    def set_instance(
+        self,
+        service_type: type[Any],
+        instance: Any,
+    ) -> None:
+        if self._disposed:
+            raise ScopeDisposedError(
+                "This service scope has already been disposed."
+            )
+
+        self._instances[service_type] = instance
+
     @property
     def is_disposed(self) -> bool:
         """

@@ -142,12 +142,17 @@ class ServiceProvider(IServiceProvider):
         """
         service_type = descriptor.service_type
 
-        if service_type in self.scope.instances:
-            return self.scope.instances[service_type]
+        cached = self.scope.get_instance(service_type)
+
+        if cached is not None:
+            return cached
 
         instance = self._create_instance(descriptor)
 
-        self.scope.instances[service_type] = instance
+        self.scope.set_instance(
+            service_type,
+            instance,
+        )
 
         return instance
 
