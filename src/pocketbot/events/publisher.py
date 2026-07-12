@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from copy import deepcopy
+
 from .event import Event
 from .event_bus import EventBus
 
@@ -16,6 +18,6 @@ class EventPublisher:
         self._event_bus.publish(
             Event(
                 name=name,
-                payload=payload,
+                payload=deepcopy(payload),
             )
         )

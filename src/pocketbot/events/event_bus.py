@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from copy import deepcopy
 
 from pocketbot.core.logger import get_logger
 
@@ -48,7 +49,9 @@ class EventBus:
             *self._global_handlers,
         ]:
             try:
-                handler.handle(event)
+                handler.handle(
+                    deepcopy(event),
+                )
 
             except Exception as exc:
                 logger.exception(
