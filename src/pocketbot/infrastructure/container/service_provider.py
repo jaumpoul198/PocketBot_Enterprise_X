@@ -7,6 +7,7 @@ Dependency injection service provider.
 
 from __future__ import annotations
 
+from copy import deepcopy
 from typing import Any
 
 from pocketbot.infrastructure.container.exceptions import (
@@ -67,10 +68,10 @@ class ServiceProvider(IServiceProvider):
         scope = ServiceScope()
 
         provider = ServiceProvider(
-           descriptors=self._descriptors,
-           scope=scope,
-           singleton_cache=self._singleton_cache,
-    )
+            descriptors=self._descriptors,
+            scope=scope,
+            singleton_cache=self._singleton_cache,
+        )
 
         scope.attach_provider(provider)
 
@@ -113,7 +114,7 @@ class ServiceProvider(IServiceProvider):
         raise ServiceResolutionError(
             f"Unsupported lifetime: {lifetime}"
         )
-    
+
     def _resolve_singleton(
         self,
         descriptor: ServiceDescriptor,
@@ -221,6 +222,8 @@ class ServiceProvider(IServiceProvider):
             service_type=descriptor.service_type,
             implementation_type=descriptor.implementation_type,
             lifetime=descriptor.lifetime,
-            implementation_instance=descriptor.implementation_instance,
+            implementation_instance=deepcopy(
+                descriptor.implementation_instance,
+            ),
             implementation_factory=descriptor.implementation_factory,
         )
