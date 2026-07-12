@@ -9,6 +9,9 @@ from pocketbot.production.bootstrap.readiness import (
 from pocketbot.production.bootstrap.runtime_context import (
     ProductionRuntimeContext,
 )
+from pocketbot.production.entrypoint.error_boundary import (
+    ProductionErrorBoundary,
+)
 
 
 def create_production_runtime() -> ProductionRuntimeContext:
@@ -18,11 +21,18 @@ def create_production_runtime() -> ProductionRuntimeContext:
 def run_production() -> bool:
     runtime_context = create_production_runtime()
 
-    readiness = ProductionReadiness(
+    boundary = ProductionErrorBoundary(
         runtime_context,
     )
 
-    if not readiness.check().ready:
-        return False
+    def start() -> bool:
+        readiness = ProductionReadiness(
+            runtime_context,
+        )
 
-    return runtime_context.start()
+        if not readiness.check().ready:
+            return False
+
+        return runtime_context.start()
+
+    return boundary.execute(start)
