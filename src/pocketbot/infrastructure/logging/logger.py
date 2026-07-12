@@ -12,7 +12,7 @@ from pathlib import Path
 
 class LoggerFactory:
     """
-    Creates configured application loggers.
+    Creates isolated application loggers.
     """
 
     def __init__(
@@ -34,23 +34,27 @@ class LoggerFactory:
         name: str,
     ) -> logging.Logger:
         """
-        Creates or returns a configured logger.
+        Creates an isolated configured logger.
         """
 
-        logger = logging.getLogger(name)
+        logger = logging.getLogger(
+            f"pocketbot.{name}",
+        )
 
-        if logger.handlers:
-            return logger
+        logger.handlers.clear()
 
         logger.setLevel(
             logging.INFO,
         )
+
+        logger.propagate = False
 
         formatter = logging.Formatter(
             "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
         )
 
         console_handler = logging.StreamHandler()
+
         console_handler.setFormatter(
             formatter,
         )
@@ -72,21 +76,18 @@ class LoggerFactory:
             file_handler,
         )
 
-        logger.propagate = False
-
         return logger
-
-
-_default_factory = LoggerFactory()
 
 
 def get_logger(
     name: str,
 ) -> logging.Logger:
     """
-    Returns application logger.
+    Returns an application logger.
     """
 
-    return _default_factory.create(
+    factory = LoggerFactory()
+
+    return factory.create(
         name,
     )
