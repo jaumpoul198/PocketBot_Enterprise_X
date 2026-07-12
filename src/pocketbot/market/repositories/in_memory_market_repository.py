@@ -6,6 +6,7 @@ In Memory Market Repository.
 
 from __future__ import annotations
 
+from copy import deepcopy
 from datetime import datetime
 
 from pocketbot.market.interfaces.market_repository import MarketRepository
@@ -14,7 +15,7 @@ from pocketbot.market.models.market_snapshot import MarketSnapshot
 
 class InMemoryMarketRepository(MarketRepository):
     """
-    Stores market snapshots in memory.
+    Stores market snapshots in memory with state isolation.
     """
 
     def __init__(self) -> None:
@@ -27,6 +28,10 @@ class InMemoryMarketRepository(MarketRepository):
         self,
         snapshot: MarketSnapshot,
     ) -> None:
+        """
+        Stores an isolated snapshot copy.
+        """
+
         key = (
             snapshot.asset,
             snapshot.timeframe,
@@ -35,13 +40,19 @@ class InMemoryMarketRepository(MarketRepository):
         if key not in self._snapshots:
             self._snapshots[key] = []
 
-        self._snapshots[key].append(snapshot)
+        self._snapshots[key].append(
+            deepcopy(snapshot),
+        )
 
     def get_latest(
         self,
         asset: str,
         timeframe: int,
     ) -> MarketSnapshot | None:
+        """
+        Returns an isolated latest snapshot copy.
+        """
+
         key = (
             asset,
             timeframe,
@@ -52,10 +63,12 @@ class InMemoryMarketRepository(MarketRepository):
         if not snapshots:
             return None
 
-        return max(
+        latest = max(
             snapshots,
             key=lambda snapshot: snapshot.timestamp,
         )
+
+        return deepcopy(latest)
 
     def get_last_n(
         self,
@@ -63,6 +76,10 @@ class InMemoryMarketRepository(MarketRepository):
         timeframe: int,
         limit: int,
     ) -> list[MarketSnapshot]:
+        """
+        Returns isolated snapshot copies.
+        """
+
         key = (
             asset,
             timeframe,
@@ -70,11 +87,13 @@ class InMemoryMarketRepository(MarketRepository):
 
         snapshots = self._snapshots.get(key, [])
 
-        return sorted(
-            snapshots,
-            key=lambda snapshot: snapshot.timestamp,
-            reverse=True,
-        )[:limit]
+        return deepcopy(
+            sorted(
+                snapshots,
+                key=lambda snapshot: snapshot.timestamp,
+                reverse=True,
+            )[:limit],
+        )
 
     def get_between(
         self,
@@ -83,6 +102,10 @@ class InMemoryMarketRepository(MarketRepository):
         start: datetime,
         end: datetime,
     ) -> list[MarketSnapshot]:
+        """
+        Returns isolated snapshots within a time range.
+        """
+
         key = (
             asset,
             timeframe,
@@ -90,11 +113,17 @@ class InMemoryMarketRepository(MarketRepository):
 
         snapshots = self._snapshots.get(key, [])
 
-        return [
-            snapshot
-            for snapshot in snapshots
-            if start <= snapshot.timestamp <= end
-        ]
+        return deepcopy(
+            [
+                snapshot
+                for snapshot in snapshots
+                if start <= snapshot.timestamp <= end
+            ],
+        )
 
     def clear(self) -> None:
+        """
+        Clears stored snapshots.
+        """
+
         self._snapshots.clear()
