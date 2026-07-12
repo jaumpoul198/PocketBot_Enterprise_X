@@ -49,6 +49,9 @@ class ServiceScope(IServiceScope):
     def instances(self) -> dict[type[Any], Any]:
         """
         Returns the scoped instances cache.
+
+        Internal scope resolution requires direct access,
+        therefore this remains an internal cache contract.
         """
         if self._disposed:
             raise ScopeDisposedError(
