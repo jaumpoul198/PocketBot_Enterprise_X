@@ -28,6 +28,8 @@ class MetricsRegistry:
     ) -> None:
         """
         Increments a metric counter.
+
+        Internal state updates are isolated.
         """
 
         current = self._metrics.get(
@@ -36,11 +38,13 @@ class MetricsRegistry:
                 name=name,
                 value=0,
             ),
-        )
+         )
 
-        current.value += amount
+        updated = deepcopy(current)
 
-        self._metrics[name] = current
+        updated.value += amount
+
+        self._metrics[name] = updated
 
     def get(
         self,
