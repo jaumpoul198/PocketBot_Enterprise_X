@@ -8,6 +8,7 @@ Service collection implementation.
 from __future__ import annotations
 
 from collections.abc import Callable, Iterator
+from copy import deepcopy
 from typing import Any
 
 from pocketbot.infrastructure.container.exceptions import (
@@ -40,7 +41,9 @@ class ServiceCollection(IServiceCollection):
                 service_type=descriptor.service_type,
                 implementation_type=descriptor.implementation_type,
                 lifetime=descriptor.lifetime,
-                implementation_instance=descriptor.implementation_instance,
+                implementation_instance=deepcopy(
+                    descriptor.implementation_instance,
+                ),
                 implementation_factory=descriptor.implementation_factory,
             )
             for descriptor in self._descriptors.values()
@@ -59,7 +62,9 @@ class ServiceCollection(IServiceCollection):
                 service_type=descriptor.service_type,
                 implementation_type=descriptor.implementation_type,
                 lifetime=descriptor.lifetime,
-                implementation_instance=descriptor.implementation_instance,
+                implementation_instance=deepcopy(
+                    descriptor.implementation_instance,
+                ),
                 implementation_factory=descriptor.implementation_factory,
             )
             for service_type, descriptor in self._descriptors.items()
