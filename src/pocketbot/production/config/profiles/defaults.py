@@ -15,9 +15,13 @@ default_profile = ConfigurationProfile(
 )
 
 
-def get_default_profile() -> ConfigurationProfile:
+def get_default_profile() -> dict[str, object]:
     """
-    Return the default production configuration profile.
+    Return the default production configuration profile mapping.
     """
 
-    return default_profile
+    return {
+        "environment": "production",
+        "debug": default_profile.debug,
+        "service_name": default_profile.service_name,
+    }
