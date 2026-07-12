@@ -6,6 +6,8 @@ Metrics Registry.
 
 from __future__ import annotations
 
+from copy import deepcopy
+
 from pocketbot.infrastructure.metrics.metric import (
     Metric,
 )
@@ -45,18 +47,27 @@ class MetricsRegistry:
         name: str,
     ) -> Metric | None:
         """
-        Returns a metric.
+        Returns an isolated metric copy.
         """
 
-        return self._metrics.get(
+        metric = self._metrics.get(
             name,
+        )
+
+        if metric is None:
+            return None
+
+        return deepcopy(
+            metric,
         )
 
     def all(self) -> list[Metric]:
         """
-        Returns all metrics.
+        Returns isolated metric copies.
         """
 
-        return list(
-            self._metrics.values(),
+        return deepcopy(
+            list(
+                self._metrics.values(),
+            ),
         )
