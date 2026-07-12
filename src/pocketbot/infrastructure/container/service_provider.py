@@ -54,13 +54,6 @@ class ServiceProvider(IServiceProvider):
 
         self._singleton_cache = singleton_cache
 
-    @property
-    def scope(self) -> ServiceScope:
-        """
-        Current dependency scope.
-        """
-        return self._scope
-
     def create_scope(self) -> ServiceScope:
         """
         Creates a child scope sharing singleton instances.
@@ -142,14 +135,14 @@ class ServiceProvider(IServiceProvider):
         """
         service_type = descriptor.service_type
 
-        cached = self.scope.get_instance(service_type)
+        cached = self._scope.get_instance(service_type)
 
         if cached is not None:
             return cached
 
         instance = self._create_instance(descriptor)
 
-        self.scope.set_instance(
+        self._scope.set_instance(
             service_type,
             instance,
         )
