@@ -6,6 +6,7 @@ Infrastructure Audit Event Model.
 
 from __future__ import annotations
 
+from copy import deepcopy
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import Enum
@@ -45,3 +46,8 @@ class AuditEvent:
     created_at: datetime = field(
         default_factory=lambda: datetime.now(UTC),
     )
+
+    def __post_init__(self) -> None:
+        self.metadata = deepcopy(
+            self.metadata,
+        )
