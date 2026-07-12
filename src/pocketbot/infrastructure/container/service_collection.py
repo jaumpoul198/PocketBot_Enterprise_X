@@ -112,6 +112,11 @@ class ServiceCollection(IServiceCollection):
         *,
         factory: FactoryType | None = None,
     ) -> None:
+        if service_type in self._descriptors:
+            raise ServiceRegistrationError(
+                f"Service '{service_type.__name__}' is already registered."
+            )
+
         if factory is not None and implementation_type is not None:
             raise ServiceRegistrationError(
                 "Factory and implementation type cannot be registered together."

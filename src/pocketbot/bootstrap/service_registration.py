@@ -245,24 +245,6 @@ def register_services(
      )
 
     services.add_singleton(
-        DecisionEngine,
-    )
-
-    services.add_singleton(
-        RiskService,
-        DefaultRiskService,
-    )
-
-    services.add_singleton(
-        RiskEvaluator,
-        factory=lambda provider: RiskEngineAdapter(
-            provider.get_service(
-                RiskService,
-            ),
-        ),
-    )
-
-    services.add_singleton(
         ExecutionEngine,
     )
 
