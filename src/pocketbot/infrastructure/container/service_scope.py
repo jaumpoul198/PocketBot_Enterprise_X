@@ -71,6 +71,11 @@ class ServiceScope(IServiceScope):
         """
         Attaches the scoped provider.
         """
+        if self._provider is not None and self._provider is not provider:
+            raise RuntimeError(
+                "Scoped provider is already attached."
+            )
+
         self._provider = provider
 
     def dispose(self) -> None:
