@@ -19,3 +19,18 @@ def test_provider_descriptor_state_is_isolated() -> None:
     second = provider.get_service(Database)
 
     assert first is second
+
+
+def test_service_collection_descriptor_exposure_is_isolated():
+    services = ServiceCollection()
+
+    services.add_singleton(Database)
+
+    descriptors = services.descriptors
+
+    descriptors[Database].lifetime = ServiceLifetime.TRANSIENT
+
+    assert (
+        services.descriptors[Database].lifetime
+        == ServiceLifetime.SINGLETON
+    )

@@ -43,9 +43,18 @@ class ServiceCollection(IServiceCollection):
     @property
     def descriptors(self) -> dict[type[Any], ServiceDescriptor]:
         """
-        Returns all registered descriptors.
+        Returns isolated registered descriptors.
         """
-        return self._descriptors
+        return {
+            service_type: ServiceDescriptor(
+                service_type=descriptor.service_type,
+                implementation_type=descriptor.implementation_type,
+                lifetime=descriptor.lifetime,
+                implementation_instance=descriptor.implementation_instance,
+                implementation_factory=descriptor.implementation_factory,
+            )
+            for service_type, descriptor in self._descriptors.items()
+        }
 
     def add_singleton(
         self,
