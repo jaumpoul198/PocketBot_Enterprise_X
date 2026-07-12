@@ -1,20 +1,15 @@
 from __future__ import annotations
 
-from pocketbot.production.bootstrap.runtime import ProductionRuntime
-from pocketbot.production.config.factory import load_production_settings
+from pocketbot.production.bootstrap.factory import (
+    create_production_runtime_context,
+)
 
 
-def create_production_runtime() -> ProductionRuntime:
-    settings = load_production_settings()
-    return ProductionRuntime(settings)
+def create_production_runtime():
+    return create_production_runtime_context()
 
 
 def run_production() -> bool:
-    runtime = create_production_runtime()
+    runtime_context = create_production_runtime_context()
 
-    started = runtime.start()
-
-    if not started:
-        return False
-
-    return runtime.shutdown()
+    return runtime_context.start()
