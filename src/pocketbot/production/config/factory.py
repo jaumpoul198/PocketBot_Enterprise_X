@@ -5,6 +5,7 @@ from pocketbot.production.config.environments import (
 )
 from pocketbot.production.config.secrets import (
     SecretProvider,
+    load_secret_settings,
     resolve_secret_provider,
 )
 from pocketbot.production.config.settings import (
@@ -18,11 +19,15 @@ from pocketbot.production.config.validator import (
 def load_production_settings(
     secret_provider: SecretProvider | None = None,
 ) -> ProductionSettings:
-    provider = (
-        secret_provider
-        if secret_provider is not None
-        else resolve_secret_provider()
-    )
+    if secret_provider is not None:
+        provider = secret_provider
+    else:
+        secret_settings = load_secret_settings(
+            None,
+        )
+        provider = resolve_secret_provider(
+            secret_settings,
+        )
 
     environment = resolve_environment(
         provider.get_secret("POCKETBOT_ENV")
