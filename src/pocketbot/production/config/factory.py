@@ -1,9 +1,11 @@
 from __future__ import annotations
 
-import os
-
 from pocketbot.production.config.environments import (
     resolve_environment,
+)
+from pocketbot.production.config.secrets import (
+    EnvironmentSecretProvider,
+    SecretProvider,
 )
 from pocketbot.production.config.settings import (
     ProductionSettings,
@@ -13,12 +15,20 @@ from pocketbot.production.config.validator import (
 )
 
 
-def load_production_settings() -> ProductionSettings:
-    environment = resolve_environment(
-        os.getenv("POCKETBOT_ENV")
+def load_production_settings(
+    secret_provider: SecretProvider | None = None,
+) -> ProductionSettings:
+    provider = (
+        secret_provider
+        if secret_provider is not None
+        else EnvironmentSecretProvider()
     )
 
-    debug_override = os.getenv(
+    environment = resolve_environment(
+        provider.get_secret("POCKETBOT_ENV")
+    )
+
+    debug_override = provider.get_secret(
         "POCKETBOT_DEBUG"
     )
 
@@ -31,10 +41,10 @@ def load_production_settings() -> ProductionSettings:
     settings = ProductionSettings(
         environment=environment.name,
         debug=debug,
-        service_name=os.getenv(
-            "POCKETBOT_SERVICE_NAME",
-            "pocketbot",
-        ),
+        service_name=provider.get_secret(
+            "POCKETBOT_SERVICE_NAME"
+        )
+        or "pocketbot",
     )
 
     validate_production_settings(settings)
