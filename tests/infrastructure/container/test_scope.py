@@ -20,4 +20,4 @@ def test_scope_dispose() -> None:
     scope.dispose()
 
     with pytest.raises(ScopeDisposedError):
-        _ = scope.instances
+        _ = scope.service_provider

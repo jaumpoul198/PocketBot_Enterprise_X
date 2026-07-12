@@ -15,10 +15,18 @@ def test_scope_instances_cache_isolated() -> None:
 
     service = MutableService()
 
-    scope.instances[MutableService] = service
+    scope.set_instance(
+        MutableService,
+        service,
+    )
 
-    cached = scope.instances
+    cached = scope.get_instance(MutableService)
 
-    cached[MutableService].value = 999
+    assert cached is not None
 
-    assert scope.instances[MutableService].value == 999
+    cached.value = 999
+
+    stored = scope.get_instance(MutableService)
+
+    assert stored is not None
+    assert stored.value == 999
