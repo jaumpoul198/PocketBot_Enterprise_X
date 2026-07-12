@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import pytest
 
-from pocketbot.infrastructure.container.exceptions import ScopeDisposedError
+from pocketbot.infrastructure.container.exceptions import (
+    ScopeDisposedError,
+)
 from pocketbot.infrastructure.container.service_collection import (
     ServiceCollection,
 )
@@ -19,9 +21,9 @@ def test_provider_does_not_expose_scope_reference_after_dispose() -> None:
 
     provider = services.build_provider()
 
-    scope = provider.scope
+    scope = provider.create_scope()
 
     scope.dispose()
 
     with pytest.raises(ScopeDisposedError):
-        _ = provider.scope.service_provider
+        _ = scope.service_provider

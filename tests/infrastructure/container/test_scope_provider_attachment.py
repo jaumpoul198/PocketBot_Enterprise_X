@@ -16,7 +16,7 @@ def test_scope_cannot_attach_different_provider() -> None:
 
     provider = services.build_provider()
 
-    scope = provider.scope
+    scope = provider.create_scope()
 
     another_provider = services.build_provider()
 
