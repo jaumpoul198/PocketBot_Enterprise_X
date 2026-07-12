@@ -6,6 +6,7 @@ Configuration Service.
 
 from __future__ import annotations
 
+from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
@@ -32,7 +33,7 @@ class ConfigService:
         filename: str,
     ) -> dict[str, Any]:
         """
-        Loads configuration file.
+        Loads isolated configuration copy.
         """
 
         if filename not in self._cache:
@@ -40,4 +41,6 @@ class ConfigService:
                 filename,
             )
 
-        return self._cache[filename]
+        return deepcopy(
+            self._cache[filename],
+        )
