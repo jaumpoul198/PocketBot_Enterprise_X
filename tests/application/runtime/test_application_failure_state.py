@@ -47,7 +47,6 @@ def test_runtime_enters_failed_state_when_startup_fails() -> None:
     publisher = RecordingPublisher()
 
     runtime = ApplicationRuntime(
-        provider=object(),
         lifecycle=FailingLifecycle(fail_start=True),
         session_manager=StubSessionManager(),
         publisher=publisher,
@@ -67,7 +66,6 @@ def test_runtime_enters_failed_state_when_shutdown_fails() -> None:
     publisher = RecordingPublisher()
 
     runtime = ApplicationRuntime(
-        provider=object(),
         lifecycle=FailingLifecycle(fail_stop=True),
         session_manager=StubSessionManager(),
         publisher=publisher,
