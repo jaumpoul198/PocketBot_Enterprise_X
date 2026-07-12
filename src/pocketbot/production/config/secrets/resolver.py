@@ -9,16 +9,26 @@ from pocketbot.production.config.secrets.environment import (
 from pocketbot.production.config.secrets.provider import (
     SecretProvider,
 )
+from pocketbot.production.config.secrets.settings import (
+    SecretSettings,
+)
 
 
-def resolve_secret_provider() -> SecretProvider:
+def resolve_secret_provider(
+    settings: SecretSettings | None = None,
+) -> SecretProvider:
     """
     Resolve enterprise secret provider.
 
-    Priority:
-    1. Docker secrets
-    2. Environment variables
+    Explicit strategy has priority.
+    Automatic detection is fallback.
     """
+
+    if settings is not None:
+        if settings.provider == "docker":
+            return DockerSecretProvider()
+
+        return EnvironmentSecretProvider()
 
     docker_path = Path("/run/secrets")
 
