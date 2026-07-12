@@ -7,6 +7,7 @@ Runtime Observability Handler.
 from __future__ import annotations
 
 from collections.abc import Callable
+from copy import deepcopy
 
 from pocketbot.core.logger import get_logger
 from pocketbot.events.event import Event
@@ -101,7 +102,7 @@ class RuntimeObservabilityHandler(EventHandler):
                     event_name=event.name,
                     source="runtime",
                     severity=severity,
-                    metadata=event.payload,
+                    metadata=deepcopy(event.payload),
                 )
             ),
             "audit",
