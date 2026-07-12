@@ -6,6 +6,8 @@ In Memory Trade Decision Repository.
 
 from __future__ import annotations
 
+from copy import deepcopy
+
 from pocketbot.trading.interfaces.trade_decision_repository import (
     TradeDecisionRepository,
 )
@@ -19,6 +21,8 @@ class InMemoryTradeDecisionRepository(
 ):
     """
     Stores trade decisions in memory.
+
+    Repository state is isolated from external references.
     """
 
     def __init__(self) -> None:
@@ -41,7 +45,7 @@ class InMemoryTradeDecisionRepository(
         self._decisions[
             decision.asset
         ].append(
-            decision,
+            deepcopy(decision),
         )
 
     def get_latest(
@@ -56,7 +60,9 @@ class InMemoryTradeDecisionRepository(
         if not decisions:
             return None
 
-        return max(
+        latest = max(
             decisions,
             key=lambda item: item.timestamp,
         )
+
+        return deepcopy(latest)
