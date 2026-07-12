@@ -36,6 +36,12 @@ class IServiceProvider(Protocol):
         """
         ...
 
+    def dispose(self) -> None:
+        """
+        Releases provider resources.
+        """
+        ...
+
 
 class IServiceScope(Protocol):
     """

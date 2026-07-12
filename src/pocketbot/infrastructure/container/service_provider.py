@@ -53,6 +53,7 @@ class ServiceProvider(IServiceProvider):
             singleton_cache = {}
 
         self._singleton_cache = singleton_cache
+        self._disposed = False
 
     def create_scope(self) -> ServiceScope:
         """
@@ -77,6 +78,12 @@ class ServiceProvider(IServiceProvider):
         """
         Resolves a registered service.
         """
+
+        if self._disposed:
+            raise ServiceResolutionError(
+                "ServiceProvider has been disposed."
+            )
+
         descriptor = self._descriptors.get(service_type)
 
         if descriptor is None:
@@ -225,3 +232,20 @@ class ServiceProvider(IServiceProvider):
             ),
             implementation_factory=descriptor.implementation_factory,
         )
+
+    def dispose(self) -> None:
+        """
+        Releases provider resources.
+        """
+
+        if self._disposed:
+            return
+
+        for instance in self._singleton_cache.values():
+            dispose = getattr(instance, "dispose", None)
+
+            if callable(dispose):
+                dispose()
+
+        self._singleton_cache.clear()
+        self._disposed = True
