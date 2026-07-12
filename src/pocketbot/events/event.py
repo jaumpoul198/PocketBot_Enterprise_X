@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any
 from uuid import uuid4
+from copy import deepcopy
 
 
 @dataclass(slots=True)
@@ -19,3 +20,6 @@ class Event:
     id: str = field(default_factory=lambda: str(uuid4()))
 
     created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+
+    def __post_init__(self) -> None:
+        self.payload = deepcopy(self.payload)
