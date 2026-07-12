@@ -52,24 +52,6 @@ class ServiceCollection(IServiceCollection):
     def __len__(self) -> int:
         return len(self._descriptors)
 
-    @property
-    def descriptors(self) -> dict[type[Any], ServiceDescriptor]:
-        """
-        Returns isolated registered descriptors.
-        """
-        return {
-            service_type: ServiceDescriptor(
-                service_type=descriptor.service_type,
-                implementation_type=descriptor.implementation_type,
-                lifetime=descriptor.lifetime,
-                implementation_instance=deepcopy(
-                    descriptor.implementation_instance,
-                ),
-                implementation_factory=descriptor.implementation_factory,
-            )
-            for service_type, descriptor in self._descriptors.items()
-        }
-
     def add_singleton(
         self,
         service_type: type[Any],

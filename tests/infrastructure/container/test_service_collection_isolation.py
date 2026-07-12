@@ -10,25 +10,21 @@ class MutableService:
         self.value = 1
 
 
-def test_descriptor_instance_isolated_from_collection_state() -> None:
+def test_service_collection_iteration_exposes_isolated_instances() -> None:
     collection = ServiceCollection()
-
-    instance = MutableService()
 
     collection.add_instance(
         MutableService,
-        instance,
+        MutableService(),
     )
 
-    descriptors = collection.descriptors
-
-    descriptor = descriptors[MutableService]
+    descriptor = next(iter(collection))
 
     assert descriptor.implementation_instance is not None
 
     descriptor.implementation_instance.value = 999
 
-    stored = collection.descriptors[MutableService]
+    stored = next(iter(collection))
 
     assert stored.implementation_instance is not None
     assert stored.implementation_instance.value == 1

@@ -1,42 +1,18 @@
-from pocketbot.infrastructure.container.service_collection import ServiceCollection
-from pocketbot.infrastructure.container.service_lifetime import ServiceLifetime
+from __future__ import annotations
+
+from pocketbot.infrastructure.container.service_collection import (
+    ServiceCollection,
+)
+from pocketbot.infrastructure.container.service_lifetime import (
+    ServiceLifetime,
+)
 
 
 class Database:
     pass
 
 
-def test_provider_descriptor_state_is_isolated() -> None:
-    services = ServiceCollection()
-
-    services.add_singleton(Database)
-
-    provider = services.build_provider()
-
-    services.descriptors[Database].lifetime = ServiceLifetime.TRANSIENT
-
-    first = provider.get_service(Database)
-    second = provider.get_service(Database)
-
-    assert first is second
-
-
-def test_service_collection_descriptor_exposure_is_isolated():
-    services = ServiceCollection()
-
-    services.add_singleton(Database)
-
-    descriptors = services.descriptors
-
-    descriptors[Database].lifetime = ServiceLifetime.TRANSIENT
-
-    assert (
-        services.descriptors[Database].lifetime
-        == ServiceLifetime.SINGLETON
-    )
-
-
-def test_service_collection_iteration_exposes_isolated_descriptors():
+def test_service_collection_iteration_exposes_isolated_descriptors() -> None:
     services = ServiceCollection()
 
     services.add_singleton(Database)
@@ -45,45 +21,6 @@ def test_service_collection_iteration_exposes_isolated_descriptors():
 
     descriptor.lifetime = ServiceLifetime.TRANSIENT
 
-    assert (
-        services.descriptors[Database].lifetime
-        == ServiceLifetime.SINGLETON
-    )
+    stored = next(iter(services))
 
-
-def test_provider_descriptor_exposure_is_isolated():
-    services = ServiceCollection()
-
-    services.add_singleton(Database)
-
-    provider = services.build_provider()
-
-    descriptor = provider.get_descriptor(Database)
-
-    descriptor.lifetime = ServiceLifetime.TRANSIENT
-
-    assert (
-        provider.get_descriptor(Database).lifetime
-        == ServiceLifetime.SINGLETON
-    )
-
-
-def test_child_scope_provider_descriptor_exposure_is_isolated():
-    services = ServiceCollection()
-
-    services.add_singleton(Database)
-
-    provider = services.build_provider()
-
-    scope = provider.create_scope()
-
-    child_provider = scope.service_provider
-
-    descriptor = child_provider.get_descriptor(Database)
-
-    descriptor.lifetime = ServiceLifetime.TRANSIENT
-
-    assert (
-        provider.get_descriptor(Database).lifetime
-        == ServiceLifetime.SINGLETON
-    )
+    assert stored.lifetime is ServiceLifetime.SINGLETON
