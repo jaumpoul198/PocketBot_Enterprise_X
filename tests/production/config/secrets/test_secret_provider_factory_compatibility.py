@@ -4,10 +4,10 @@ from pocketbot.production.config.secrets.factory import load_secret_settings
 from pocketbot.production.config.secrets.provider import SecretProvider
 
 
-def test_factory_returns_secret_provider() -> None:
+def test_factory_returns_secret_strategy_configuration() -> None:
     settings = load_secret_settings("environment")
 
-    assert isinstance(settings.provider, SecretProvider)
+    assert settings.provider == "environment"
 
 
 def test_registered_providers_are_factory_compatible() -> None:
