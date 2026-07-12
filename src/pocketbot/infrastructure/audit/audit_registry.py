@@ -6,6 +6,8 @@ Infrastructure Audit Registry.
 
 from __future__ import annotations
 
+from copy import deepcopy
+
 from pocketbot.infrastructure.audit.audit_event import (
     AuditEvent,
 )
@@ -25,16 +27,26 @@ class AuditRegistry:
     ) -> None:
         """
         Record an audit event.
+
+        The registry stores an isolated copy to prevent
+        external mutation of internal state.
         """
 
-        self._events.append(event)
+        self._events.append(
+            deepcopy(event),
+        )
 
     def all(self) -> list[AuditEvent]:
         """
         Return all audit events.
+
+        Returned events are isolated copies to prevent
+        callers from mutating registry state.
         """
 
-        return list(self._events)
+        return deepcopy(
+            self._events,
+        )
 
     def query(
         self,
@@ -44,6 +56,8 @@ class AuditRegistry:
     ) -> list[AuditEvent]:
         """
         Query audit events by filters.
+
+        Returned events are isolated copies.
         """
 
         events = self._events
@@ -62,4 +76,6 @@ class AuditRegistry:
                 if event.source == source
             ]
 
-        return list(events)
+        return deepcopy(
+            events,
+        )
