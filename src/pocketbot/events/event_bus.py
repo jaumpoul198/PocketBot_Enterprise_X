@@ -38,6 +38,16 @@ class EventBus:
         """
         self._global_handlers.append(handler)
 
+    def handlers(
+        self,
+    ) -> dict[str, list[EventHandler]]:
+        return deepcopy(self._handlers)
+
+    def global_handlers(
+        self,
+    ) -> list[EventHandler]:
+        return deepcopy(self._global_handlers)
+
     def publish(
         self,
         event: Event,
