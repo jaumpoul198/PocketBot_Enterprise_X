@@ -62,6 +62,8 @@ class ApplicationRuntime:
             )
 
         except Exception as exc:
+            self._state = ApplicationState.FAILED
+
             self._publisher.publish(
                 "application.startup.failed",
                 {
@@ -102,9 +104,23 @@ class ApplicationRuntime:
             {},
         )
 
-        self._lifecycle.stop()
+        try:
+            self._lifecycle.stop()
 
-        self._state = ApplicationState.STOPPED
+        except Exception as exc:
+            self._state = ApplicationState.FAILED
+
+            self._publisher.publish(
+                "application.shutdown.failed",
+                {
+                    "error": str(exc),
+                },
+            )
+
+            raise
+
+        else:
+            self._state = ApplicationState.STOPPED
 
         self._publisher.publish(
             "application.shutdown.completed",
