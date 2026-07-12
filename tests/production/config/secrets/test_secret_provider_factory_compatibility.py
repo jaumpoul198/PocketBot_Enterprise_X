@@ -5,7 +5,7 @@ from pocketbot.production.config.secrets.provider import SecretProvider
 
 
 def test_factory_returns_secret_provider() -> None:
-    settings = load_secret_settings()
+    settings = load_secret_settings("environment")
 
     assert isinstance(settings.provider, SecretProvider)
 
