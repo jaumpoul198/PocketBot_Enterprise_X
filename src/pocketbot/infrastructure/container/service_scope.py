@@ -93,5 +93,18 @@ class ServiceScope(IServiceScope):
         """
         Releases all scoped instances.
         """
+        if self._disposed:
+            return
+
+        for instance in self._instances.values():
+            dispose = getattr(
+                instance,
+                "dispose",
+                None,
+            )
+
+            if callable(dispose):
+                dispose()
+
         self._instances.clear()
         self._disposed = True
