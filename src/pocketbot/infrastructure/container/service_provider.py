@@ -241,11 +241,16 @@ class ServiceProvider(IServiceProvider):
         if self._disposed:
             return
 
-        for instance in self._singleton_cache.values():
+        self._disposed = True
+
+        instances = tuple(
+            self._singleton_cache.values()
+        )
+
+        self._singleton_cache.clear()
+
+        for instance in instances:
             dispose = getattr(instance, "dispose", None)
 
             if callable(dispose):
                 dispose()
-
-        self._singleton_cache.clear()
-        self._disposed = True
