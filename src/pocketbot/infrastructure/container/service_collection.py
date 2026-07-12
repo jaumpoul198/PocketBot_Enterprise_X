@@ -142,4 +142,4 @@ class ServiceCollection(IServiceCollection):
             ServiceProvider,
         )
 
-        return ServiceProvider(self._descriptors)
+        return ServiceProvider(self._descriptors.copy())
