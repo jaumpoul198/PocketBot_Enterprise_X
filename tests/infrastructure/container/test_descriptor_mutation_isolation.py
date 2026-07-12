@@ -66,3 +66,24 @@ def test_provider_descriptor_exposure_is_isolated():
         provider.get_descriptor(Database).lifetime
         == ServiceLifetime.SINGLETON
     )
+
+
+def test_child_scope_provider_descriptor_exposure_is_isolated():
+    services = ServiceCollection()
+
+    services.add_singleton(Database)
+
+    provider = services.build_provider()
+
+    scope = provider.create_scope()
+
+    child_provider = scope.service_provider
+
+    descriptor = child_provider.get_descriptor(Database)
+
+    descriptor.lifetime = ServiceLifetime.TRANSIENT
+
+    assert (
+        provider.get_descriptor(Database).lifetime
+        == ServiceLifetime.SINGLETON
+    )
