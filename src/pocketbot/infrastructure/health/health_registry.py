@@ -6,6 +6,8 @@ Infrastructure Health Registry.
 
 from __future__ import annotations
 
+from copy import deepcopy
+
 from pocketbot.infrastructure.health.health_check import (
     HealthCheck,
     HealthStatus,
@@ -26,26 +28,36 @@ class HealthRegistry:
     ) -> None:
         """
         Register or replace a health check.
+
+        The registry stores an isolated copy.
         """
 
-        self._checks[check.name] = check
+        self._checks[check.name] = deepcopy(check)
 
     def get(
         self,
         name: str,
     ) -> HealthCheck | None:
         """
-        Retrieve a health check by name.
+        Retrieve an isolated health check copy.
         """
 
-        return self._checks.get(name)
+        check = self._checks.get(name)
+
+        if check is None:
+            return None
+
+        return deepcopy(check)
 
     def all(self) -> list[HealthCheck]:
         """
-        Return all registered health checks.
+        Return isolated health check copies.
         """
 
-        return list(self._checks.values())
+        return [
+            deepcopy(check)
+            for check in self._checks.values()
+        ]
 
     def overall_status(self) -> HealthStatus:
         """
