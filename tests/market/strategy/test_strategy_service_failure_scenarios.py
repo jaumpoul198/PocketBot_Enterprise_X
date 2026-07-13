@@ -1,7 +1,10 @@
 import pytest
 
 from pocketbot.market.strategy.base import BaseStrategy
-from pocketbot.market.strategy.models import StrategyResult
+from pocketbot.market.strategy.models import (
+    StrategyResult,
+    StrategySignal,
+)
 from pocketbot.market.strategy.service import StrategyService
 from pocketbot.market.strategy.selector.models import StrategyScore
 
@@ -113,7 +116,7 @@ def test_analyze_preserves_strategy_result_order() -> None:
             market_data,
         ) -> StrategyResult:
             return StrategyResult(
-                signal="BUY",
+                signal=StrategySignal.BUY,
                 confidence=0.8,
                 reason="first",
             )
@@ -130,7 +133,7 @@ def test_analyze_preserves_strategy_result_order() -> None:
             market_data,
         ) -> StrategyResult:
             return StrategyResult(
-                signal="SELL",
+                signal=StrategySignal.SELL,
                 confidence=0.6,
                 reason="second",
             )
