@@ -6,6 +6,7 @@ Market State Intelligence Service.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 
 from pocketbot.market.interfaces.market_repository import (
@@ -41,8 +42,20 @@ class MarketStateService:
         self,
         repository: MarketRepository,
     ) -> None:
-        self._repository = repository
+        if repository is None:
+            raise ValueError(
+                "repository cannot be None",
+            )
 
+        if not hasattr(
+            repository,
+            "get_last_n",
+        ):
+            raise TypeError(
+                "repository must provide get_last_n",
+            )
+
+        self._repository = repository
 
     def get_current_state(
         self,
@@ -50,11 +63,43 @@ class MarketStateService:
         timeframe: int,
     ) -> MarketState | None:
 
+        if asset is None:
+            raise ValueError(
+                "asset cannot be None",
+            )
+
+        if not isinstance(
+            asset,
+            str,
+        ):
+            raise TypeError(
+                "asset must be a string",
+            )
+
+        if not isinstance(
+            timeframe,
+            int,
+        ) or isinstance(
+            timeframe,
+            bool,
+        ):
+            raise TypeError(
+                "timeframe must be an integer",
+            )
+
         snapshots = self._repository.get_last_n(
             asset,
             timeframe,
             2,
         )
+
+        if not isinstance(
+            snapshots,
+            list,
+        ):
+            raise TypeError(
+                "repository result must be a list",
+            )
 
         if len(snapshots) < 2:
             return None
@@ -74,6 +119,19 @@ class MarketStateService:
         last_price = latest_candle.close.value
         previous_price = previous_candle.close.value
 
+        if (
+            not math.isfinite(last_price)
+            or not math.isfinite(previous_price)
+        ):
+            raise ValueError(
+                "price must be finite",
+            )
+
+        if previous_price == 0:
+            raise ValueError(
+                "previous price cannot be zero",
+            )
+
         if last_price > previous_price:
             trend = "UP"
 
@@ -83,7 +141,6 @@ class MarketStateService:
         else:
             trend = "SIDEWAYS"
 
-
         change_percent = (
             (
                 last_price - previous_price
@@ -91,7 +148,6 @@ class MarketStateService:
             /
             previous_price
         ) * 100
-
 
         return MarketState(
             asset=asset,

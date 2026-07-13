@@ -260,3 +260,108 @@ def test_market_analysis_rejects_invalid_analytics_result() -> None:
         match="analytics result must be AnalyticsSnapshot",
     ):
         service.analyze([])
+
+def test_market_state_rejects_none_repository() -> None:
+    with pytest.raises(
+        ValueError,
+        match="repository cannot be None",
+    ):
+        MarketStateService(
+            None,
+        )
+
+
+def test_market_state_rejects_invalid_repository_contract() -> None:
+    class InvalidRepository:
+        pass
+
+    with pytest.raises(
+        TypeError,
+        match="repository must provide get_last_n",
+    ):
+        MarketStateService(
+            InvalidRepository(),
+        )
+
+
+def test_market_state_rejects_none_asset() -> None:
+    repository = Mock()
+
+    service = MarketStateService(
+        repository,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="asset cannot be None",
+    ):
+        service.get_current_state(
+            None,
+            60,
+        )
+
+
+def test_market_state_rejects_invalid_timeframe_bool() -> None:
+    repository = Mock()
+
+    service = MarketStateService(
+        repository,
+    )
+
+    with pytest.raises(
+        TypeError,
+        match="timeframe must be an integer",
+    ):
+        service.get_current_state(
+            "BTCUSDT",
+            True,
+        )
+
+
+def test_market_state_rejects_zero_previous_price() -> None:
+    repository = Mock()
+
+    previous = Mock()
+    previous.last_candle.close.value = 0
+
+    latest = Mock()
+    latest.last_candle.close.value = 100
+
+    repository.get_last_n.return_value = [
+        latest,
+        previous,
+    ]
+
+    service = MarketStateService(
+        repository,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="previous price cannot be zero",
+    ):
+        service.get_current_state(
+            "BTCUSDT",
+            60,
+        )
+
+def test_market_state_rejects_nan_price() -> None:
+    repository = Mock()
+
+    repository.get_last_n.return_value = [
+        create_snapshot(float("nan")),
+        create_snapshot(100),
+    ]
+
+    service = MarketStateService(
+        repository,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="price must be finite",
+    ):
+        service.get_current_state(
+            "BTCUSDT",
+            60,
+        )
