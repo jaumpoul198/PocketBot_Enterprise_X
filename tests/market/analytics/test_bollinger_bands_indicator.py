@@ -65,11 +65,11 @@ def test_bollinger_bands_returns_none_without_enough_candles():
     assert result is None
 
 
-def test_bollinger_bands_requires_positive_period():
+def test_bollinger_bands_requires_minimum_period():
 
     with pytest.raises(ValueError):
 
         BollingerBandsIndicator(
-            period=0,
+            period=1,
             multiplier=2,
         )

@@ -43,9 +43,9 @@ class BollingerBandsIndicator(
         multiplier: float = 2.0,
     ) -> None:
 
-        if period <= 0:
+        if period <= 2:
             raise ValueError(
-                "Period must be positive."
+                "Period must be at least 2."
             )
 
         self.period = period
