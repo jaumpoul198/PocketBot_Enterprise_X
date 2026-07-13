@@ -85,3 +85,96 @@ def test_analyze_with_no_strategies_returns_empty_list() -> None:
     )
 
     assert result == []
+
+def test_analyze_handles_none_strategy_instance_failure() -> None:
+    service = StrategyService(
+        strategies=[
+            None,
+        ],
+    )
+
+    with pytest.raises(
+        AttributeError,
+    ):
+        service.analyze(
+            {},
+        )
+
+
+def test_analyze_preserves_strategy_result_order() -> None:
+    class FirstStrategy(BaseStrategy):
+
+        @property
+        def name(self) -> str:
+            return "first"
+
+        def analyze(
+            self,
+            market_data,
+        ) -> StrategyResult:
+            return StrategyResult(
+                signal="BUY",
+                confidence=0.8,
+                reason="first",
+            )
+
+
+    class SecondStrategy(BaseStrategy):
+
+        @property
+        def name(self) -> str:
+            return "second"
+
+        def analyze(
+            self,
+            market_data,
+        ) -> StrategyResult:
+            return StrategyResult(
+                signal="SELL",
+                confidence=0.6,
+                reason="second",
+            )
+
+
+    service = StrategyService(
+        strategies=[
+            FirstStrategy(),
+            SecondStrategy(),
+        ],
+    )
+
+    result = service.analyze(
+        {},
+    )
+
+    assert len(result) == 2
+    assert result[0].reason == "first"
+    assert result[1].reason == "second"
+
+
+def test_analyze_allows_strategy_returning_none() -> None:
+
+    class NoneReturningStrategy(BaseStrategy):
+
+        @property
+        def name(self) -> str:
+            return "none"
+
+        def analyze(
+            self,
+            market_data,
+        ):
+            return None
+
+
+    service = StrategyService(
+        strategies=[
+            NoneReturningStrategy(),
+        ],
+    )
+
+    result = service.analyze(
+        {},
+    )
+
+    assert result == [None]
