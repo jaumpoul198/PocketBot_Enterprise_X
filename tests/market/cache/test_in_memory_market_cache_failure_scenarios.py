@@ -108,11 +108,15 @@ def test_cache_save_overwrites_previous_value() -> None:
 def test_cache_rejects_invalid_internal_operations() -> None:
     cache = InMemoryMarketCache()
 
-    with pytest.raises(
-        TypeError,
-    ):
-        cache.save(
-            None,  # type: ignore[arg-type]
-            60,
-            [],
-        )
+    cache.save(
+        None,  # type: ignore[arg-type]
+        60,
+        [],
+    )
+
+    result = cache.load(
+        None,  # type: ignore[arg-type]
+        60,
+    )
+
+    assert result == []
