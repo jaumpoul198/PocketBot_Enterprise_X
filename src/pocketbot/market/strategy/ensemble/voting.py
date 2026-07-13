@@ -30,10 +30,15 @@ class MajorityVotingEnsemble(BaseStrategyEnsemble):
                 reason="No strategy results available",
             )
 
-        votes = {
-            result.reason: result.signal
-            for result in results
-        }
+        votes: dict[str, StrategySignal] = {}
+
+        for index, result in enumerate(results):
+            vote_key = result.reason
+
+            if vote_key in votes:
+                vote_key = f"{vote_key}_{index}"
+
+            votes[vote_key] = result.signal
 
         signals = [
             result.signal
