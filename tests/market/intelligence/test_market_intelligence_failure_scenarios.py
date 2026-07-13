@@ -194,3 +194,69 @@ def test_market_state_returns_none_when_previous_candle_missing() -> None:
     )
 
     assert result is None
+
+def test_market_analysis_rejects_none_analytics_service() -> None:
+    with pytest.raises(
+        ValueError,
+        match="analytics_service cannot be None",
+    ):
+        MarketAnalysisService(
+            None,
+        )
+
+
+def test_market_analysis_rejects_invalid_analytics_service_contract() -> None:
+    class InvalidAnalyticsService:
+        pass
+
+    with pytest.raises(
+        TypeError,
+        match="analytics_service must provide analyze",
+    ):
+        MarketAnalysisService(
+            InvalidAnalyticsService(),
+        )
+
+
+def test_market_analysis_rejects_none_candles() -> None:
+    service = MarketAnalysisService(
+        Mock(),
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="candles cannot be None",
+    ):
+        service.analyze(
+            None,
+        )
+
+
+def test_market_analysis_rejects_invalid_candles_type() -> None:
+    service = MarketAnalysisService(
+        Mock(),
+    )
+
+    with pytest.raises(
+        TypeError,
+        match="candles must be a list",
+    ):
+        service.analyze(
+            "invalid",
+        )
+
+
+def test_market_analysis_rejects_invalid_analytics_result() -> None:
+    analytics = Mock()
+
+    analytics.analyze.return_value = None
+
+    service = MarketAnalysisService(
+        analytics,
+    )
+
+    with pytest.raises(
+        TypeError,
+        match="analytics result must be AnalyticsSnapshot",
+    ):
+        service.analyze([])

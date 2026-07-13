@@ -6,7 +6,6 @@ Market Analysis Service
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
 
 from pocketbot.domain.candle import Candle
 
@@ -34,6 +33,19 @@ class MarketAnalysisService:
         self,
         analytics_service: AnalyticsService,
     ) -> None:
+        if analytics_service is None:
+            raise ValueError(
+                "analytics_service cannot be None",
+            )
+
+        if not hasattr(
+            analytics_service,
+            "analyze",
+        ):
+            raise TypeError(
+                "analytics_service must provide analyze",
+            )
+
         self._analytics_service = analytics_service
 
     def analyze(
@@ -44,10 +56,31 @@ class MarketAnalysisService:
         Executa a análise completa do mercado.
         """
 
+        if candles is None:
+            raise ValueError(
+                "candles cannot be None",
+            )
+
+        if not isinstance(
+            candles,
+            list,
+        ):
+            raise TypeError(
+                "candles must be a list",
+            )
+
         analytics = self._analytics_service.analyze(
-            candles
+            candles,
         )
 
+        if not isinstance(
+            analytics,
+            AnalyticsSnapshot,
+        ):
+            raise TypeError(
+                "analytics result must be AnalyticsSnapshot",
+            )
+
         return MarketAnalysisResult(
-            analytics=analytics
+            analytics=analytics,
         )
