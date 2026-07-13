@@ -365,3 +365,110 @@ def test_market_state_rejects_nan_price() -> None:
             "BTCUSDT",
             60,
         )
+
+def test_market_history_rejects_none_repository() -> None:
+    with pytest.raises(
+        ValueError,
+        match="repository cannot be None",
+    ):
+        MarketHistoryService(
+            None,
+        )
+
+
+def test_market_history_rejects_invalid_repository_contract() -> None:
+    class InvalidRepository:
+        pass
+
+    with pytest.raises(
+        TypeError,
+        match="repository must provide market history methods",
+    ):
+        MarketHistoryService(
+            InvalidRepository(),
+        )
+
+
+def test_market_history_rejects_none_asset() -> None:
+    service = MarketHistoryService(
+        Mock(),
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="asset cannot be None",
+    ):
+        service.get_last_n(
+            None,
+            60,
+            10,
+        )
+
+
+def test_market_history_rejects_invalid_timeframe_bool() -> None:
+    service = MarketHistoryService(
+        Mock(),
+    )
+
+    with pytest.raises(
+        TypeError,
+        match="timeframe must be an integer",
+    ):
+        service.get_last_n(
+            "BTCUSDT",
+            True,
+            10,
+        )
+
+
+def test_market_history_rejects_invalid_limit_bool() -> None:
+    service = MarketHistoryService(
+        Mock(),
+    )
+
+    with pytest.raises(
+        TypeError,
+        match="limit must be an integer",
+    ):
+        service.get_last_n(
+            "BTCUSDT",
+            60,
+            True,
+        )
+
+
+def test_market_history_rejects_negative_limit() -> None:
+    service = MarketHistoryService(
+        Mock(),
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="limit must be greater than zero",
+    ):
+        service.get_last_n(
+            "BTCUSDT",
+            60,
+            -1,
+        )
+
+
+def test_market_history_rejects_invalid_date_range() -> None:
+    service = MarketHistoryService(
+        Mock(),
+    )
+
+    end = datetime.now(UTC)
+
+    with pytest.raises(
+        ValueError,
+        match="start must be before end",
+    ):
+        service.get_between(
+            "BTCUSDT",
+            60,
+            end,
+            end.replace(
+                year=end.year - 1,
+            ),
+        )
