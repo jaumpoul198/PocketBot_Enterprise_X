@@ -23,6 +23,32 @@ class MarketConnectionService(HostedService):
         self,
         market_provider: MarketProvider,
     ) -> None:
+
+        if market_provider is None:
+            raise ValueError(
+                "market_provider cannot be None",
+            )
+
+        required_methods = (
+            "is_connected",
+            "connect",
+            "disconnect",
+        )
+
+        if not all(
+            callable(
+                getattr(
+                    market_provider,
+                    method,
+                    None,
+                )
+            )
+            for method in required_methods
+        ):
+            raise TypeError(
+                "invalid market provider",
+            )
+
         self._market_provider = market_provider
 
     def start(self) -> None:
