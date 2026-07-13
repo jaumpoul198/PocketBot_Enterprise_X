@@ -44,6 +44,20 @@ class FakeOrchestrator:
         )
 
 
+class FailingOrchestrator:
+    """
+    Fake orchestrator that fails during execution.
+    """
+
+    def execute(
+        self,
+        request: TradingRequest,
+    ) -> TradingResult:
+        raise RuntimeError(
+            "orchestrator unavailable",
+        )
+
+
 def create_request() -> TradingRequest:
     """
     Creates a test trading request.
@@ -116,3 +130,24 @@ def test_execute_completed_session_fails() -> None:
         manager.execute(
             session,
         )
+
+
+def test_execute_session_marks_failed_when_orchestrator_fails() -> None:
+    manager = TradingSessionManager(
+        orchestrator=FailingOrchestrator(),  # type: ignore[arg-type]
+    )
+
+    session = manager.create_session(
+        create_request(),
+    )
+
+    with pytest.raises(
+        RuntimeError,
+        match="orchestrator unavailable",
+    ):
+        manager.execute(
+            session,
+        )
+
+    assert session.status is TradingSessionStatus.FAILED
+    assert session.result is None
