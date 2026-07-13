@@ -71,3 +71,71 @@ def test_performance_model_is_immutable() -> None:
         FrozenInstanceError,
     ):
         performance.total_signals = 20
+
+def test_evaluator_rejects_empty_strategy_name() -> None:
+    evaluator = StrategyEvaluator()
+
+    with pytest.raises(
+        ValueError,
+        match="strategy_name",
+    ):
+        evaluator.evaluate(
+            strategy_name="",
+            predictions=[
+                True,
+            ],
+            outcomes=[
+                True,
+            ],
+        )
+
+
+def test_evaluator_rejects_non_boolean_predictions() -> None:
+    evaluator = StrategyEvaluator()
+
+    with pytest.raises(
+        TypeError,
+    ):
+        evaluator.evaluate(
+            strategy_name="momentum",
+            predictions=[
+                1,
+            ],
+            outcomes=[
+                True,
+            ],
+        )
+
+
+def test_evaluator_rejects_non_boolean_outcomes() -> None:
+    evaluator = StrategyEvaluator()
+
+    with pytest.raises(
+        TypeError,
+    ):
+        evaluator.evaluate(
+            strategy_name="momentum",
+            predictions=[
+                True,
+            ],
+            outcomes=[
+                0,
+            ],
+        )
+
+
+def test_evaluator_rejects_none_values() -> None:
+    evaluator = StrategyEvaluator()
+
+    with pytest.raises(
+        TypeError,
+    ):
+        evaluator.evaluate(
+            strategy_name="momentum",
+            predictions=[
+                None,
+            ],
+            outcomes=[
+                False,
+            ],
+        )
