@@ -61,6 +61,10 @@ class BreakoutStrategy(BaseStrategy):
                 reason="Invalid indicator values",
             )
 
+        price = float(price)
+        support = float(support)
+        resistance = float(resistance)
+
         if price > resistance:
             return StrategyResult(
                 signal=StrategySignal.BUY,
