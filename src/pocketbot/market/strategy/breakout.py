@@ -1,3 +1,5 @@
+import math
+
 from pocketbot.market.strategy.base import BaseStrategy
 from pocketbot.market.strategy.models import (
     StrategyResult,
@@ -12,6 +14,13 @@ class BreakoutStrategy(BaseStrategy):
 
     name = "breakout"
 
+    def _is_valid_number(self, value: object) -> bool:
+        return (
+            isinstance(value, (int, float))
+            and not isinstance(value, bool)
+            and math.isfinite(float(value))
+        )
+
     def analyze(
         self,
         data: object,
@@ -24,7 +33,7 @@ class BreakoutStrategy(BaseStrategy):
                 reason="Invalid indicator data",
             )
 
-        indicators: dict[str, float] = data
+        indicators: dict[str, object] = data
 
         price = indicators.get("price")
         support = indicators.get("support")
@@ -39,6 +48,17 @@ class BreakoutStrategy(BaseStrategy):
                 signal=StrategySignal.HOLD,
                 confidence=0.0,
                 reason="Missing support or resistance levels",
+            )
+
+        if not (
+            self._is_valid_number(price)
+            and self._is_valid_number(support)
+            and self._is_valid_number(resistance)
+        ):
+            return StrategyResult(
+                signal=StrategySignal.HOLD,
+                confidence=0.0,
+                reason="Invalid indicator values",
             )
 
         if price > resistance:
