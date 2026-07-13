@@ -1,3 +1,5 @@
+from datetime import UTC, datetime
+
 from pocketbot.domain.candle import Candle
 from pocketbot.market.validators.default_market_validator import (
     DefaultMarketValidator,
@@ -6,6 +8,9 @@ from pocketbot.market.validators.default_market_validator import (
 
 def create_candle() -> Candle:
     return Candle(
+        symbol="BTCUSDT",
+        timeframe=5,
+        timestamp=datetime.now(UTC),
         open=100.0,
         high=110.0,
         low=90.0,
