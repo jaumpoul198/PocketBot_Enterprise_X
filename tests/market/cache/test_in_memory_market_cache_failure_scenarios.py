@@ -105,18 +105,99 @@ def test_cache_save_overwrites_previous_value() -> None:
     ]
 
 
-def test_cache_rejects_invalid_internal_operations() -> None:
+def test_cache_rejects_none_asset() -> None:
     cache = InMemoryMarketCache()
 
-    cache.save(
-        None,  # type: ignore[arg-type]
-        60,
-        [],
-    )
+    with pytest.raises(
+        ValueError,
+        match="asset cannot be None",
+    ):
+        cache.save(
+            None,  # type: ignore[arg-type]
+            60,
+            [],
+        )
 
-    result = cache.load(
-        None,  # type: ignore[arg-type]
-        60,
-    )
 
-    assert result == []
+def test_cache_rejects_invalid_asset_type() -> None:
+    cache = InMemoryMarketCache()
+
+    with pytest.raises(
+        TypeError,
+        match="asset must be a string",
+    ):
+        cache.save(
+            123,  # type: ignore[arg-type]
+            60,
+            [],
+        )
+
+
+def test_cache_rejects_none_timeframe() -> None:
+    cache = InMemoryMarketCache()
+
+    with pytest.raises(
+        ValueError,
+        match="timeframe cannot be None",
+    ):
+        cache.save(
+            "BTCUSDT",
+            None,  # type: ignore[arg-type]
+            [],
+        )
+
+
+def test_cache_rejects_bool_timeframe() -> None:
+    cache = InMemoryMarketCache()
+
+    with pytest.raises(
+        TypeError,
+        match="timeframe must be an integer",
+    ):
+        cache.save(
+            "BTCUSDT",
+            True,
+            [],
+        )
+
+
+def test_cache_rejects_invalid_timeframe_type() -> None:
+    cache = InMemoryMarketCache()
+
+    with pytest.raises(
+        TypeError,
+        match="timeframe must be an integer",
+    ):
+        cache.save(
+            "BTCUSDT",
+            "60",  # type: ignore[arg-type]
+            [],
+        )
+
+
+def test_cache_rejects_none_candles() -> None:
+    cache = InMemoryMarketCache()
+
+    with pytest.raises(
+        ValueError,
+        match="candles cannot be None",
+    ):
+        cache.save(
+            "BTCUSDT",
+            60,
+            None,  # type: ignore[arg-type]
+        )
+
+
+def test_cache_rejects_invalid_candles_type() -> None:
+    cache = InMemoryMarketCache()
+
+    with pytest.raises(
+        TypeError,
+        match="candles must be a list",
+    ):
+        cache.save(
+            "BTCUSDT",
+            60,
+            "invalid",  # type: ignore[arg-type]
+        )
