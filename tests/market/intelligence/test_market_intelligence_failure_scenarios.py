@@ -145,3 +145,52 @@ def test_market_state_propagates_repository_failure() -> None:
             "BTCUSDT",
             60,
         )
+
+def test_market_state_returns_none_when_latest_candle_missing() -> None:
+    repository = Mock()
+
+    latest = Mock()
+    latest.last_candle = None
+
+    previous = create_snapshot(100)
+
+    repository.get_last_n.return_value = [
+        latest,
+        previous,
+    ]
+
+    service = MarketStateService(
+        repository,
+    )
+
+    result = service.get_current_state(
+        "BTCUSDT",
+        60,
+    )
+
+    assert result is None
+
+
+def test_market_state_returns_none_when_previous_candle_missing() -> None:
+    repository = Mock()
+
+    latest = create_snapshot(100)
+
+    previous = Mock()
+    previous.last_candle = None
+
+    repository.get_last_n.return_value = [
+        latest,
+        previous,
+    ]
+
+    service = MarketStateService(
+        repository,
+    )
+
+    result = service.get_current_state(
+        "BTCUSDT",
+        60,
+    )
+
+    assert result is None
