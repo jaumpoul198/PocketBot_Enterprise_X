@@ -22,6 +22,7 @@ from pocketbot.application.session.trading_session_manager import (
     TradingSessionManager,
 )
 
+
 class ApplicationRuntime:
     """
     Controls application lifecycle.
@@ -42,6 +43,14 @@ class ApplicationRuntime:
         """
         Initializes application runtime.
         """
+
+        if self._state is ApplicationState.RUNNING:
+            return
+
+        if self._state is ApplicationState.STOPPED:
+            raise RuntimeError(
+                "Application runtime cannot restart after stop."
+            )
 
         self._state = ApplicationState.STARTING
 
@@ -75,6 +84,11 @@ class ApplicationRuntime:
         Executes application trading session.
         """
 
+        if self._state is ApplicationState.STOPPED:
+            raise RuntimeError(
+                "Cannot run stopped application runtime."
+            )
+
         if not self.is_running:
             self.start()
 
@@ -91,6 +105,9 @@ class ApplicationRuntime:
         Stops application runtime.
         """
 
+        if self._state is ApplicationState.STOPPED:
+            return
+
         self._state = ApplicationState.STOPPING
 
         self._publisher.publish(
@@ -100,7 +117,6 @@ class ApplicationRuntime:
 
         try:
             self._lifecycle.stop()
-
 
         except Exception as exc:
             self._state = ApplicationState.FAILED
