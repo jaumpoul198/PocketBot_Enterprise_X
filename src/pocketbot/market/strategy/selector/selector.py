@@ -20,6 +20,9 @@ class RankingEngineProtocol(Protocol):
         ...
 
 
+_DEFAULT_RANKING_ENGINE = object()
+
+
 class StrategySelectorEngine:
     """
     Selects the best strategy based on ranking.
@@ -27,23 +30,31 @@ class StrategySelectorEngine:
 
     def __init__(
         self,
-        ranking_engine: RankingEngineProtocol | None = None,
+        ranking_engine: RankingEngineProtocol | object = (
+            _DEFAULT_RANKING_ENGINE
+        ),
     ) -> None:
 
-        if ranking_engine is None:
+        if ranking_engine is _DEFAULT_RANKING_ENGINE:
             self._ranking_engine: RankingEngineProtocol = (
                 StrategyRankingEngine()
             )
-        else:
-            if not hasattr(
-                ranking_engine,
-                "rank",
-            ):
-                raise TypeError(
-                    "ranking_engine must provide rank",
-                )
+            return
 
-            self._ranking_engine = ranking_engine
+        if ranking_engine is None:
+            raise ValueError(
+                "ranking_engine cannot be None",
+            )
+
+        if not hasattr(
+            ranking_engine,
+            "rank",
+        ):
+            raise TypeError(
+                "ranking_engine must provide rank",
+            )
+
+        self._ranking_engine = ranking_engine
 
     def select(
         self,
