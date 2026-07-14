@@ -20,6 +20,47 @@ class DefaultMarketNormalizer(MarketNormalizer):
     Default implementation for market normalization.
     """
 
+    _REQUIRED_FIELDS = (
+        "timestamp",
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+    )
+
+    def _validate_raw_data(
+        self,
+        raw_data: list[dict[str, object]],
+    ) -> None:
+        if raw_data is None:
+            raise ValueError(
+                "raw_data cannot be None",
+            )
+
+        if not isinstance(
+            raw_data,
+            list,
+        ):
+            raise TypeError(
+                "raw_data must be a list",
+            )
+
+        for index, item in enumerate(raw_data):
+            if not isinstance(
+                item,
+                dict,
+            ):
+                raise TypeError(
+                    f"raw_data[{index}] must be a dictionary",
+                )
+
+            for field in self._REQUIRED_FIELDS:
+                if field not in item:
+                    raise ValueError(
+                        f"missing required field: {field}",
+                    )
+
     def normalize(
         self,
         raw_data: list[dict[str, object]],
@@ -27,6 +68,10 @@ class DefaultMarketNormalizer(MarketNormalizer):
         """
         Converts raw market data into Candle entities.
         """
+
+        self._validate_raw_data(
+            raw_data,
+        )
 
         candles: list[Candle] = []
 
