@@ -47,15 +47,27 @@ class InMemoryTradeDecisionRepository(
                 "invalid trade decision type",
             )
 
-        if decision.asset not in self._decisions:
+        copied_decision = deepcopy(
+            decision,
+        )
+
+        if not isinstance(
+            copied_decision,
+            TradeDecision,
+        ):
+            raise TypeError(
+                "invalid copied trade decision type",
+            )
+
+        if copied_decision.asset not in self._decisions:
             self._decisions[
-                decision.asset
+                copied_decision.asset
             ] = []
 
         self._decisions[
-            decision.asset
+            copied_decision.asset
         ].append(
-            deepcopy(decision),
+            copied_decision,
         )
 
     def get_latest(
@@ -85,4 +97,16 @@ class InMemoryTradeDecisionRepository(
             key=lambda item: item.timestamp,
         )
 
-        return deepcopy(latest)
+        copied_latest = deepcopy(
+            latest,
+        )
+
+        if not isinstance(
+            copied_latest,
+            TradeDecision,
+        ):
+            raise TypeError(
+                "invalid copied latest trade decision type",
+            )
+
+        return copied_latest
