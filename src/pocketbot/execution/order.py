@@ -6,6 +6,7 @@ Execution Order.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any
@@ -20,19 +21,67 @@ class ExecutionOrder:
     """
 
     asset: str
-
     signal: SignalType
-
     timeframe: int
-
     amount: float
-
     confidence: float
-
     expiration: int
-
     metadata: dict[str, Any] = field(default_factory=dict)
 
     created_at: datetime = field(
         default_factory=lambda: datetime.now(UTC),
     )
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.asset, str):
+            raise TypeError("asset must be a string")
+
+        if not self.asset.strip():
+            raise ValueError("asset cannot be empty")
+
+        if not isinstance(self.signal, SignalType):
+            raise TypeError("signal must be a SignalType")
+
+        timeframe = self.timeframe
+        if isinstance(timeframe, bool):
+            raise TypeError("timeframe cannot be boolean")
+        if not isinstance(timeframe, int):
+            raise TypeError("timeframe must be int")
+        if timeframe <= 0:
+            raise ValueError("timeframe must be greater than zero")
+
+        expiration = self.expiration
+        if isinstance(expiration, bool):
+            raise TypeError("expiration cannot be boolean")
+        if not isinstance(expiration, int):
+            raise TypeError("expiration must be int")
+        if expiration <= 0:
+            raise ValueError("expiration must be greater than zero")
+
+        amount = self.amount
+        if isinstance(amount, bool):
+            raise TypeError("amount cannot be boolean")
+        if not isinstance(amount, (int, float)):
+            raise TypeError("amount must be numeric")
+        amount_value = float(amount)
+        if not math.isfinite(amount_value):
+            raise ValueError("amount must be finite")
+        if amount_value <= 0:
+            raise ValueError("amount must be greater than zero")
+
+        confidence = self.confidence
+        if isinstance(confidence, bool):
+            raise TypeError("confidence cannot be boolean")
+        if not isinstance(confidence, (int, float)):
+            raise TypeError("confidence must be numeric")
+        confidence_value = float(confidence)
+        if not math.isfinite(confidence_value):
+            raise ValueError("confidence must be finite")
+        if confidence_value <= 0:
+            raise ValueError("confidence must be greater than zero")
+
+        if not isinstance(self.metadata, dict):
+            raise TypeError("metadata must be a dictionary")
+
+        if not isinstance(self.created_at, datetime):
+            raise TypeError("created_at must be datetime")
