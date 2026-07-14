@@ -11,11 +11,21 @@ class StrategySelectorEngine:
         self,
         ranking_engine: StrategyRankingEngine | None = None,
     ) -> None:
-        self._ranking_engine = (
-            ranking_engine
-            if ranking_engine is not None
-            else StrategyRankingEngine()
-        )
+
+        if ranking_engine is None:
+            raise ValueError(
+                "ranking_engine cannot be None",
+            )
+
+        if not hasattr(
+            ranking_engine,
+            "rank",
+        ):
+            raise TypeError(
+                "ranking_engine must provide rank",
+            )
+
+        self._ranking_engine = ranking_engine
 
     def select(
         self,
@@ -25,6 +35,13 @@ class StrategySelectorEngine:
         Returns the highest ranked strategy.
         """
 
-        ranked_scores = self._ranking_engine.rank(scores)
+        if scores is None:
+            raise ValueError(
+                "scores cannot be None",
+            )
+
+        ranked_scores = self._ranking_engine.rank(
+            scores,
+        )
 
         return ranked_scores[0]

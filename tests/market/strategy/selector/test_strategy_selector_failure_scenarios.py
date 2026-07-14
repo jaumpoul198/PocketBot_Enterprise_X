@@ -73,3 +73,49 @@ def test_strategy_ranking_is_immutable() -> None:
         FrozenInstanceError,
     ):
         ranking.scores = []
+def test_selector_rejects_none_ranking_engine() -> None:
+    with pytest.raises(
+        ValueError,
+        match="ranking_engine cannot be None",
+    ):
+        StrategySelectorEngine(
+            ranking_engine=None,
+        )
+
+
+def test_selector_rejects_invalid_ranking_engine_contract() -> None:
+
+    class InvalidRankingEngine:
+        pass
+
+    with pytest.raises(
+        TypeError,
+        match="ranking_engine must provide rank",
+    ):
+        StrategySelectorEngine(
+            ranking_engine=InvalidRankingEngine(),
+        )
+
+
+def test_selector_rejects_none_scores() -> None:
+    selector = StrategySelectorEngine()
+
+    with pytest.raises(
+        ValueError,
+        match="scores cannot be None",
+    ):
+        selector.select(
+            None,
+        )
+
+
+def test_ranking_rejects_none_scores() -> None:
+    engine = StrategyRankingEngine()
+
+    with pytest.raises(
+        ValueError,
+        match="scores cannot be None",
+    ):
+        engine.rank(
+            None,
+        )
