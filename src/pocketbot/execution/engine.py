@@ -26,6 +26,27 @@ class ExecutionEngine:
         risk: RiskResult,
     ) -> ExecutionResult:
 
+        if not isinstance(asset, str):
+            raise TypeError("asset must be a string")
+
+        if not asset.strip():
+            raise ValueError("asset cannot be empty")
+
+        if isinstance(timeframe, bool):
+            raise TypeError("timeframe cannot be boolean")
+
+        if not isinstance(timeframe, int):
+            raise TypeError("timeframe must be int")
+
+        if timeframe <= 0:
+            raise ValueError("timeframe must be greater than zero")
+
+        if decision is None:
+            raise TypeError("decision cannot be None")
+
+        if risk is None:
+            raise TypeError("risk cannot be None")
+
         if not decision.approved:
             return ExecutionResult(
                 decision=decision,

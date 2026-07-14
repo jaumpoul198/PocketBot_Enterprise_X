@@ -35,6 +35,7 @@ def create_risk(
         reason="test",
     )
 
+
 def test_execution_rejects_unapproved_decision() -> None:
     engine = ExecutionEngine()
 
@@ -80,17 +81,13 @@ def test_execution_creates_order_when_approved() -> None:
     assert result.order.asset == "BTCUSDT"
 
 
-def test_execution_propagates_invalid_risk_failure() -> None:
+def test_execution_rejects_none_risk() -> None:
     engine = ExecutionEngine()
 
-    invalid_risk = None
-
-    with pytest.raises(
-        AttributeError,
-    ):
+    with pytest.raises(TypeError):
         engine.execute(
             "BTCUSDT",
             60,
             create_decision(),
-            invalid_risk,  # type: ignore[arg-type]
+            None,  # type: ignore[arg-type]
         )
