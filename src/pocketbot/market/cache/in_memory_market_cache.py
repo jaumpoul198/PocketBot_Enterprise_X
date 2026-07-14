@@ -45,6 +45,11 @@ class InMemoryMarketCache(MarketCache):
                 "asset must be a string",
             )
 
+        if not asset:
+            raise ValueError(
+                "asset cannot be empty",
+            )
+
     def _validate_timeframe(
         self,
         timeframe: int,
@@ -86,6 +91,15 @@ class InMemoryMarketCache(MarketCache):
             raise TypeError(
                 "candles must be a list",
             )
+
+        for candle in candles:
+            if not isinstance(
+                candle,
+                Candle,
+            ):
+                raise TypeError(
+                    "candles must contain only Candle instances",
+                )
 
     def save(
         self,
