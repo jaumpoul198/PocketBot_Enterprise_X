@@ -8,10 +8,8 @@ from __future__ import annotations
 
 from pocketbot.decision.result import DecisionResult
 from pocketbot.risk.interfaces.risk_service import RiskService
+from pocketbot.risk.models.risk_assessment import RiskStatus
 from pocketbot.risk.result import RiskResult
-from pocketbot.risk.models.risk_assessment import (
-    RiskStatus,
-)
 
 
 class RiskEngineAdapter:
@@ -24,12 +22,30 @@ class RiskEngineAdapter:
         risk_service: RiskService,
     ) -> None:
 
+        if risk_service is None:
+            raise TypeError(
+                "risk_service cannot be None"
+            )
+
         self._risk_service = risk_service
 
     def evaluate(
         self,
         decision: DecisionResult,
     ) -> RiskResult:
+
+        if decision is None:
+            raise TypeError(
+                "decision cannot be None"
+            )
+
+        if not isinstance(
+            decision,
+            DecisionResult,
+        ):
+            raise TypeError(
+                "decision must be DecisionResult"
+            )
 
         if not decision.approved:
             return RiskResult(
