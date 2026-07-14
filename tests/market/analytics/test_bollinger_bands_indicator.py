@@ -65,11 +65,57 @@ def test_bollinger_bands_returns_none_without_enough_candles():
     assert result is None
 
 
-def test_bollinger_bands_requires_positive_period():
+def test_bollinger_bands_requires_minimum_period():
 
     with pytest.raises(ValueError):
 
         BollingerBandsIndicator(
-            period=0,
+            period=1,
             multiplier=2,
         )
+
+def test_bollinger_bands_requires_positive_multiplier() -> None:
+
+    with pytest.raises(ValueError):
+        BollingerBandsIndicator(
+            period=3,
+            multiplier=0,
+        )
+
+
+def test_bollinger_bands_returns_none_for_empty_candles() -> None:
+
+    indicator = BollingerBandsIndicator(
+        period=3,
+        multiplier=2,
+    )
+
+    result = indicator.calculate(
+        []
+    )
+
+    assert result is None
+
+
+def test_bollinger_bands_constant_prices_return_equal_bands() -> None:
+
+    candles = [
+        create_candle(100),
+        create_candle(100),
+        create_candle(100),
+    ]
+
+    indicator = BollingerBandsIndicator(
+        period=3,
+        multiplier=2,
+    )
+
+    result = indicator.calculate(
+        candles
+    )
+
+    assert result is not None
+
+    assert result.middle == 100
+    assert result.upper == 100
+    assert result.lower == 100

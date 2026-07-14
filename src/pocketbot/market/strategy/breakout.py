@@ -1,8 +1,19 @@
+import math
+from typing import TypeGuard
+
 from pocketbot.market.strategy.base import BaseStrategy
 from pocketbot.market.strategy.models import (
     StrategyResult,
     StrategySignal,
 )
+
+
+def _is_valid_number(value: object) -> TypeGuard[float]:
+    return (
+        isinstance(value, (int, float))
+        and not isinstance(value, bool)
+        and math.isfinite(float(value))
+    )
 
 
 class BreakoutStrategy(BaseStrategy):
@@ -24,7 +35,7 @@ class BreakoutStrategy(BaseStrategy):
                 reason="Invalid indicator data",
             )
 
-        indicators: dict[str, float] = data
+        indicators: dict[str, object] = data
 
         price = indicators.get("price")
         support = indicators.get("support")
@@ -39,6 +50,17 @@ class BreakoutStrategy(BaseStrategy):
                 signal=StrategySignal.HOLD,
                 confidence=0.0,
                 reason="Missing support or resistance levels",
+            )
+
+        if not (
+            _is_valid_number(price)
+            and _is_valid_number(support)
+            and _is_valid_number(resistance)
+        ):
+            return StrategyResult(
+                signal=StrategySignal.HOLD,
+                confidence=0.0,
+                reason="Invalid indicator values",
             )
 
         if price > resistance:

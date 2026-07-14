@@ -22,12 +22,12 @@ class HostedServiceManager:
         self,
         services: Iterable[HostedService] | None = None,
     ) -> None:
+
         self._services: list[HostedService] = []
 
         if services is not None:
-            self._services.extend(
-                services,
-            )
+            for service in services:
+                self.add(service)
 
     def add(
         self,
@@ -36,6 +36,11 @@ class HostedServiceManager:
         """
         Registers a hosted service.
         """
+
+        if service is None:
+            raise TypeError(
+                "hosted service cannot be None",
+            )
 
         self._services.append(
             service,

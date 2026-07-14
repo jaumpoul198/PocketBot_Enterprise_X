@@ -27,6 +27,80 @@ class InMemoryMarketCache(MarketCache):
             list[Candle],
         ] = {}
 
+    def _validate_asset(
+        self,
+        asset: str,
+    ) -> None:
+
+        if asset is None:
+            raise ValueError(
+                "asset cannot be None",
+            )
+
+        if not isinstance(
+            asset,
+            str,
+        ):
+            raise TypeError(
+                "asset must be a string",
+            )
+
+        if not asset:
+            raise ValueError(
+                "asset cannot be empty",
+            )
+
+    def _validate_timeframe(
+        self,
+        timeframe: int,
+    ) -> None:
+
+        if timeframe is None:
+            raise ValueError(
+                "timeframe cannot be None",
+            )
+
+        if (
+            not isinstance(
+                timeframe,
+                int,
+            )
+            or isinstance(
+                timeframe,
+                bool,
+            )
+        ):
+            raise TypeError(
+                "timeframe must be an integer",
+            )
+
+    def _validate_candles(
+        self,
+        candles: list[Candle],
+    ) -> None:
+
+        if candles is None:
+            raise ValueError(
+                "candles cannot be None",
+            )
+
+        if not isinstance(
+            candles,
+            list,
+        ):
+            raise TypeError(
+                "candles must be a list",
+            )
+
+        for candle in candles:
+            if not isinstance(
+                candle,
+                Candle,
+            ):
+                raise TypeError(
+                    "candles must contain only Candle instances",
+                )
+
     def save(
         self,
         asset: str,
@@ -36,6 +110,18 @@ class InMemoryMarketCache(MarketCache):
         """
         Stores candles in memory.
         """
+
+        self._validate_asset(
+            asset,
+        )
+
+        self._validate_timeframe(
+            timeframe,
+        )
+
+        self._validate_candles(
+            candles,
+        )
 
         self._cache[
             (asset, timeframe)
@@ -49,6 +135,14 @@ class InMemoryMarketCache(MarketCache):
         """
         Loads candles from memory.
         """
+
+        self._validate_asset(
+            asset,
+        )
+
+        self._validate_timeframe(
+            timeframe,
+        )
 
         return deepcopy(
             self._cache.get(

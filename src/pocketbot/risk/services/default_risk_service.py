@@ -6,6 +6,8 @@ Default risk service implementation.
 
 from __future__ import annotations
 
+import math
+
 from pocketbot.risk.interfaces.risk_service import (
     RiskService,
 )
@@ -27,6 +29,7 @@ class DefaultRiskService(RiskService):
         self,
         profile: RiskProfile | None = None,
     ) -> None:
+
         self._profile = profile or RiskProfile(
             max_position_size=1.0,
             max_loss_percentage=2.0,
@@ -42,6 +45,26 @@ class DefaultRiskService(RiskService):
         """
         Evaluate trading risk constraints.
         """
+
+        self._validate_numeric(
+            "position_size",
+            position_size,
+        )
+
+        self._validate_numeric(
+            "current_exposure",
+            current_exposure,
+        )
+
+        if position_size <= 0:
+            raise ValueError(
+                "position_size must be greater than zero"
+            )
+
+        if current_exposure < 0:
+            raise ValueError(
+                "current_exposure cannot be negative"
+            )
 
         if position_size > self._profile.max_position_size:
             return RiskAssessment(
@@ -62,3 +85,24 @@ class DefaultRiskService(RiskService):
             status=RiskStatus.APPROVED,
             reason="Risk approved.",
         )
+
+    @staticmethod
+    def _validate_numeric(
+        name: str,
+        value: float,
+    ) -> None:
+
+        if isinstance(value, bool):
+            raise TypeError(
+                f"{name} cannot be boolean"
+            )
+
+        if not isinstance(value, (int, float)):
+            raise TypeError(
+                f"{name} must be numeric"
+            )
+
+        if not math.isfinite(float(value)):
+            raise ValueError(
+                f"{name} must be finite"
+            )

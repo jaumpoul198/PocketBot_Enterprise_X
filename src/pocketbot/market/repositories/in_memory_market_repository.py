@@ -24,6 +24,71 @@ class InMemoryMarketRepository(MarketRepository):
             list[MarketSnapshot],
         ] = {}
 
+    def _validate_snapshot(
+        self,
+        snapshot: MarketSnapshot,
+    ) -> None:
+
+        if snapshot is None:
+            raise ValueError(
+                "snapshot cannot be None",
+            )
+
+        if not isinstance(
+            snapshot,
+            MarketSnapshot,
+        ):
+            raise TypeError(
+                "snapshot must be a MarketSnapshot",
+            )
+
+    def _validate_asset(
+        self,
+        asset: str,
+    ) -> None:
+
+        if asset is None:
+            raise ValueError(
+                "asset cannot be None",
+            )
+
+        if not isinstance(
+            asset,
+            str,
+        ):
+            raise TypeError(
+                "asset must be a string",
+            )
+
+        if not asset:
+            raise ValueError(
+                "asset cannot be empty",
+            )
+
+    def _validate_timeframe(
+        self,
+        timeframe: int,
+    ) -> None:
+
+        if timeframe is None:
+            raise ValueError(
+                "timeframe cannot be None",
+            )
+
+        if (
+            not isinstance(
+                timeframe,
+                int,
+            )
+            or isinstance(
+                timeframe,
+                bool,
+            )
+        ):
+            raise TypeError(
+                "timeframe must be an integer",
+            )
+
     def save(
         self,
         snapshot: MarketSnapshot,
@@ -31,6 +96,10 @@ class InMemoryMarketRepository(MarketRepository):
         """
         Stores an isolated snapshot copy.
         """
+
+        self._validate_snapshot(
+            snapshot,
+        )
 
         key = (
             snapshot.asset,
@@ -52,6 +121,14 @@ class InMemoryMarketRepository(MarketRepository):
         """
         Returns an isolated latest snapshot copy.
         """
+
+        self._validate_asset(
+            asset,
+        )
+
+        self._validate_timeframe(
+            timeframe,
+        )
 
         key = (
             asset,
@@ -80,6 +157,33 @@ class InMemoryMarketRepository(MarketRepository):
         Returns isolated snapshot copies.
         """
 
+        self._validate_asset(
+            asset,
+        )
+
+        self._validate_timeframe(
+            timeframe,
+        )
+
+        if limit is None:
+            raise ValueError(
+                "limit cannot be None",
+            )
+
+        if (
+            not isinstance(
+                limit,
+                int,
+            )
+            or isinstance(
+                limit,
+                bool,
+            )
+        ):
+            raise TypeError(
+                "limit must be an integer",
+            )
+
         key = (
             asset,
             timeframe,
@@ -105,6 +209,19 @@ class InMemoryMarketRepository(MarketRepository):
         """
         Returns isolated snapshots within a time range.
         """
+
+        self._validate_asset(
+            asset,
+        )
+
+        self._validate_timeframe(
+            timeframe,
+        )
+
+        if start is None or end is None:
+            raise ValueError(
+                "date range cannot be None",
+            )
 
         key = (
             asset,

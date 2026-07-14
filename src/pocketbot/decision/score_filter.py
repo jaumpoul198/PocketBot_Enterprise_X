@@ -22,8 +22,45 @@ class ScoreFilter(DecisionFilter):
         minimum_buy: float = 80.0,
         maximum_sell: float = 20.0,
     ) -> None:
-        self._minimum_buy = minimum_buy
-        self._maximum_sell = maximum_sell
+
+        if isinstance(minimum_buy, bool):
+            raise TypeError(
+                "minimum_buy cannot be boolean"
+            )
+
+        if isinstance(maximum_sell, bool):
+            raise TypeError(
+                "maximum_sell cannot be boolean"
+            )
+
+        if not isinstance(
+            minimum_buy,
+            (int, float),
+        ):
+            raise TypeError(
+                "minimum_buy must be numeric"
+            )
+
+        if not isinstance(
+            maximum_sell,
+            (int, float),
+        ):
+            raise TypeError(
+                "maximum_sell must be numeric"
+            )
+
+        if minimum_buy <= 0:
+            raise ValueError(
+                "minimum_buy must be greater than zero"
+            )
+
+        if maximum_sell < 0:
+            raise ValueError(
+                "maximum_sell cannot be negative"
+            )
+
+        self._minimum_buy = float(minimum_buy)
+        self._maximum_sell = float(maximum_sell)
 
     def evaluate(
         self,
@@ -32,6 +69,19 @@ class ScoreFilter(DecisionFilter):
         """
         Evaluates the score.
         """
+
+        if score is None:
+            raise TypeError(
+                "score cannot be None"
+            )
+
+        if not isinstance(
+            score,
+            ScoreResult,
+        ):
+            raise TypeError(
+                "score must be ScoreResult"
+            )
 
         if score.score >= self._minimum_buy:
             return DecisionResult(

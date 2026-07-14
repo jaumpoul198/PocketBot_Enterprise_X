@@ -86,3 +86,24 @@ def test_sma_requires_positive_period():
         SMAIndicator(
             period=0
         )
+
+def test_sma_returns_none_for_empty_candles():
+
+    indicator = SMAIndicator(
+        period=3
+    )
+
+    result = indicator.calculate(
+        []
+    )
+
+    assert result is None
+
+
+def test_sma_requires_positive_negative_period():
+
+    with pytest.raises(ValueError):
+
+        SMAIndicator(
+            period=-1
+        )

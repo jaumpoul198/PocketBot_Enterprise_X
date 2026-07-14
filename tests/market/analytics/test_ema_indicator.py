@@ -68,3 +68,46 @@ def test_ema_requires_positive_period():
 
     except ValueError:
         assert True
+
+def test_ema_returns_none_for_empty_candles() -> None:
+
+    indicator = EMAIndicator(
+        period=3,
+    )
+
+    result = indicator.calculate(
+        []
+    )
+
+    assert result is None
+
+
+def test_ema_rejects_negative_period() -> None:
+
+    try:
+        EMAIndicator(
+            period=-1,
+        )
+
+        assert False
+
+    except ValueError:
+        assert True
+
+
+def test_ema_with_period_one_returns_last_price() -> None:
+
+    candles = [
+        create_candle(100),
+        create_candle(105),
+    ]
+
+    indicator = EMAIndicator(
+        period=1,
+    )
+
+    result = indicator.calculate(
+        candles,
+    )
+
+    assert result == 105

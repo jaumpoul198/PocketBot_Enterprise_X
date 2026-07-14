@@ -1,4 +1,4 @@
-"""
+﻿"""
 PocketBot Enterprise X
 Simple Moving Average Indicator
 """

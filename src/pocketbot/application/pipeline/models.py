@@ -7,7 +7,7 @@ Trading Pipeline models.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any
+from typing import TypeAlias
 
 from pocketbot.decision.result import DecisionResult
 from pocketbot.indicators.base.result import IndicatorResult
@@ -17,6 +17,15 @@ from pocketbot.risk.models.risk_assessment import (
     RiskAssessment,
 )
 from pocketbot.score.result import ScoreResult
+
+
+TradingMetadataValue: TypeAlias = (
+    str
+    | int
+    | float
+    | bool
+    | None
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -52,6 +61,6 @@ class TradingResult:
 
     risk: RiskAssessment
 
-    metadata: dict[str, Any] = field(
+    metadata: dict[str, TradingMetadataValue] = field(
         default_factory=dict,
     )

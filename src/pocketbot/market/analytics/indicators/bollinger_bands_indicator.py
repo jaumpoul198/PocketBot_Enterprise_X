@@ -1,4 +1,4 @@
-"""
+﻿"""
 PocketBot Enterprise X
 Bollinger Bands Indicator
 """
@@ -43,9 +43,14 @@ class BollingerBandsIndicator(
         multiplier: float = 2.0,
     ) -> None:
 
-        if period <= 0:
+        if period <= 2:
             raise ValueError(
-                "Period must be positive."
+                "Period must be at least 2."
+            )
+
+        if multiplier <= 0:
+            raise ValueError(
+                "Multiplier must be positive."
             )
 
         self.period = period

@@ -22,6 +22,7 @@ class DecisionEngine:
     """
 
     def __init__(self) -> None:
+
         self._filters = DecisionFilters()
 
     def decide(
@@ -32,6 +33,27 @@ class DecisionEngine:
         """
         Executes all decision filters.
         """
+
+        if score is None:
+            raise TypeError(
+                "score cannot be None"
+            )
+
+        if not isinstance(
+            score,
+            ScoreResult,
+        ):
+            raise TypeError(
+                "score must be ScoreResult"
+            )
+
+        if strategy is not None and not isinstance(
+            strategy,
+            StrategyResult,
+        ):
+            raise TypeError(
+                "strategy must be StrategyResult"
+            )
 
         if not self._filters.score_ok(score):
             return DecisionResult(
@@ -61,19 +83,11 @@ class DecisionEngine:
             )
 
         if strategy is not None:
-            if strategy.signal is StrategySignal.HOLD:
-                return DecisionResult(
-                    signal=SignalType.NEUTRAL,
-                    score=score.score,
-                    confidence=score.confidence,
-                    approved=False,
-                    reason=strategy.reason,
-                    metadata={
-                        "strategy_signal": strategy.signal.value,
-                    },
-                )
 
-            if strategy.signal is StrategySignal.SELL:
+            if strategy.signal in (
+                StrategySignal.HOLD,
+                StrategySignal.SELL,
+            ):
                 return DecisionResult(
                     signal=SignalType.NEUTRAL,
                     score=score.score,

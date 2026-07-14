@@ -77,6 +77,8 @@ class TradingSessionManager:
             return result
 
         except Exception:
+            # Session lifecycle requires failure state transition.
+            # Original exception is intentionally preserved.
             session.status = TradingSessionStatus.FAILED
             raise
 

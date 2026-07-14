@@ -40,6 +40,21 @@ class TradeEngine:
         execution: ExecutionEngine,
     ) -> None:
 
+        if decision is None:
+            raise TypeError(
+                "decision cannot be None",
+            )
+
+        if risk is None:
+            raise TypeError(
+                "risk cannot be None",
+            )
+
+        if execution is None:
+            raise TypeError(
+                "execution cannot be None",
+            )
+
         self._decision = decision
         self._risk = risk
         self._execution = execution
@@ -50,6 +65,31 @@ class TradeEngine:
         timeframe: int,
         score: ScoreResult,
     ) -> TradeResult:
+
+        if not isinstance(asset, str):
+            raise TypeError(
+                "asset must be a string",
+            )
+
+        if not asset.strip():
+            raise ValueError(
+                "asset cannot be empty",
+            )
+
+        if not isinstance(timeframe, int):
+            raise TypeError(
+                "timeframe must be an integer",
+            )
+
+        if timeframe <= 0:
+            raise ValueError(
+                "timeframe must be positive",
+            )
+
+        if score is None:
+            raise TypeError(
+                "score cannot be None",
+            )
 
         decision = self._decision.decide(
             score,

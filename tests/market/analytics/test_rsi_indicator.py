@@ -64,3 +64,33 @@ def test_rsi_requires_positive_period():
         assert False
     except ValueError:
         assert True
+
+def test_rsi_returns_zero_when_all_losses() -> None:
+    candles = [
+        create_candle(100),
+        create_candle(98),
+        create_candle(96),
+        create_candle(94),
+    ]
+
+    indicator = RSIIndicator(
+        period=3,
+    )
+
+    result = indicator.calculate(
+        candles,
+    )
+
+    assert result == 0.0
+
+
+def test_rsi_handles_empty_candles() -> None:
+    indicator = RSIIndicator(
+        period=3,
+    )
+
+    result = indicator.calculate(
+        [],
+    )
+
+    assert result is None

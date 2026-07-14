@@ -6,12 +6,8 @@ Default Market Collector.
 
 from __future__ import annotations
 
-from pocketbot.domain.candle import Candle
-from pocketbot.market.interfaces.market_collector import (
-    MarketCollector,
-)
-from pocketbot.market.interfaces.market_provider import (
-    MarketProvider,
+from pocketbot.market.cache.in_memory_market_cache import (
+    InMemoryMarketCache,
 )
 from pocketbot.market.collectors.default_market_collector import (
     DefaultMarketCollector,
@@ -19,13 +15,25 @@ from pocketbot.market.collectors.default_market_collector import (
 from pocketbot.market.providers.default_provider import (
     DefaultMarketProvider,
 )
+from pocketbot.market.repositories.in_memory_market_repository import (
+    InMemoryMarketRepository,
+)
+from pocketbot.market.validators.default_market_validator import (
+    DefaultMarketValidator,
+)
 
 
 def test_market_collector_collects_candles() -> None:
     provider = DefaultMarketProvider()
+    validator = DefaultMarketValidator()
+    cache = InMemoryMarketCache()
+    repository = InMemoryMarketRepository()
 
     collector = DefaultMarketCollector(
         provider,
+        validator,
+        cache,
+        repository,
     )
 
     candles = collector.collect(
@@ -38,30 +46,3 @@ def test_market_collector_collects_candles() -> None:
         candles,
         list,
     )
-
-class DefaultMarketCollector(MarketCollector):
-    """
-    Default implementation of market data collector.
-    """
-
-    def __init__(
-        self,
-        provider: MarketProvider,
-    ) -> None:
-        self._provider = provider
-
-    def collect(
-        self,
-        asset: str,
-        timeframe: int,
-        count: int,
-    ) -> list[Candle]:
-        """
-        Collects market candles from provider.
-        """
-
-        return self._provider.get_candles(
-            asset,
-            timeframe,
-            count,
-        )

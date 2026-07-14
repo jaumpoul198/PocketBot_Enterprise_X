@@ -1,13 +1,61 @@
 from __future__ import annotations
 
-import os
+from pocketbot.production.config.environments import (
+    resolve_environment,
+)
+from pocketbot.production.config.secrets import (
+    EnvironmentSecretProvider,
+    SecretProvider,
+    load_secret_settings,
+    resolve_secret_provider,
+)
+from pocketbot.production.config.settings import (
+    ProductionSettings,
+)
+from pocketbot.production.config.validator import (
+    validate_production_settings,
+)
 
-from pocketbot.production.config.settings import ProductionSettings
 
+def load_production_settings(
+    secret_provider: SecretProvider | None = None,
+) -> ProductionSettings:
+    if secret_provider is not None:
+        provider = secret_provider
+    else:
+        secret_settings = load_secret_settings(
+            EnvironmentSecretProvider().get_secret(
+                "POCKETBOT_SECRET_PROVIDER"
+            ),
+        )
 
-def load_production_settings() -> ProductionSettings:
-    return ProductionSettings(
-        environment=os.getenv("POCKETBOT_ENV", "production"),
-        debug=os.getenv("POCKETBOT_DEBUG", "false").lower() == "true",
-        service_name=os.getenv("POCKETBOT_SERVICE_NAME", "pocketbot"),
+        provider = resolve_secret_provider(
+            secret_settings,
+        )
+
+    environment = resolve_environment(
+        provider.get_secret("POCKETBOT_ENV")
     )
+
+    debug_override = provider.get_secret(
+        "POCKETBOT_DEBUG"
+    )
+
+    debug = (
+        debug_override.lower() == "true"
+        if debug_override is not None
+        else environment.debug
+    )
+
+    settings = ProductionSettings(
+        environment=environment.name,
+        debug=debug,
+        service_name=provider.get_secret(
+            "POCKETBOT_SERVICE_NAME"
+        )
+        or "pocketbot",
+    )
+
+    validate_production_settings(settings)
+
+    return settings

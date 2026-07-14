@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
@@ -30,23 +30,28 @@ class Candle:
 
     @property
     def body(self) -> float:
-        return abs(float(self.close) - float(self.open))
+        return abs(
+            float(self.close)
+            - float(self.open)
+        )
 
     @property
     def range(self) -> float:
-        return float(self.high) - float(self.low)
+        return (
+            float(self.high)
+            - float(self.low)
+        )
 
     @property
     def bullish(self) -> bool:
-        return float(self.close) > float(self.open)
+        return (
+            float(self.close)
+            > float(self.open)
+        )
 
     @property
     def bearish(self) -> bool:
-        return float(self.close) < float(self.open)
-
-    @property
-    def doji(self) -> bool:
-        if self.range == 0:
-            return True
-
-        return self.body <= self.range * 0.05
+        return (
+            float(self.close)
+            < float(self.open)
+        )

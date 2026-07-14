@@ -25,12 +25,22 @@ class TradingDecisionRecorder:
         repository: TradeDecisionRepository,
     ) -> None:
 
+        if repository is None:
+            raise TypeError(
+                "repository cannot be None",
+            )
+
         self._repository = repository
 
     def record(
         self,
         decision: TradeDecision,
     ) -> None:
+
+        if decision is None:
+            raise TypeError(
+                "trade decision cannot be None",
+            )
 
         self._repository.save(
             decision,

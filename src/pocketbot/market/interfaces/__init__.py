@@ -9,6 +9,7 @@ from .market_normalizer import MarketNormalizer
 from .market_provider import MarketProvider
 from .market_repository import MarketRepository
 from .market_validator import MarketValidator
+from .market_filter import MarketFilter
 
 __all__ = [
     "MarketProvider",
@@ -17,4 +18,5 @@ __all__ = [
     "MarketNormalizer",
     "MarketRepository",
     "MarketValidator",
+    "MarketFilter",
 ]

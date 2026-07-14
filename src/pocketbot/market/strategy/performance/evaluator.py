@@ -21,6 +21,21 @@ class StrategyEvaluator:
         Calculate strategy performance.
         """
 
+        if not strategy_name:
+            raise ValueError(
+                "strategy_name must not be empty"
+            )
+
+        self._validate_boolean_collection(
+            predictions,
+            "predictions",
+        )
+
+        self._validate_boolean_collection(
+            outcomes,
+            "outcomes",
+        )
+
         if not predictions or not outcomes:
             return StrategyPerformance(
                 strategy_name=strategy_name,
@@ -29,7 +44,10 @@ class StrategyEvaluator:
                 failed_signals=0,
             )
 
-        total = min(len(predictions), len(outcomes))
+        total = min(
+            len(predictions),
+            len(outcomes),
+        )
 
         successful = sum(
             1
@@ -45,3 +63,15 @@ class StrategyEvaluator:
             successful_signals=successful,
             failed_signals=failed,
         )
+
+    @staticmethod
+    def _validate_boolean_collection(
+        values: list[bool],
+        field_name: str,
+    ) -> None:
+
+        for value in values:
+            if type(value) is not bool:
+                raise TypeError(
+                    f"{field_name} must contain only boolean values"
+                )

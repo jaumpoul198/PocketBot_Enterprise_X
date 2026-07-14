@@ -73,3 +73,44 @@ def test_macd_requires_valid_periods():
 
     except ValueError:
         assert True
+
+def test_macd_rejects_invalid_slow_period() -> None:
+
+    try:
+        MACDIndicator(
+            fast_period=3,
+            slow_period=0,
+        )
+
+        assert False
+
+    except ValueError:
+        assert True
+
+
+def test_macd_rejects_fast_period_greater_than_or_equal_slow_period() -> None:
+
+    try:
+        MACDIndicator(
+            fast_period=5,
+            slow_period=5,
+        )
+
+        assert False
+
+    except ValueError:
+        assert True
+
+
+def test_macd_returns_none_for_empty_candles() -> None:
+
+    indicator = MACDIndicator(
+        fast_period=3,
+        slow_period=5,
+    )
+
+    result = indicator.calculate(
+        []
+    )
+
+    assert result is None

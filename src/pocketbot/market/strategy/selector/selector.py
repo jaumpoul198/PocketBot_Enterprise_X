@@ -1,5 +1,26 @@
-from pocketbot.market.strategy.selector.models import StrategyScore
-from pocketbot.market.strategy.selector.ranking import StrategyRankingEngine
+from typing import Protocol
+
+from pocketbot.market.strategy.selector.models import (
+    StrategyScore,
+)
+from pocketbot.market.strategy.selector.ranking import (
+    StrategyRankingEngine,
+)
+
+
+class RankingEngineProtocol(Protocol):
+    """
+    Contract required by strategy selector ranking engine.
+    """
+
+    def rank(
+        self,
+        scores: list[StrategyScore],
+    ) -> list[StrategyScore]:
+        ...
+
+
+_DEFAULT_RANKING_ENGINE = object()
 
 
 class StrategySelectorEngine:
@@ -9,22 +30,44 @@ class StrategySelectorEngine:
 
     def __init__(
         self,
-        ranking_engine: StrategyRankingEngine | None = None,
+        ranking_engine: RankingEngineProtocol | object = (
+            _DEFAULT_RANKING_ENGINE
+        ),
     ) -> None:
-        self._ranking_engine = (
-            ranking_engine
-            if ranking_engine is not None
-            else StrategyRankingEngine()
-        )
+
+        if ranking_engine is _DEFAULT_RANKING_ENGINE:
+            self._ranking_engine: RankingEngineProtocol = (
+                StrategyRankingEngine()
+            )
+            return
+
+        if ranking_engine is None:
+            raise ValueError(
+                "ranking_engine cannot be None",
+            )
+
+        if not hasattr(
+            ranking_engine,
+            "rank",
+        ):
+            raise TypeError(
+                "ranking_engine must provide rank",
+            )
+
+        self._ranking_engine = ranking_engine
 
     def select(
         self,
-        scores: list[StrategyScore],
+        scores: list[StrategyScore] | None,
     ) -> StrategyScore:
-        """
-        Returns the highest ranked strategy.
-        """
 
-        ranked_scores = self._ranking_engine.rank(scores)
+        if scores is None:
+            raise ValueError(
+                "scores cannot be None",
+            )
+
+        ranked_scores = self._ranking_engine.rank(
+            scores,
+        )
 
         return ranked_scores[0]

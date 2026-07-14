@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+import math
+
 from pocketbot.market.strategy.base import BaseStrategy
 from pocketbot.market.strategy.models import (
     StrategyResult,
@@ -11,8 +15,10 @@ class TrendFollowingStrategy(BaseStrategy):
     def name(self) -> str:
         return "trend_following"
 
-
-    def analyze(self, market_data: object) -> StrategyResult:
+    def analyze(
+        self,
+        market_data: object,
+    ) -> StrategyResult:
         """
         Simple trend detection using EMA and SMA values.
 
@@ -23,7 +29,10 @@ class TrendFollowingStrategy(BaseStrategy):
         }
         """
 
-        if not isinstance(market_data, dict):
+        if not isinstance(
+            market_data,
+            dict,
+        ):
             return StrategyResult(
                 signal=StrategySignal.HOLD,
                 confidence=0.0,
@@ -39,6 +48,16 @@ class TrendFollowingStrategy(BaseStrategy):
                 confidence=0.0,
                 reason="Missing moving averages",
             )
+
+        self._validate_average(
+            ema,
+            "ema",
+        )
+
+        self._validate_average(
+            sma,
+            "sma",
+        )
 
         if ema > sma:
             return StrategyResult(
@@ -59,3 +78,28 @@ class TrendFollowingStrategy(BaseStrategy):
             confidence=0.5,
             reason="EMA equals SMA",
         )
+
+    @staticmethod
+    def _validate_average(
+        value: object,
+        field_name: str,
+    ) -> None:
+        if isinstance(value, bool):
+            raise TypeError(
+                f"{field_name} must be numeric"
+            )
+
+        if not isinstance(
+            value,
+            (int, float),
+        ):
+            raise TypeError(
+                f"{field_name} must be numeric"
+            )
+
+        if not math.isfinite(
+            float(value),
+        ):
+            raise ValueError(
+                f"{field_name} must be finite"
+            )

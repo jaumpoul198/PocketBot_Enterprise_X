@@ -28,6 +28,11 @@ class TradingOrchestrator:
         flow: TradingFlowProtocol,
     ) -> None:
 
+        if flow is None:
+            raise TypeError(
+                "flow cannot be None",
+            )
+
         self._flow = flow
 
     def execute(
@@ -37,6 +42,11 @@ class TradingOrchestrator:
         """
         Execute trading workflow.
         """
+
+        if request is None:
+            raise TypeError(
+                "request cannot be None",
+            )
 
         return self._flow.execute(
             request,

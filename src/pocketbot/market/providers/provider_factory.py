@@ -19,10 +19,25 @@ class ProviderFactory:
         self,
         provider: MarketProvider,
     ) -> None:
+
+        if provider is None:
+            raise ValueError(
+                "provider cannot be None",
+            )
+
+        if not hasattr(
+            provider,
+            "get_candles",
+        ):
+            raise TypeError(
+                "provider must provide get_candles",
+            )
+
         self._provider = provider
 
     def build(self) -> MarketProvider:
         """
         Returns the configured provider.
         """
+
         return self._provider
