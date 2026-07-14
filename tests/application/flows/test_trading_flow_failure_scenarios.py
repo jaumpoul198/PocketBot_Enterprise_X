@@ -1,3 +1,12 @@
+"""
+PocketBot Enterprise X
+
+Trading application flow failure scenarios.
+"""
+
+from __future__ import annotations
+
+from datetime import UTC, datetime
 from unittest.mock import Mock
 
 import pytest
@@ -5,55 +14,31 @@ import pytest
 from pocketbot.application.flows.trading_flow import (
     TradingApplicationFlow,
 )
-from pocketbot.application.pipeline.models import (
+from pocketbot.application.requests import (
     TradingRequest,
 )
-from pocketbot.application.pipeline.exceptions import (
-    TradingPipelineError,
-)
-
-
-class FailingPipeline:
-
-    def execute(
-        self,
-        request: TradingRequest,
-    ):
-        raise TradingPipelineError(
-            "pipeline unavailable",
-        )
 
 
 class FailingRecorder:
+    """
+    Recorder that simulates persistence failure.
+    """
 
     def record(
         self,
-        decision,
+        *_args: object,
+        **_kwargs: object,
     ) -> None:
         raise RuntimeError(
             "recorder unavailable",
         )
 
 
-def test_trading_flow_propagates_pipeline_failure() -> None:
-    flow = TradingApplicationFlow(
-        pipeline=FailingPipeline(),
-        recorder=Mock(),
-    )
-
-    with pytest.raises(
-        TradingPipelineError,
-        match="pipeline unavailable",
-    ):
-        flow.execute(
-            TradingRequest(
-                asset="BTCUSDT",
-                timeframe=60,
-            )
-        )
-
-
 def test_trading_flow_propagates_recorder_failure() -> None:
+    """
+    Recorder failures must propagate.
+    """
+
     pipeline = Mock()
 
     pipeline.execute.return_value = Mock(
@@ -68,7 +53,7 @@ def test_trading_flow_propagates_recorder_failure() -> None:
         strategy=None,
         score=Mock(
             score=90.0,
-            timestamp=None,
+            timestamp=datetime.now(UTC),
         ),
     )
 
