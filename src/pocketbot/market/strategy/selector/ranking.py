@@ -10,9 +10,11 @@ class StrategyRankingEngine:
         self,
         scores: list[StrategyScore],
     ) -> list[StrategyScore]:
-        """
-        Returns strategies ordered by highest win rate.
-        """
+
+        if scores is None:
+            raise ValueError(
+                "scores cannot be None",
+            )
 
         return sorted(
             scores,

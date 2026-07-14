@@ -1,5 +1,10 @@
+from typing import Final
+
 from pocketbot.market.strategy.selector.models import StrategyScore
 from pocketbot.market.strategy.selector.ranking import StrategyRankingEngine
+
+
+_UNSET: Final = object()
 
 
 class StrategySelectorEngine:
@@ -9,8 +14,12 @@ class StrategySelectorEngine:
 
     def __init__(
         self,
-        ranking_engine: StrategyRankingEngine | None = None,
+        ranking_engine: StrategyRankingEngine | object = _UNSET,
     ) -> None:
+
+        if ranking_engine is _UNSET:
+            self._ranking_engine = StrategyRankingEngine()
+            return
 
         if ranking_engine is None:
             raise ValueError(
@@ -31,9 +40,6 @@ class StrategySelectorEngine:
         self,
         scores: list[StrategyScore],
     ) -> StrategyScore:
-        """
-        Returns the highest ranked strategy.
-        """
 
         if scores is None:
             raise ValueError(
