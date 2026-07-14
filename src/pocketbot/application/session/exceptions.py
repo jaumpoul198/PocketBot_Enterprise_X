@@ -4,8 +4,12 @@ PocketBot Enterprise X
 Trading session exceptions.
 """
 
+from pocketbot.core.exceptions import (
+    PocketBotError,
+)
 
-class TradingSessionError(Exception):
+
+class TradingSessionError(PocketBotError):
     """
     Base trading session exception.
     """
@@ -14,4 +18,10 @@ class TradingSessionError(Exception):
 class InvalidTradingSessionError(TradingSessionError):
     """
     Raised when a session operation is invalid.
+    """
+
+
+class TradingSessionExecutionError(TradingSessionError):
+    """
+    Raised when a trading session execution fails.
     """
