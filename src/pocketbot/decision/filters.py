@@ -22,6 +22,9 @@ class DecisionFilters:
         """
         Checks whether the score is sufficient.
         """
+
+        self._validate_score(score)
+
         return score.score >= minimum
 
     def confidence_ok(
@@ -32,6 +35,9 @@ class DecisionFilters:
         """
         Checks confidence.
         """
+
+        self._validate_score(score)
+
         return score.confidence >= minimum
 
     def strength_ok(
@@ -42,4 +48,25 @@ class DecisionFilters:
         """
         Checks indicator strength.
         """
+
+        self._validate_score(score)
+
         return score.strength >= minimum
+
+    def _validate_score(
+        self,
+        score: ScoreResult,
+    ) -> None:
+
+        if score is None:
+            raise TypeError(
+                "score cannot be None"
+            )
+
+        if not isinstance(
+            score,
+            ScoreResult,
+        ):
+            raise TypeError(
+                "score must be ScoreResult"
+            )
