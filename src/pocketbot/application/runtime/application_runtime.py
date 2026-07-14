@@ -6,8 +6,6 @@ Application Runtime.
 
 from __future__ import annotations
 
-from pocketbot.events.publisher import EventPublisher
-
 from pocketbot.application.lifecycle.lifecycle_manager import (
     LifecycleManager,
 )
@@ -15,12 +13,16 @@ from pocketbot.application.pipeline.models import (
     TradingRequest,
     TradingResult,
 )
+from pocketbot.application.runtime.exceptions import (
+    InvalidApplicationStateError,
+)
 from pocketbot.application.runtime.state import (
     ApplicationState,
 )
 from pocketbot.application.session.trading_session_manager import (
     TradingSessionManager,
 )
+from pocketbot.events.publisher import EventPublisher
 
 
 class ApplicationRuntime:
@@ -34,6 +36,22 @@ class ApplicationRuntime:
         session_manager: TradingSessionManager,
         publisher: EventPublisher,
     ) -> None:
+
+        if lifecycle is None:
+            raise TypeError(
+                "lifecycle cannot be None",
+            )
+
+        if session_manager is None:
+            raise TypeError(
+                "session_manager cannot be None",
+            )
+
+        if publisher is None:
+            raise TypeError(
+                "publisher cannot be None",
+            )
+
         self._lifecycle = lifecycle
         self._session_manager = session_manager
         self._state = ApplicationState.CREATED
@@ -48,7 +66,7 @@ class ApplicationRuntime:
             return
 
         if self._state is ApplicationState.STOPPED:
-            raise RuntimeError(
+            raise InvalidApplicationStateError(
                 "Application runtime cannot restart after stop."
             )
 
@@ -85,7 +103,7 @@ class ApplicationRuntime:
         """
 
         if self._state is ApplicationState.STOPPED:
-            raise RuntimeError(
+            raise InvalidApplicationStateError(
                 "Cannot run stopped application runtime."
             )
 
