@@ -23,6 +23,12 @@ class MarketQueryService:
         self,
         repository: MarketRepository,
     ) -> None:
+
+        if repository is None:
+            raise TypeError(
+                "repository cannot be None",
+            )
+
         self._repository = repository
 
     def get_latest_market(
@@ -30,6 +36,16 @@ class MarketQueryService:
         asset: str,
         timeframe: int,
     ) -> MarketSnapshot | None:
+
+        if not asset:
+            raise ValueError(
+                "asset cannot be empty",
+            )
+
+        if timeframe <= 0:
+            raise ValueError(
+                "timeframe must be positive",
+            )
 
         return self._repository.get_latest(
             asset,

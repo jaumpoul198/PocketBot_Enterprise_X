@@ -49,6 +49,20 @@ class ApplicationService:
         trading_pipeline: TradingPipelineService | None = None,
     ) -> None:
 
+        dependencies = {
+            "market": market,
+            "pipeline": pipeline,
+            "confluence": confluence,
+            "score_engine": score_engine,
+            "trade_engine": trade_engine,
+        }
+
+        for name, dependency in dependencies.items():
+            if dependency is None:
+                raise TypeError(
+                    f"{name} cannot be None",
+                )
+
         self._market = market
         self._pipeline = pipeline
         self._confluence = confluence
@@ -62,12 +76,21 @@ class ApplicationService:
         timeframe: int,
         candles: int,
     ) -> TradeResult:
-        """
-        Executes legacy analysis flow.
 
-        TradingPipelineService is optional and does not
-        replace the existing application contract yet.
-        """
+        if not asset:
+            raise ValueError(
+                "asset cannot be empty",
+            )
+
+        if timeframe <= 0:
+            raise ValueError(
+                "timeframe must be positive",
+            )
+
+        if candles <= 0:
+            raise ValueError(
+                "candles must be positive",
+            )
 
         market_candles = self._market.refresh_market(
             asset=asset,
@@ -84,7 +107,7 @@ class ApplicationService:
             market_candles,
         )
 
-        confluence = self._confluence.calculate(
+        self._confluence.calculate(
             indicators,
         )
 
@@ -102,12 +125,11 @@ class ApplicationService:
         self,
         request: TradingRequest,
     ) -> TradingResult:
-        """
-        Executes modern trading pipeline flow.
 
-        Keeps the TradingPipelineService optional
-        for backwards compatibility.
-        """
+        if request is None:
+            raise TypeError(
+                "request cannot be None",
+            )
 
         if self._trading_pipeline is None:
             raise RuntimeError(
