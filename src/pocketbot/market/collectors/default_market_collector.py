@@ -39,6 +39,26 @@ class DefaultMarketCollector(MarketCollector):
         cache: MarketCache,
         repository: MarketRepository,
     ) -> None:
+        if provider is None:
+            raise ValueError(
+                "provider is required",
+            )
+
+        if validator is None:
+            raise ValueError(
+                "validator is required",
+            )
+
+        if cache is None:
+            raise ValueError(
+                "cache is required",
+            )
+
+        if repository is None:
+            raise ValueError(
+                "repository is required",
+            )
+
         self._provider = provider
         self._validator = validator
         self._cache = cache
@@ -54,11 +74,29 @@ class DefaultMarketCollector(MarketCollector):
         Collects, validates, caches and persists market candles.
         """
 
+        if not asset:
+            raise ValueError(
+                "asset is required",
+            )
+
+        if timeframe <= 0:
+            raise ValueError(
+                "timeframe must be positive",
+            )
+
+        if count <= 0:
+            raise ValueError(
+                "count must be positive",
+            )
+
         candles = self._provider.get_candles(
             asset,
             timeframe,
             count,
         )
+
+        if not candles:
+            return []
 
         if not self._validator.validate(
             candles,
