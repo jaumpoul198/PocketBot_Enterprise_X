@@ -10,6 +10,7 @@ from pocketbot.application.pipeline.exceptions import (
     TradingPipelineError,
 )
 from pocketbot.application.pipeline.models import (
+    TradingMetadataValue,
     TradingRequest,
     TradingResult,
 )
@@ -122,7 +123,7 @@ class TradingPipelineService(
             current_exposure=0.0,
         )
 
-        metadata = {}
+        metadata: dict[str, TradingMetadataValue] = {}
 
         if risk.status is RiskStatus.REJECTED:
             metadata["blocked_by_risk"] = True
