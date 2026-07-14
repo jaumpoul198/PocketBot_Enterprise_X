@@ -1,4 +1,4 @@
-"""
+﻿"""
 PocketBot Enterprise X
 
 Market Analytics Service.
@@ -7,12 +7,15 @@ Market Analytics Service.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import TypeVar
 
 from pocketbot.domain.candle import Candle
 from pocketbot.market.analytics.indicators.base_indicator import (
     BaseIndicator,
 )
+
+
+T = TypeVar("T")
 
 
 @dataclass(frozen=True)
@@ -21,7 +24,7 @@ class AnalyticsSnapshot:
     Resultado consolidado da análise de mercado.
     """
 
-    values: dict[str, Any]
+    values: dict[str, object]
 
 
 class AnalyticsService:
@@ -31,7 +34,7 @@ class AnalyticsService:
 
     def __init__(
         self,
-        indicators: list[BaseIndicator[Any]],
+        indicators: list[BaseIndicator[object]],
     ) -> None:
         self._indicators = indicators
 
@@ -44,7 +47,7 @@ class AnalyticsService:
         sobre uma sequência de candles.
         """
 
-        results: dict[str, Any] = {}
+        results: dict[str, object] = {}
 
         for indicator in self._indicators:
             indicator_name = (
