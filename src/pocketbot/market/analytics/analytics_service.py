@@ -1,6 +1,7 @@
 """
 PocketBot Enterprise X
-Market Analytics Service
+
+Market Analytics Service.
 """
 
 from __future__ import annotations
@@ -9,7 +10,6 @@ from dataclasses import dataclass
 from typing import Any
 
 from pocketbot.domain.candle import Candle
-
 from pocketbot.market.analytics.indicators.base_indicator import (
     BaseIndicator,
 )
@@ -52,9 +52,11 @@ class AnalyticsService:
             )
 
             results[indicator_name] = (
-                indicator.calculate(candles)
+                indicator.calculate(
+                    candles,
+                )
             )
 
         return AnalyticsSnapshot(
-            values=results
+            values=results,
         )
