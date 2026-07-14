@@ -1,15 +1,16 @@
-from typing import Final, Protocol
+from typing import Protocol
 
-from pocketbot.market.strategy.selector.models import StrategyScore
-from pocketbot.market.strategy.selector.ranking import StrategyRankingEngine
-
-
-_UNSET: Final = object()
+from pocketbot.market.strategy.selector.models import (
+    StrategyScore,
+)
+from pocketbot.market.strategy.selector.ranking import (
+    StrategyRankingEngine,
+)
 
 
 class RankingEngineProtocol(Protocol):
     """
-    Contract required by strategy ranking engine.
+    Contract required by strategy selector ranking engine.
     """
 
     def rank(
@@ -26,37 +27,28 @@ class StrategySelectorEngine:
 
     def __init__(
         self,
-        ranking_engine: RankingEngineProtocol | object = _UNSET,
+        ranking_engine: RankingEngineProtocol | None = None,
     ) -> None:
 
-        if ranking_engine is _UNSET:
+        if ranking_engine is None:
             self._ranking_engine: RankingEngineProtocol = (
                 StrategyRankingEngine()
             )
-            return
+        else:
+            if not hasattr(
+                ranking_engine,
+                "rank",
+            ):
+                raise TypeError(
+                    "ranking_engine must provide rank",
+                )
 
-        if ranking_engine is None:
-            raise ValueError(
-                "ranking_engine cannot be None",
-            )
-
-        if not hasattr(
-            ranking_engine,
-            "rank",
-        ):
-            raise TypeError(
-                "ranking_engine must provide rank",
-            )
-
-        self._ranking_engine = ranking_engine  # type: ignore[assignment]
+            self._ranking_engine = ranking_engine
 
     def select(
         self,
-        scores: list[StrategyScore],
+        scores: list[StrategyScore] | None,
     ) -> StrategyScore:
-        """
-        Returns the highest ranked strategy.
-        """
 
         if scores is None:
             raise ValueError(
