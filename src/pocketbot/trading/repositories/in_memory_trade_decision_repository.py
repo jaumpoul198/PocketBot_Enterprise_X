@@ -37,6 +37,16 @@ class InMemoryTradeDecisionRepository(
         decision: TradeDecision,
     ) -> None:
 
+        if decision is None:
+            raise TypeError(
+                "trade decision cannot be None",
+            )
+
+        if not isinstance(decision, TradeDecision):
+            raise TypeError(
+                "invalid trade decision type",
+            )
+
         if decision.asset not in self._decisions:
             self._decisions[
                 decision.asset
@@ -52,6 +62,16 @@ class InMemoryTradeDecisionRepository(
         self,
         asset: str,
     ) -> TradeDecision | None:
+
+        if not isinstance(asset, str):
+            raise TypeError(
+                "asset must be a string",
+            )
+
+        if not asset.strip():
+            raise ValueError(
+                "asset cannot be empty",
+            )
 
         decisions = self._decisions.get(
             asset,
