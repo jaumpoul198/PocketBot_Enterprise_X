@@ -31,6 +31,10 @@ class DefaultMarketNormalizer(MarketNormalizer):
         candles: list[Candle] = []
 
         for item in raw_data:
+            timestamp = float(
+                str(item["timestamp"])
+            )
+
             candles.append(
                 Candle(
                     symbol=str(
@@ -47,31 +51,29 @@ class DefaultMarketNormalizer(MarketNormalizer):
                     ),
                     open=Price(
                         float(
-                            item["open"]
+                            str(item["open"])
                         )
                     ),
                     high=Price(
                         float(
-                            item["high"]
+                            str(item["high"])
                         )
                     ),
                     low=Price(
                         float(
-                            item["low"]
+                            str(item["low"])
                         )
                     ),
                     close=Price(
                         float(
-                            item["close"]
+                            str(item["close"])
                         )
                     ),
                     volume=float(
-                        item["volume"]
+                        str(item["volume"])
                     ),
                     timestamp=datetime.fromtimestamp(
-                        float(
-                            item["timestamp"]
-                        )
+                        timestamp
                     ),
                 )
             )
