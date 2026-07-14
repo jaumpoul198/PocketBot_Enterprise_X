@@ -6,7 +6,6 @@ from pocketbot.market.strategy.models import (
     StrategySignal,
 )
 from pocketbot.market.strategy.service import StrategyService
-from pocketbot.market.strategy.selector.models import StrategyScore
 
 
 class FailingStrategy(BaseStrategy):
@@ -60,7 +59,9 @@ def test_analyze_stops_when_strategy_execution_fails() -> None:
         ],
     )
 
-    with pytest.raises(RuntimeError):
+    with pytest.raises(
+        RuntimeError,
+    ):
         service.analyze(
             None,
         )
@@ -78,6 +79,7 @@ def test_select_best_strategy_propagates_selector_failure() -> None:
             [],
         )
 
+
 def test_analyze_with_no_strategies_returns_empty_list() -> None:
     service = StrategyService(
         strategies=[],
@@ -88,6 +90,7 @@ def test_analyze_with_no_strategies_returns_empty_list() -> None:
     )
 
     assert result == []
+
 
 def test_analyze_handles_none_strategy_instance_failure() -> None:
     service = StrategyService(
@@ -105,6 +108,7 @@ def test_analyze_handles_none_strategy_instance_failure() -> None:
 
 
 def test_analyze_preserves_strategy_result_order() -> None:
+
     class FirstStrategy(BaseStrategy):
 
         @property
@@ -181,3 +185,54 @@ def test_analyze_allows_strategy_returning_none() -> None:
     )
 
     assert result == [None]
+
+
+def test_strategy_service_rejects_none_strategies() -> None:
+    with pytest.raises(
+        ValueError,
+        match="strategies cannot be None",
+    ):
+        StrategyService(
+            None,
+        )
+
+
+def test_strategy_service_rejects_invalid_selector_contract() -> None:
+
+    class InvalidSelector:
+        pass
+
+    with pytest.raises(
+        TypeError,
+        match="selector must provide select",
+    ):
+        StrategyService(
+            strategies=[],
+            selector=InvalidSelector(),
+        )
+
+
+def test_strategy_service_propagates_selector_runtime_failure() -> None:
+
+    class FailingSelector:
+
+        def select(
+            self,
+            scores,
+        ):
+            raise RuntimeError(
+                "selector failure",
+            )
+
+    service = StrategyService(
+        strategies=[],
+        selector=FailingSelector(),
+    )
+
+    with pytest.raises(
+        RuntimeError,
+        match="selector failure",
+    ):
+        service.select_best_strategy(
+            [],
+        )
