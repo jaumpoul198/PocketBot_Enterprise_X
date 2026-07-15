@@ -81,6 +81,13 @@ class HealthRequestHandler(BaseHTTPRequestHandler):
 
         self.wfile.write(body)
 
+    def log_message(
+        self,
+        format: str,
+        *args: object,
+    ) -> None:
+        return
+
 
 class HealthServer:
     """
@@ -93,6 +100,7 @@ class HealthServer:
         health_service: ProductionHealthService,
     ) -> None:
         self._port = port
+        self._started = False
 
         HealthRequestHandler.health_service = (
             health_service
@@ -107,7 +115,18 @@ class HealthServer:
         )
 
     def start(self) -> None:
+        if self._started:
+            return
+
+        self._started = True
+
         self._server.serve_forever()
 
     def stop(self) -> None:
+        if not self._started:
+            return
+
         self._server.shutdown()
+        self._server.server_close()
+
+        self._started = False
