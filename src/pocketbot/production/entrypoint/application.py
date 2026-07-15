@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import sys
+
 from pocketbot.production.bootstrap.factory import (
     create_production_runtime_context,
 )
@@ -36,3 +38,17 @@ def run_production() -> bool:
         return runtime_context.start()
 
     return boundary.execute(start)
+
+
+def main() -> int:
+    """
+    Production application entrypoint.
+    """
+
+    success = run_production()
+
+    return 0 if success else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())
