@@ -42,9 +42,7 @@ class HostedServiceManager:
                 "hosted service cannot be None",
             )
 
-        self._services.append(
-            service,
-        )
+        self._services.append(service)
 
     def start(self) -> None:
         """
@@ -64,3 +62,29 @@ class HostedServiceManager:
 
         for service in reversed(self._services):
             service.stop()
+
+    def restart(self) -> None:
+        """
+        Restarts all hosted services.
+        """
+
+        self.stop()
+        self.start()
+
+    def health(self) -> dict[str, bool]:
+        """
+        Returns the health status of all hosted services.
+        """
+
+        return {
+            service.name: service.health()
+            for service in self._services
+        }
+
+    @property
+    def services(self) -> tuple[HostedService, ...]:
+        """
+        Returns registered hosted services.
+        """
+
+        return tuple(self._services)
