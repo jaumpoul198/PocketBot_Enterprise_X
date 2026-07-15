@@ -1,0 +1,34 @@
+services:
+  pocketbot:
+    image: pocketbot-enterprise-x:v1.5
+    container_name: pocketbot-enterprise-x
+
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    restart: unless-stopped
+
+    environment:
+      PYTHONPATH: /app/src
+      POCKETBOT_ENV: production
+
+    volumes:
+      - ./config:/app/config:ro
+      - ./logs:/app/logs
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import pocketbot"
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+    security_opt:
+      - no-new-privileges:true
