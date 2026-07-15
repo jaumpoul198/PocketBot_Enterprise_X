@@ -13,4 +13,5 @@ class ProductionSettings:
     environment: str = "production"
     debug: bool = False
     service_name: str = "pocketbot"
+    health_port: int = 8080
     environment_config: EnvironmentConfig = production_environment
