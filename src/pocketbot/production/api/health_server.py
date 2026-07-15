@@ -1,0 +1,113 @@
+from __future__ import annotations
+
+import json
+from http.server import BaseHTTPRequestHandler
+from http.server import HTTPServer
+
+from pocketbot.production.api.health_models import (
+    HealthResponse,
+)
+from pocketbot.production.health.service import (
+    ProductionHealthService,
+)
+
+
+class HealthRequestHandler(BaseHTTPRequestHandler):
+    """
+    HTTP handler for production health endpoints.
+    """
+
+    health_service: ProductionHealthService | None = None
+
+    def do_GET(self) -> None:
+        if self.health_service is None:
+            self._send_response(
+                503,
+                {
+                    "status": "unavailable",
+                },
+            )
+            return
+
+        if self.path == "/health":
+            result = self.health_service.health()
+
+        elif self.path == "/readiness":
+            result = self.health_service.readiness()
+
+        elif self.path == "/liveness":
+            result = self.health_service.liveness()
+
+        else:
+            self._send_response(
+                404,
+                {
+                    "status": "not_found",
+                },
+            )
+            return
+
+        response = HealthResponse(
+            status="ok" if result.healthy else "unhealthy",
+            service=result.service,
+            healthy=result.healthy,
+            ready=result.ready,
+            alive=result.alive,
+            uptime_seconds=result.uptime_seconds,
+        )
+
+        self._send_response(
+            200 if result.healthy else 503,
+            response.to_dict(),
+        )
+
+    def _send_response(
+        self,
+        status_code: int,
+        payload: dict[str, object],
+    ) -> None:
+        body = json.dumps(payload).encode()
+
+        self.send_response(status_code)
+        self.send_header(
+            "Content-Type",
+            "application/json",
+        )
+        self.send_header(
+            "Content-Length",
+            str(len(body)),
+        )
+        self.end_headers()
+
+        self.wfile.write(body)
+
+
+class HealthServer:
+    """
+    Minimal production health HTTP server.
+    """
+
+    def __init__(
+        self,
+        port: int,
+        health_service: ProductionHealthService,
+    ) -> None:
+        self._port = port
+
+        HealthRequestHandler.health_service = (
+            health_service
+        )
+
+        self._server = HTTPServer(
+            (
+                "0.0.0.0",
+                port,
+            ),
+            HealthRequestHandler,
+        )
+
+    def start(self) -> None:
+        self._server.serve_forever()
+
+    def stop(self) -> None:
+        self._server.shutdown()
