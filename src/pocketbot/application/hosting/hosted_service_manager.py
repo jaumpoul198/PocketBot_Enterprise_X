@@ -8,6 +8,9 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 
+from pocketbot.application.hosting.hosted_service_state import (
+    HostedServiceState,
+)
 from pocketbot.application.hosting.interfaces import (
     HostedService,
 )
@@ -24,6 +27,7 @@ class HostedServiceManager:
     ) -> None:
 
         self._services: list[HostedService] = []
+        self._states: dict[str, HostedServiceState] = {}
 
         if services is not None:
             for service in services:
@@ -42,7 +46,13 @@ class HostedServiceManager:
                 "hosted service cannot be None",
             )
 
-        self._services.append(service)
+        self._services.append(
+            service,
+        )
+
+        self._states[service.name] = (
+            HostedServiceState.CREATED
+        )
 
     def start(self) -> None:
         """
@@ -50,18 +60,55 @@ class HostedServiceManager:
         """
 
         for service in self._services:
-            service.start()
+
+            if self._states[service.name] is (
+                HostedServiceState.RUNNING
+            ):
+                continue
+
+            self._states[service.name] = (
+                HostedServiceState.STARTING
+            )
+
+            try:
+                service.start()
+            except Exception:
+                self._states[service.name] = (
+                    HostedServiceState.FAILED
+                )
+                raise
+
+            self._states[service.name] = (
+                HostedServiceState.RUNNING
+            )
 
     def stop(self) -> None:
         """
         Stops all hosted services.
-
-        Services are stopped in reverse order
-        to preserve dependency lifecycle.
         """
 
         for service in reversed(self._services):
-            service.stop()
+
+            if self._states[service.name] is (
+                HostedServiceState.STOPPED
+            ):
+                continue
+
+            self._states[service.name] = (
+                HostedServiceState.STOPPING
+            )
+
+            try:
+                service.stop()
+            except Exception:
+                self._states[service.name] = (
+                    HostedServiceState.FAILED
+                )
+                raise
+
+            self._states[service.name] = (
+                HostedServiceState.STOPPED
+            )
 
     def restart(self) -> None:
         """
@@ -82,9 +129,23 @@ class HostedServiceManager:
         }
 
     @property
-    def services(self) -> tuple[HostedService, ...]:
+    def services(
+        self,
+    ) -> tuple[HostedService, ...]:
         """
         Returns registered hosted services.
         """
 
-        return tuple(self._services)
+        return tuple(
+            self._services,
+        )
+
+    def state(
+        self,
+        service_name: str,
+    ) -> HostedServiceState:
+        """
+        Returns service lifecycle state.
+        """
+
+        return self._states[service_name]
