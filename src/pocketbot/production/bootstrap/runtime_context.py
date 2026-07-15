@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import TYPE_CHECKING
 
 from pocketbot.application.lifecycle.lifecycle_manager import (
     LifecycleManager,
@@ -13,11 +14,16 @@ from pocketbot.production.config.settings import (
     ProductionSettings,
 )
 
+if TYPE_CHECKING:
+    from pocketbot.production.bootstrap.health_runtime import (
+        ProductionHealthRuntime,
+    )
+
 
 class ProductionRuntimeContext:
     """
     Coordinates the production runtime together with the
-    application lifecycle.
+    application lifecycle and optional health runtime.
     """
 
     def __init__(
@@ -30,6 +36,10 @@ class ProductionRuntimeContext:
         self.context = context
         self._lifecycle = lifecycle
 
+        self._health_runtime: (
+            ProductionHealthRuntime | None
+        ) = None
+
     @property
     def settings(self) -> ProductionSettings:
         """
@@ -40,26 +50,49 @@ class ProductionRuntimeContext:
     @property
     def lifecycle(self) -> LifecycleManager | None:
         """
-        Returns the configured lifecycle manager.
+        Returns configured lifecycle manager.
         """
         return self._lifecycle
 
+    def attach_health_runtime(
+        self,
+        health_runtime: ProductionHealthRuntime,
+    ) -> None:
+        """
+        Attach production health HTTP runtime.
+        """
+        self._health_runtime = health_runtime
+
     def start(self) -> bool:
         """
-        Starts the application lifecycle and then the runtime.
+        Starts application lifecycle and runtime.
         """
-        self.context.metrics.increment("startup")
+
+        self.context.metrics.increment(
+            "startup",
+        )
 
         if self._lifecycle is not None:
             self._lifecycle.start()
 
-        return self.runtime.start()
+        result = self.runtime.start()
+
+        if result and self._health_runtime is not None:
+            self._health_runtime.start()
+
+        return result
 
     def shutdown(self) -> bool:
         """
-        Stops the runtime and then the application lifecycle.
+        Stops runtime, health service and lifecycle.
         """
-        self.context.metrics.increment("shutdown")
+
+        self.context.metrics.increment(
+            "shutdown",
+        )
+
+        if self._health_runtime is not None:
+            self._health_runtime.stop()
 
         runtime_result = self.runtime.shutdown()
 

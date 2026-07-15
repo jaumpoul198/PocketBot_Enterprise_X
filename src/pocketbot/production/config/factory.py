@@ -47,6 +47,16 @@ def load_production_settings(
         else environment.debug
     )
 
+    health_port_value = provider.get_secret(
+        "POCKETBOT_HEALTH_PORT"
+    )
+
+    health_port = (
+        int(health_port_value)
+        if health_port_value is not None
+        else 8080
+    )
+
     settings = ProductionSettings(
         environment=environment.name,
         debug=debug,
@@ -54,6 +64,7 @@ def load_production_settings(
             "POCKETBOT_SERVICE_NAME"
         )
         or "pocketbot",
+        health_port=health_port,
     )
 
     validate_production_settings(settings)
