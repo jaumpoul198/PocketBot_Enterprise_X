@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import TYPE_CHECKING
 
 from pocketbot.application.lifecycle.lifecycle_manager import (
     LifecycleManager,
@@ -12,6 +13,11 @@ from pocketbot.production.bootstrap.runtime import (
 from pocketbot.production.config.settings import (
     ProductionSettings,
 )
+
+if TYPE_CHECKING:
+    from pocketbot.production.bootstrap.health_runtime import (
+        ProductionHealthRuntime,
+    )
 
 
 class ProductionRuntimeContext:
@@ -30,7 +36,9 @@ class ProductionRuntimeContext:
         self.context = context
         self._lifecycle = lifecycle
 
-        self._health_runtime = None
+        self._health_runtime: (
+            ProductionHealthRuntime | None
+        ) = None
 
     @property
     def settings(self) -> ProductionSettings:
@@ -48,12 +56,11 @@ class ProductionRuntimeContext:
 
     def attach_health_runtime(
         self,
-        health_runtime: object,
+        health_runtime: ProductionHealthRuntime,
     ) -> None:
         """
         Attach production health HTTP runtime.
         """
-
         self._health_runtime = health_runtime
 
     def start(self) -> bool:
