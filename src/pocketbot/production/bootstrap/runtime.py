@@ -9,8 +9,8 @@ from __future__ import annotations
 from pocketbot.application.lifecycle.lifecycle_manager import (
     LifecycleManager,
 )
-from pocketbot.enterprise.runtime.runtime_coordinator import (
-    RuntimeCoordinator,
+from pocketbot.enterprise.runtime.runtime_supervisor import (
+    RuntimeSupervisor,
 )
 from pocketbot.production.config.settings import ProductionSettings
 
@@ -24,12 +24,14 @@ class ProductionRuntime:
         self,
         settings: ProductionSettings,
         lifecycle: LifecycleManager | None = None,
-        runtime: RuntimeCoordinator | None = None,
+        supervisor: RuntimeSupervisor | None = None,
     ) -> None:
+
         self._settings = settings
         self._lifecycle = lifecycle
-        self._runtime = runtime
-        self._started = False
+        self._supervisor = supervisor
+
+        self._running = False
 
     @property
     def settings(self) -> ProductionSettings:
@@ -37,7 +39,7 @@ class ProductionRuntime:
 
     @property
     def started(self) -> bool:
-        return self._started
+        return self._running
 
     def start(self) -> bool:
         """
@@ -47,24 +49,24 @@ class ProductionRuntime:
         if self._lifecycle is not None:
             self._lifecycle.start()
 
-        if self._runtime is not None:
-            self._runtime.start()
+        self._running = True
 
-        self._started = True
+        if self._supervisor is not None:
+            return self._supervisor.check(
+                runtime_running=True,
+                autonomy_running=True,
+            )
 
         return True
 
     def shutdown(self) -> bool:
         """
-        Shuts down production runtime.
+        Stops production runtime.
         """
-
-        if self._runtime is not None:
-            self._runtime.stop()
 
         if self._lifecycle is not None:
             self._lifecycle.stop()
 
-        self._started = False
+        self._running = False
 
         return True
