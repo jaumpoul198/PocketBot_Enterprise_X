@@ -17,8 +17,6 @@ from pocketbot.application.hosting.hosted_service_manager import (
 from pocketbot.application.lifecycle.lifecycle_manager import (
     LifecycleManager,
 )
-from pocketbot.score.engine import ScoreEngine
-from pocketbot.trading.engine import TradeEngine
 from pocketbot.application.lifecycle.shutdown import Shutdown
 from pocketbot.application.lifecycle.startup import Startup
 from pocketbot.application.orchestrator.trading_orchestrator import (
@@ -46,17 +44,30 @@ from pocketbot.bootstrap.indicator_loader import load_indicators
 from pocketbot.config.service import ConfigService
 from pocketbot.confluence.engine import ConfluenceEngine
 from pocketbot.decision.engine import DecisionEngine
+from pocketbot.events import (
+    EventBus,
+    EventPublisher,
+)
 from pocketbot.execution.engine import ExecutionEngine
 from pocketbot.indicators.engine import IndicatorEngine
 from pocketbot.indicators.factory import IndicatorFactory
 from pocketbot.indicators.manager import IndicatorManager
 from pocketbot.indicators.pipeline import IndicatorPipeline
 from pocketbot.indicators.registry import IndicatorRegistry
+from pocketbot.infrastructure.audit import (
+    AuditRegistry,
+)
 from pocketbot.infrastructure.container.interfaces import (
     IServiceProvider,
 )
 from pocketbot.infrastructure.container.service_collection import (
     ServiceCollection,
+)
+from pocketbot.infrastructure.health import (
+    HealthRegistry,
+)
+from pocketbot.infrastructure.metrics import (
+    MetricsRegistry,
 )
 from pocketbot.infrastructure.observability import (
     RuntimeObservabilityHandler,
@@ -113,6 +124,7 @@ from pocketbot.risk.interfaces.risk_service import (
 from pocketbot.risk.services.default_risk_service import (
     DefaultRiskService,
 )
+from pocketbot.score.engine import ScoreEngine
 from pocketbot.trading.engine import (
     RiskEvaluator,
     TradeEngine,
@@ -126,22 +138,7 @@ from pocketbot.trading.repositories.in_memory_trade_decision_repository import (
 from pocketbot.trading.services.trading_decision_recorder import (
     TradingDecisionRecorder,
 )
-from pocketbot.events import (
-    EventBus,
-    EventPublisher,
-)
-from pocketbot.infrastructure.audit import (
-    AuditRegistry,
-)
-from pocketbot.infrastructure.container.interfaces import (
-    IServiceProvider,
-)
-from pocketbot.infrastructure.health import (
-    HealthRegistry,
-)
-from pocketbot.infrastructure.metrics import (
-    MetricsRegistry,
-)
+
 
 def _build_event_bus(
     provider: IServiceProvider,
