@@ -44,7 +44,9 @@ def create_production_runtime_context() -> ProductionRuntimeContext:
         LifecycleManager,
     )
 
-    autonomy = AutonomyRuntimeService()
+    autonomy = provider.get_service(
+        AutonomyRuntimeService,
+    )
 
     runtime = ProductionRuntime(
         settings,
