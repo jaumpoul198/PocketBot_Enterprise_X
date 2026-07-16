@@ -10,7 +10,9 @@ from pocketbot.production.api.health_models import (
 from pocketbot.production.health.service import (
     ProductionHealthService,
 )
-
+from pocketbot.production.api.intelligence_routes import (
+    IntelligenceAPI,
+)
 
 class HealthRequestHandler(BaseHTTPRequestHandler):
     """
@@ -18,6 +20,8 @@ class HealthRequestHandler(BaseHTTPRequestHandler):
     """
 
     health_service: ProductionHealthService | None = None
+
+    intelligence_api: IntelligenceAPI | None = None
 
     def do_GET(self) -> None:
         if self.health_service is None:
@@ -37,6 +41,15 @@ class HealthRequestHandler(BaseHTTPRequestHandler):
 
         elif self.path == "/liveness":
             result = self.health_service.liveness()
+
+        elif self.path == "/api/intelligence/status":
+            result = self.intelligence_api.status()
+
+        elif self.path == "/api/intelligence/decision":
+            result = self.intelligence_api.decision()
+
+        elif self.path == "/api/intelligence/signals":
+            result = self.intelligence_api.signals()
 
         else:
             self._send_response(
@@ -104,6 +117,10 @@ class HealthServer:
 
         HealthRequestHandler.health_service = (
             health_service
+        )
+
+        HealthRequestHandler.intelligence_api = (
+            IntelligenceAPI()
         )
 
         self._server = HTTPServer(
