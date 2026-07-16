@@ -8,6 +8,14 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from pocketbot.enterprise.autonomy.autonomy_metrics import (
+    AutonomyMetrics,
+)
+
+from pocketbot.enterprise.autonomy.autonomy_metrics import (
+    AutonomyMetrics,
+)
+
 from pocketbot.application.flows.trading_flow import (
     TradingApplicationFlow,
 )
@@ -176,6 +184,10 @@ def register_services(
 
     services.add_singleton(
         MetricsRegistry,
+    )
+
+    services.add_singleton(
+        AutonomyMetrics,
     )
 
     services.add_singleton(
