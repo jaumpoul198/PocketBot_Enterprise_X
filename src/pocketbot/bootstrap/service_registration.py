@@ -34,6 +34,12 @@ from pocketbot.application.pipeline.service import (
 from pocketbot.application.runtime.application_runtime import (
     ApplicationRuntime,
 )
+from pocketbot.enterprise.runtime.runtime_health import (
+    RuntimeHealth,
+)
+from pocketbot.enterprise.runtime.runtime_recovery import (
+    RuntimeRecoveryPolicy,
+)
 from pocketbot.application.services.application_service import (
     ApplicationService,
 )
@@ -150,6 +156,9 @@ from pocketbot.trading.repositories.in_memory_trade_decision_repository import (
 from pocketbot.trading.services.trading_decision_recorder import (
     TradingDecisionRecorder,
 )
+from pocketbot.enterprise.runtime.runtime_supervisor import (
+    RuntimeSupervisor,
+)
 
 
 def _build_event_bus(
@@ -208,11 +217,31 @@ def register_services(
     )
 
     services.add_singleton(
+        RuntimeSupervisor,
+    )
+
+    services.add_singleton(
+        RuntimeHealth,
+        factory=lambda _: RuntimeHealth(
+            healthy=True,
+            runtime_running=True,
+            autonomy_running=True,
+        ),
+    )
+
+    services.add_singleton(
+        RuntimeRecoveryPolicy,
+        factory=lambda _: RuntimeRecoveryPolicy(
+            max_attempts=3,
+        ),
+    )
+
+    services.add_singleton(
         RuntimeCoordinator,
         factory=lambda provider: RuntimeCoordinator(
             autonomy=provider.get_service(
-                AutonomyRuntimeService,
-            ),
+                AutonomyRuntimeService, 
+           ),
         ),
     )
 
