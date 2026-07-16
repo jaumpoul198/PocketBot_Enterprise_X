@@ -53,6 +53,9 @@ from pocketbot.decision.engine import DecisionEngine
 from pocketbot.enterprise.autonomy.autonomy_runtime_service import (
     AutonomyRuntimeService,
 )
+from pocketbot.enterprise.runtime.runtime_coordinator import (
+    RuntimeCoordinator,
+)
 from pocketbot.events import (
     EventBus,
     EventPublisher,
@@ -202,6 +205,15 @@ def register_services(
 
     services.add_singleton(
         AutonomyRuntimeService,
+    )
+
+    services.add_singleton(
+        RuntimeCoordinator,
+        factory=lambda provider: RuntimeCoordinator(
+            autonomy=provider.get_service(
+                AutonomyRuntimeService,
+            ),
+        ),
     )
 
     services.add_instance(
