@@ -1,8 +1,12 @@
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from pocketbot.application.lifecycle.lifecycle_manager import (
     LifecycleManager,
+)
+from pocketbot.enterprise.autonomy.autonomy_runtime_service import (
+    AutonomyRuntimeService,
 )
 from pocketbot.production.bootstrap.context import (
     ProductionContext,
@@ -23,7 +27,7 @@ if TYPE_CHECKING:
 class ProductionRuntimeContext:
     """
     Coordinates the production runtime together with the
-    application lifecycle and optional health runtime.
+    application lifecycle, health runtime and autonomy runtime.
     """
 
     def __init__(
@@ -38,6 +42,10 @@ class ProductionRuntimeContext:
 
         self._health_runtime: (
             ProductionHealthRuntime | None
+        ) = None
+
+        self._autonomy_runtime: (
+            AutonomyRuntimeService | None
         ) = None
 
     @property
@@ -63,6 +71,15 @@ class ProductionRuntimeContext:
         """
         self._health_runtime = health_runtime
 
+    def attach_autonomy_runtime(
+        self,
+        autonomy_runtime: AutonomyRuntimeService,
+    ) -> None:
+        """
+        Attach enterprise autonomy runtime.
+        """
+        self._autonomy_runtime = autonomy_runtime
+
     def start(self) -> bool:
         """
         Starts application lifecycle and runtime.
@@ -80,16 +97,22 @@ class ProductionRuntimeContext:
         if result and self._health_runtime is not None:
             self._health_runtime.start()
 
+        if result and self._autonomy_runtime is not None:
+            self._autonomy_runtime.start()
+
         return result
 
     def shutdown(self) -> bool:
         """
-        Stops runtime, health service and lifecycle.
+        Stops runtime, health service, autonomy service and lifecycle.
         """
 
         self.context.metrics.increment(
             "shutdown",
         )
+
+        if self._autonomy_runtime is not None:
+            self._autonomy_runtime.stop()
 
         if self._health_runtime is not None:
             self._health_runtime.stop()
