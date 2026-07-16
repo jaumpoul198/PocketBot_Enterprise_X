@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-
 from http.server import BaseHTTPRequestHandler
 from http.server import HTTPServer
 
@@ -24,9 +23,7 @@ class HealthRequestHandler(BaseHTTPRequestHandler):
     """
 
     health_service: ProductionHealthService | None = None
-
     intelligence_api: IntelligenceAPI | None = None
-
 
     def do_GET(self) -> None:
 
@@ -39,66 +36,43 @@ class HealthRequestHandler(BaseHTTPRequestHandler):
             )
             return
 
-
         if self.path == "/health":
 
             result = self.health_service.health()
 
+            response = result.to_dict()
 
         elif self.path == "/readiness":
 
             result = self.health_service.readiness()
 
+            response = result.to_dict()
 
         elif self.path == "/liveness":
 
             result = self.health_service.liveness()
 
+            response = result.to_dict()
+
 
         elif self.path == "/api/intelligence/status":
 
-            result = self.intelligence_api.status()
+            response = self.intelligence_api.status()
 
 
         elif self.path == "/api/intelligence/decision":
 
-            result = self.intelligence_api.decision()
+            response = self.intelligence_api.decision()
 
 
         elif self.path == "/api/intelligence/signals":
 
-            result = self.intelligence_api.signals()
+            response = self.intelligence_api.signals()
 
 
         elif self.path == "/api/intelligence/autonomy":
 
-            result = self.intelligence_api.autonomy()
-
-
-        elif self.path == "/api/intelligence/context/history":
-
-            result = self.intelligence_api.context_history()
-
-
-            self._send_response(
-                200,
-                result,
-            )
-
-            return
-
-
-        elif self.path == "/api/intelligence/context/metrics":
-
-            result = self.intelligence_api.context_metrics()
-
-
-            self._send_response(
-                200,
-                result,
-            )
-
-            return
+            response = self.intelligence_api.autonomy()
 
 
         else:
@@ -113,33 +87,26 @@ class HealthRequestHandler(BaseHTTPRequestHandler):
             return
 
 
-
-        response = HealthResponse(
-            status="ok" if result.healthy else "unhealthy",
-            service=result.service,
-            healthy=result.healthy,
-            ready=result.ready,
-            alive=result.alive,
-            uptime_seconds=result.uptime_seconds,
-        )
-
-
         self._send_response(
-            200 if result.healthy else 503,
-            response.to_dict(),
+            200,
+            response,
         )
 
 
     def _send_response(
         self,
         status_code: int,
-        payload: dict[str, object],
+        payload: dict,
     ) -> None:
 
-        body = json.dumps(payload).encode()
+        body = json.dumps(
+            payload
+        ).encode()
 
 
-        self.send_response(status_code)
+        self.send_response(
+            status_code
+        )
 
         self.send_header(
             "Content-Type",
@@ -153,9 +120,9 @@ class HealthRequestHandler(BaseHTTPRequestHandler):
 
         self.end_headers()
 
-
-        self.wfile.write(body)
-
+        self.wfile.write(
+            body
+        )
 
 
     def log_message(
@@ -170,9 +137,8 @@ class HealthRequestHandler(BaseHTTPRequestHandler):
 
 class HealthServer:
     """
-    Minimal production health HTTP server.
+    Minimal production HTTP server.
     """
-
 
     def __init__(
         self,
@@ -181,7 +147,6 @@ class HealthServer:
     ) -> None:
 
         self._port = port
-
         self._started = False
 
 
@@ -198,32 +163,29 @@ class HealthServer:
         self._server = HTTPServer(
             (
                 "0.0.0.0",
+                port,
+            ),
             HealthRequestHandler,
         )
 
+
+    def start(self) -> None:
+
         if self._started:
-
             return
 
-
-
-
-
-    def stop(self) -> None:
-
-
-
-        self._server.shutdown()
-
-        self._server.server_close()
-
-        self._started = False        if not self._started:
-
-            return
         self._started = True
 
         self._server.serve_forever()
 
 
-    def start(self) -> None:
+    def stop(self) -> None:
 
+        if not self._started:
+            return
+
+        self._server.shutdown()
+
+        self._server.server_close()
+
+        self._started = False
