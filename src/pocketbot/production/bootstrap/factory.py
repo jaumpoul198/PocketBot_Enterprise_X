@@ -6,6 +6,9 @@ from pocketbot.application.lifecycle.lifecycle_manager import (
 from pocketbot.bootstrap.builder import (
     ApplicationBuilder,
 )
+from pocketbot.enterprise.autonomy.autonomy_runtime_service import (
+    AutonomyRuntimeService,
+)
 from pocketbot.production.bootstrap.context import (
     create_production_context,
 )
@@ -41,6 +44,8 @@ def create_production_runtime_context() -> ProductionRuntimeContext:
         LifecycleManager,
     )
 
+    autonomy = AutonomyRuntimeService()
+
     runtime = ProductionRuntime(
         settings,
         lifecycle=lifecycle,
@@ -50,6 +55,7 @@ def create_production_runtime_context() -> ProductionRuntimeContext:
         runtime=runtime,
         context=context,
         lifecycle=lifecycle,
+        autonomy=autonomy,
     )
 
     health_runtime = ProductionHealthRuntime(

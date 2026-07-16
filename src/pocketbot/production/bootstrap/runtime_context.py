@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 class ProductionRuntimeContext:
     """
     Coordinates the production runtime together with the
-    application lifecycle, health runtime and autonomy runtime.
+    application lifecycle, autonomy runtime and optional health runtime.
     """
 
     def __init__(
@@ -35,17 +35,15 @@ class ProductionRuntimeContext:
         runtime: ProductionRuntime,
         context: ProductionContext,
         lifecycle: LifecycleManager | None = None,
+        autonomy: AutonomyRuntimeService | None = None,
     ) -> None:
         self.runtime = runtime
         self.context = context
         self._lifecycle = lifecycle
+        self._autonomy = autonomy
 
         self._health_runtime: (
             ProductionHealthRuntime | None
-        ) = None
-
-        self._autonomy_runtime: (
-            AutonomyRuntimeService | None
         ) = None
 
     @property
@@ -62,6 +60,13 @@ class ProductionRuntimeContext:
         """
         return self._lifecycle
 
+    @property
+    def autonomy(self) -> AutonomyRuntimeService | None:
+        """
+        Returns configured autonomy runtime service.
+        """
+        return self._autonomy
+
     def attach_health_runtime(
         self,
         health_runtime: ProductionHealthRuntime,
@@ -71,18 +76,9 @@ class ProductionRuntimeContext:
         """
         self._health_runtime = health_runtime
 
-    def attach_autonomy_runtime(
-        self,
-        autonomy_runtime: AutonomyRuntimeService,
-    ) -> None:
-        """
-        Attach enterprise autonomy runtime.
-        """
-        self._autonomy_runtime = autonomy_runtime
-
     def start(self) -> bool:
         """
-        Starts application lifecycle and runtime.
+        Starts application lifecycle, autonomy and runtime.
         """
 
         self.context.metrics.increment(
@@ -92,30 +88,30 @@ class ProductionRuntimeContext:
         if self._lifecycle is not None:
             self._lifecycle.start()
 
+        if self._autonomy is not None:
+            self._autonomy.start()
+
         result = self.runtime.start()
 
         if result and self._health_runtime is not None:
             self._health_runtime.start()
 
-        if result and self._autonomy_runtime is not None:
-            self._autonomy_runtime.start()
-
         return result
 
     def shutdown(self) -> bool:
         """
-        Stops runtime, health service, autonomy service and lifecycle.
+        Stops health service, autonomy, runtime and lifecycle.
         """
 
         self.context.metrics.increment(
             "shutdown",
         )
 
-        if self._autonomy_runtime is not None:
-            self._autonomy_runtime.stop()
-
         if self._health_runtime is not None:
             self._health_runtime.stop()
+
+        if self._autonomy is not None:
+            self._autonomy.stop()
 
         runtime_result = self.runtime.shutdown()
 
