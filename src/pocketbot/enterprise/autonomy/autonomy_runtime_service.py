@@ -3,115 +3,62 @@ from __future__ import annotations
 from pocketbot.enterprise.autonomy.autonomy_metrics import (
     AutonomyMetrics,
 )
+
 from pocketbot.enterprise.autonomy.autonomy_monitor import (
     AutonomyMonitor,
     AutonomySnapshot,
-)
-from pocketbot.enterprise.autonomy.recovery import (
-    AutonomyRecoveryEngine,
-    RecoveryStatus,
 )
 
 
 class AutonomyRuntimeService:
     """
-    Controls enterprise autonomy runtime lifecycle.
+    Enterprise autonomy runtime service.
     """
 
     def __init__(
         self,
-        monitor: AutonomyMonitor | None = None,
-        metrics: AutonomyMetrics | None = None,
-        recovery: AutonomyRecoveryEngine | None = None,
+        monitor: AutonomyMonitor,
+        metrics: AutonomyMetrics,
     ) -> None:
-
-        self._monitor = monitor or AutonomyMonitor()
+        self._monitor = monitor
         self._metrics = metrics
-        self._recovery = recovery or AutonomyRecoveryEngine()
-
-        self._started = False
-
-    @property
-    def started(self) -> bool:
-        return self._started
+        self._running = False
 
     def start(self) -> None:
-        if self._started:
+        """
+        Starts autonomy runtime.
+        """
+
+        if self._running:
             return
 
-        self._monitor.start()
+        self._running = True
 
-        if self._metrics is not None:
-            self._metrics.record_start()
-
-        self._started = True
+        self._metrics.record_start()
 
     def stop(self) -> None:
-        if not self._started:
+        """
+        Stops autonomy runtime.
+        """
+
+        if not self._running:
             return
 
-        self._monitor.stop()
+        self._running = False
 
-        if self._metrics is not None:
-            self._metrics.record_stop()
-
-        self._started = False
+        self._metrics.record_stop()
 
     def snapshot(self) -> AutonomySnapshot:
+        """
+        Returns autonomy snapshot.
+        """
+
         return self._monitor.snapshot()
 
-    def detect_failure(
-        self,
-        reason: str,
-    ) -> RecoveryStatus:
+    @property
+    def running(self) -> bool:
         """
-        Register runtime failure.
+        Returns runtime state.
         """
 
-        status = self._recovery.detect_failure(reason)
-
-        self._monitor.mark_failure()
-
-        self._monitor.update_metric(
-            "recovery_state",
-            status.state.value,
-        )
-
-        return status
-
-    def recover(self) -> bool:
-        """
-        Execute autonomous recovery.
-        """
-
-        self._monitor.mark_recovering()
-
-        result = self._recovery.execute_recovery()
-
-        status = self._recovery.get_status()
-
-        self._monitor.update_metric(
-            "recovery_state",
-            status.state.value,
-        )
-
-        if result:
-            self._monitor.mark_recovered()
-        else:
-            self._monitor.mark_failure()
-
-        return result
-
-    def recovery_status(self) -> RecoveryStatus:
-        """
-        Return recovery lifecycle state.
-        """
-
-        return self._recovery.get_status()
-
-    def recovery_metrics(self) -> dict[str, object]:
-        """
-        Return recovery metrics.
-        """
-
-        return self._recovery.get_metrics()
+        return self._running
