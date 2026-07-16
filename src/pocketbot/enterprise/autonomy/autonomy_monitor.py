@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timezone
-from typing import Any, Dict
+from datetime import UTC, datetime
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -14,7 +14,7 @@ class AutonomySnapshot:
     timestamp: datetime
     healthy: bool
     active: bool
-    metrics: Dict[str, Any]
+    metrics: dict[str, Any]
 
     @classmethod
     def create(
@@ -22,12 +22,12 @@ class AutonomySnapshot:
         *,
         healthy: bool = True,
         active: bool = False,
-        metrics: Dict[str, Any] | None = None,
-    ) -> "AutonomySnapshot":
+        metrics: dict[str, Any] | None = None,
+    ) -> AutonomySnapshot:
         """Create a runtime snapshot."""
 
         return cls(
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             healthy=healthy,
             active=active,
             metrics=metrics or {},
@@ -44,7 +44,7 @@ class AutonomyMonitor:
     def __init__(self) -> None:
         self._healthy = True
         self._active = False
-        self._metrics: Dict[str, Any] = {}
+        self._metrics: dict[str, Any] = {}
 
     def start(self) -> None:
         """Activate autonomy monitoring."""
