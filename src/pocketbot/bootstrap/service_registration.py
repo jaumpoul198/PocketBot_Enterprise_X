@@ -44,6 +44,9 @@ from pocketbot.bootstrap.indicator_loader import load_indicators
 from pocketbot.config.service import ConfigService
 from pocketbot.confluence.engine import ConfluenceEngine
 from pocketbot.decision.engine import DecisionEngine
+from pocketbot.enterprise.autonomy.autonomy_runtime_service import (
+    AutonomyRuntimeService,
+)
 from pocketbot.events import (
     EventBus,
     EventPublisher,
@@ -183,6 +186,10 @@ def register_services(
         RuntimeObservabilityHandler,
     )
 
+    services.add_singleton(
+        AutonomyRuntimeService,
+    )
+
     services.add_instance(
         IndicatorRegistry,
         indicator_registry,
@@ -239,7 +246,7 @@ def register_services(
                 RiskService,
             ),
         ),
-     )
+    )
 
     services.add_singleton(
         ExecutionEngine,
@@ -425,4 +432,4 @@ def register_services(
                 EventPublisher,
             ),
         ),
-     )
+    )
