@@ -18,7 +18,7 @@ class AutonomyRuntimeService:
     def __init__(
         self,
         monitor: AutonomyMonitor,
-        metrics: AutonomyMetrics,
+        metrics: AutonomyMetrics | None = None,
     ) -> None:
         self._monitor = monitor
         self._metrics = metrics
@@ -34,7 +34,10 @@ class AutonomyRuntimeService:
 
         self._running = True
 
-        self._metrics.record_start()
+        self._monitor.activate()
+
+        if self._metrics is not None:
+            self._metrics.record_start()
 
     def stop(self) -> None:
         """
@@ -46,7 +49,10 @@ class AutonomyRuntimeService:
 
         self._running = False
 
-        self._metrics.record_stop()
+        self._monitor.deactivate()
+
+        if self._metrics is not None:
+            self._metrics.record_stop()
 
     def snapshot(self) -> AutonomySnapshot:
         """
@@ -54,6 +60,14 @@ class AutonomyRuntimeService:
         """
 
         return self._monitor.snapshot()
+
+    @property
+    def started(self) -> bool:
+        """
+        Returns runtime started state.
+        """
+
+        return self._running
 
     @property
     def running(self) -> bool:

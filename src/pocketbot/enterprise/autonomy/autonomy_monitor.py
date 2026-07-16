@@ -63,6 +63,12 @@ class AutonomyMonitor:
     def stop(self) -> None:
         self._active = False
 
+    def activate(self) -> None:
+        self._active = True
+
+    def deactivate(self) -> None:
+        self._active = False
+
     def update_health(
         self,
         healthy: bool,
