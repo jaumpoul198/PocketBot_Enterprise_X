@@ -5,7 +5,12 @@ from .autonomy_monitor import (
     AutonomySnapshot,
 )
 
+from .autonomy_runtime_service import (
+    AutonomyRuntimeService,
+)
+
 __all__ = [
     "AutonomyMonitor",
     "AutonomySnapshot",
+    "AutonomyRuntimeService",
 ]
