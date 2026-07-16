@@ -1,16 +1,46 @@
-from pocketbot.production.api.intelligence_routes import (
-    IntelligenceAPI,
+from pocketbot.enterprise.api.intelligence.intelligence_routes import (
+    intelligence_bp,
 )
 
+from flask import Flask
 
-def test_intelligence_autonomy():
 
-    api = IntelligenceAPI()
+def create_app():
 
-    api.decision()
+    app = Flask(__name__)
 
-    result = api.autonomy()
+    app.register_blueprint(
+        intelligence_bp
+    )
 
-    assert "autonomy_score" in result
-    assert "decision_count" in result
-    assert result["decision_count"] == 1
+    return app
+
+
+def test_intelligence_status_api():
+
+    app = create_app()
+
+    client = app.test_client()
+
+    response = client.get(
+        "/intelligence/status"
+    )
+
+    assert response.status_code == 200
+
+    data = response.get_json()
+
+    assert data["status"] == "active"
+
+
+def test_context_history_api():
+
+    app = create_app()
+
+    client = app.test_client()
+
+    response = client.get(
+        "/intelligence/context/history"
+    )
+
+    assert response.status_code == 200
