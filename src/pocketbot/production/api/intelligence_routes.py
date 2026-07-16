@@ -33,3 +33,23 @@ class IntelligenceAPI:
             .metrics
             .latest()
         )
+
+    def autonomy(self) -> dict:
+        """
+        Return operational autonomy metrics.
+        """
+
+        score = self._runtime.history.autonomy_score()
+
+        if score >= 90:
+            status = "high_autonomy"
+        elif score >= 70:
+            status = "medium_autonomy"
+        else:
+            status = "low_autonomy"
+
+        return {
+            "autonomy_score": score,
+            "decision_count": self._runtime.history.count(),
+            "status": status,
+        }

@@ -51,6 +51,9 @@ class HealthRequestHandler(BaseHTTPRequestHandler):
         elif self.path == "/api/intelligence/signals":
             result = self.intelligence_api.signals()
 
+        elif self.path == "/api/intelligence/autonomy":
+            result = self.intelligence_api.autonomy()
+
         else:
             self._send_response(
                 404,
