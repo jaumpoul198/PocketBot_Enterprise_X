@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 
 
 @dataclass(slots=True)
@@ -8,6 +8,22 @@ class AdaptiveDecision:
     threshold: float
     mode: str
     confidence_floor: float
+
+    def to_dict(self):
+        return asdict(self)
+
+    @classmethod
+    def from_mapping(cls, data=None):
+        data = data or {}
+
+        return cls(
+            threshold=data.get("threshold", 0.50),
+            mode=data.get("mode", "supervised"),
+            confidence_floor=data.get(
+                "confidence_floor",
+                0.60,
+            ),
+        )
 
 
 class AdaptiveEngine:
