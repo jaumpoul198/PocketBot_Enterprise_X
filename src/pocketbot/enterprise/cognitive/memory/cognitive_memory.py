@@ -6,7 +6,7 @@ from .memory_models import CognitiveMemoryEntry
 class CognitiveMemory:
 
     def __init__(self):
-        self.entries = []
+        self._memory = []
 
     def remember(
         self,
@@ -22,14 +22,29 @@ class CognitiveMemory:
             timestamp=datetime.now(UTC),
         )
 
-        self.entries.append(entry)
+        self._memory.append(entry)
 
         return entry
 
     def latest(self):
 
-        return self.entries[-1] if self.entries else None
+        if not self._memory:
+            return None
+
+        return self._memory[-1]
 
     def all(self):
 
-        return list(self.entries)
+        return self._memory
+
+    def history(self):
+
+        return self._memory
+
+    def count(self):
+
+        return len(self._memory)
+
+    def clear(self):
+
+        self._memory.clear()
