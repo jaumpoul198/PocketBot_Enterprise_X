@@ -15,6 +15,7 @@ class CognitiveRuntime:
         self.learning = CognitiveLearning()
 
         self.started_at = datetime.now(UTC)
+
         self.last_decision = None
         self.last_intelligence_decision = None
         self.last_memory_entry = None
@@ -35,9 +36,9 @@ class CognitiveRuntime:
         )
 
         learning_experience = self.learning.learn(
-            event=cognitive_decision.action,
-            outcome=intelligence_decision.action,
-            score=health_score,
+            memory_entry,
+            cognitive_decision.action,
+            cognitive_decision.confidence,
         )
 
         self.last_decision = cognitive_decision
@@ -54,7 +55,7 @@ class CognitiveRuntime:
             "last_decision": self.last_decision,
             "last_intelligence_decision": self.last_intelligence_decision,
             "last_memory_entry": self.last_memory_entry,
-            "memory": self.memory.history(),
+            "memory": self.memory.all(),
             "last_learning_experience": self.last_learning_experience,
             "learning_score": self.learning.score(),
             "engine": self.engine.status(),
