@@ -1,14 +1,19 @@
-"""Enterprise Intelligence Orchestration."""
-
 from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Any, Mapping
 
+from pocketbot.enterprise.intelligence import IntelligenceEngine
+from pocketbot.enterprise.intelligence.adaptive import AdaptiveEngine
+from pocketbot.enterprise.intelligence.feedback import FeedbackEngine
+from pocketbot.enterprise.intelligence.learning import LearningEngine
+
 
 @dataclass(frozen=True, slots=True)
 class IntelligenceOrchestrationResult:
-    """Immutable orchestration execution result."""
+    """
+    Enterprise orchestration execution result.
+    """
 
     status: str
     operation: str
@@ -25,7 +30,20 @@ class IntelligenceOrchestrationResult:
 
 
 class IntelligenceOrchestrator:
-    """Coordinates enterprise intelligence operations."""
+    """
+    Coordinates Enterprise Intelligence modules.
+    """
+
+    def __init__(self) -> None:
+
+        self.engine = IntelligenceEngine()
+
+        self.learning = LearningEngine()
+
+        self.feedback = FeedbackEngine()
+
+        self.adaptive = AdaptiveEngine()
+
 
     def execute(
         self,
@@ -33,20 +51,45 @@ class IntelligenceOrchestrator:
         operation: str,
         details: Mapping[str, Any] | None = None,
     ) -> IntelligenceOrchestrationResult:
+
+        payload = dict(details or {})
+
         return IntelligenceOrchestrationResult(
             status="completed",
             operation=operation,
             executed=True,
-            details=dict(details or {}),
+            details=payload,
         )
+
 
     def from_mapping(
         self,
         data: Mapping[str, Any],
     ) -> IntelligenceOrchestrationResult:
+
         return IntelligenceOrchestrationResult(
-            status=str(data.get("status", "")),
-            operation=str(data.get("operation", "")),
-            executed=bool(data.get("executed", False)),
-            details=dict(data.get("details", {})),
+            status=str(
+                data.get(
+                    "status",
+                    "",
+                )
+            ),
+            operation=str(
+                data.get(
+                    "operation",
+                    "",
+                )
+            ),
+            executed=bool(
+                data.get(
+                    "executed",
+                    False,
+                )
+            ),
+            details=dict(
+                data.get(
+                    "details",
+                    {},
+                )
+            ),
         )
