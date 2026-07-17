@@ -21,3 +21,23 @@ class CognitiveLearning:
             score=score,
             timestamp=datetime.now(UTC),
         )
+
+        self.experiences.append(experience)
+
+        return experience
+
+    def history(self):
+
+        return self.experiences
+
+    def score(self):
+
+        if not self.experiences:
+            return 0.0
+
+        total = sum(
+            experience.score
+            for experience in self.experiences
+        )
+
+        return total / len(self.experiences)
