@@ -1,6 +1,7 @@
 from datetime import datetime, UTC
 
 from ..core.cognitive_engine import CognitiveEngine
+from ..decision.cognitive_decision import CognitiveDecision
 from ..memory.cognitive_memory import CognitiveMemory
 from ..learning.cognitive_learning import CognitiveLearning
 from ...intelligence.runtime import IntelligenceRuntime
@@ -13,6 +14,8 @@ class CognitiveRuntime:
         self.intelligence = IntelligenceRuntime()
         self.memory = CognitiveMemory()
         self.learning = CognitiveLearning()
+        self.decision = CognitiveDecision()
+        self.last_final_decision = None
 
         self.started_at = datetime.now(UTC)
 
@@ -41,10 +44,17 @@ class CognitiveRuntime:
             cognitive_decision.confidence,
         )
 
+        final_decision = self.decision.decide(
+            cognitive_state=cognitive_decision.action,
+            memory_score=cognitive_decision.confidence,
+            learning_score=self.learning.score(),
+        )
+
         self.last_decision = cognitive_decision
         self.last_intelligence_decision = intelligence_decision
         self.last_memory_entry = memory_entry
         self.last_learning_experience = learning_experience
+        self.last_final_decision = final_decision
 
         return cognitive_decision
 
@@ -60,4 +70,6 @@ class CognitiveRuntime:
             "learning_score": self.learning.score(),
             "engine": self.engine.status(),
             "intelligence": self.intelligence.status(),
+            "last_final_decision": self.last_final_decision,
+            "decision": self.decision.status(),
         }
