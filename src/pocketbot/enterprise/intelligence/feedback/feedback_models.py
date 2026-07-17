@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, asdict
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 @dataclass
@@ -39,7 +39,7 @@ class DecisionFeedback:
 
         timestamp = data.get(
             "timestamp",
-            datetime.utcnow(),
+            datetime.now(timezone.utc),
         )
 
         if isinstance(timestamp, str):
@@ -64,6 +64,7 @@ class DecisionFeedback:
             ),
             timestamp=timestamp,
         )
+
 
 @dataclass
 class FeedbackRecord:
@@ -100,17 +101,29 @@ class FeedbackRecord:
 
         timestamp = data.get(
             "timestamp",
-            datetime.utcnow(),
+            datetime.now(timezone.utc),
         )
 
         if isinstance(timestamp, str):
             timestamp = datetime.fromisoformat(timestamp)
 
         return cls(
-            decision=data.get("decision", ""),
-            expected_score=data.get("expected_score", 0.0),
-            actual_score=data.get("actual_score", 0.0),
-            success=data.get("success", False),
+            decision=data.get(
+                "decision",
+                "",
+            ),
+            expected_score=data.get(
+                "expected_score",
+                0.0,
+            ),
+            actual_score=data.get(
+                "actual_score",
+                0.0,
+            ),
+            success=data.get(
+                "success",
+                False,
+            ),
             timestamp=timestamp,
         )
 

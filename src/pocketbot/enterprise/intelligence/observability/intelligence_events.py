@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 class IntelligenceEvent:
@@ -16,7 +16,7 @@ class IntelligenceEvent:
 
         self.event_type = event_type
         self.payload = payload
-        self.created_at = datetime.utcnow()
+        self.created_at = datetime.now(timezone.utc)
 
 
     def to_dict(self) -> dict:
@@ -73,6 +73,7 @@ class IntelligenceEventStore:
             event.to_dict()
             for event in self._events[-limit:]
         ]
+
 
 
     def count(self) -> int:

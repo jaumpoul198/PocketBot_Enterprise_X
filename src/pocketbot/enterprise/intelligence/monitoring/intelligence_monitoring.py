@@ -1,5 +1,5 @@
 from dataclasses import dataclass, asdict
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 @dataclass
@@ -12,7 +12,7 @@ class IntelligenceMonitoring:
 
     def __post_init__(self):
         if not self.last_check:
-            self.last_check = datetime.utcnow().isoformat()
+            self.last_check = datetime.now(timezone.utc).isoformat()
 
     def run_check(self):
         return self.to_dict()

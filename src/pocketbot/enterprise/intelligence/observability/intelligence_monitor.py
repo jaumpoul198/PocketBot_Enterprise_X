@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 from pocketbot.enterprise.intelligence.observability.intelligence_events import (
     IntelligenceEventManager,
@@ -17,7 +17,7 @@ class IntelligenceMonitor:
 
         self._events = IntelligenceEventManager()
 
-        self._started_at = datetime.utcnow()
+        self._started_at = datetime.now(timezone.utc)
 
         self._checks = 0
 
@@ -42,7 +42,7 @@ class IntelligenceMonitor:
             "status": "healthy",
             "checks": self._checks,
             "uptime_seconds": (
-                datetime.utcnow() - self._started_at
+                datetime.now(timezone.utc) - self._started_at
             ).total_seconds(),
             "events": self._events.total_events(),
         }

@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
-from datetime import datetime
-from typing import Dict, Any
+from datetime import datetime, timezone
+from typing import Any, Dict, Optional
 
 
 @dataclass
@@ -8,11 +8,16 @@ class DecisionContext:
     decision_id: str
     score: float
     input_context: Dict[str, Any] = field(default_factory=dict)
-    feedback: Dict[str, Any] = field(default_factory=dict)
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    feedback: Optional[Dict[str, Any]] = None
+    created_at: datetime = field(
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
 
 
 @dataclass
 class ContextSnapshot:
-    decision_id: str
-    history: list[DecisionContext] = field(default_factory=list)
+    context_id: str
+    data: Dict[str, Any]
+    created_at: datetime = field(
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
