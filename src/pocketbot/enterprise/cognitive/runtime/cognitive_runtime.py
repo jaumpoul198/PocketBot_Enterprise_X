@@ -14,12 +14,18 @@ from ..memory.cognitive_memory import CognitiveMemory
 from ..planning import CognitivePlanning
 from ..reflection.self_reflection import SelfReflection
 from ..persistence import CognitiveStorage
+from ..observability import CognitiveMonitor
 
 
 class CognitiveRuntime:
 
-    def __init__(self):
+    def __init__(
+        self,
+        observability: CognitiveMonitor | None = None,
+    ):
 
+        self.observability = observability or CognitiveMonitor()
+        
         self.engine = CognitiveEngine()
 
         self.intelligence = IntelligenceRuntime()
@@ -84,6 +90,15 @@ class CognitiveRuntime:
 
         start_time = time.perf_counter()
 
+        trace = self.observability.start_trace(
+            "cognitive_runtime.execute"
+        )
+
+        self.observability.emit_event(
+            event_type="COGNITIVE_RUNTIME_STARTED",
+            source="runtime",
+        )
+
         try:
 
             result = self._execute_cycle(
@@ -102,11 +117,27 @@ class CognitiveRuntime:
 
             self.last_error = repr(error)
 
+            self.observability.emit_event(
+                event_type="COGNITIVE_RUNTIME_ERROR",
+                source="runtime",
+                payload={
+                   "error": repr(error),
+                },
+            )
+
+            self.observability.traces.finish(trace)
+
             return None
 
         finally:
 
             duration = time.perf_counter() - start_time
+
+            self.observability.record_metric(
+                name="runtime_cycle_duration",
+                value=duration,
+                component="runtime",
+            )
 
             self.last_cycle_duration = duration
 
