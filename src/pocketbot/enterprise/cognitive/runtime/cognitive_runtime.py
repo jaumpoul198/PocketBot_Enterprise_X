@@ -5,6 +5,7 @@ from ..autonomy import CognitiveAutonomyOrchestrator
 from ..core.cognitive_engine import CognitiveEngine
 from ..decision.cognitive_decision import CognitiveDecision
 from ..feedback.cognitive_feedback_loop import CognitiveFeedbackLoop
+from ..evolution import CognitiveEvolution
 from ..goals import CognitiveGoalManager
 from ..goals.runtime import GoalRuntime
 from ..learning.cognitive_learning import CognitiveLearning
@@ -35,6 +36,8 @@ class CognitiveRuntime:
 
         self.feedback_loop = CognitiveFeedbackLoop()
 
+        self.evolution = CognitiveEvolution()
+
         self.autonomy = CognitiveAutonomyOrchestrator()
 
         self.self_reflection = SelfReflection()
@@ -60,6 +63,8 @@ class CognitiveRuntime:
         self.last_feedback = None
 
         self.last_reflection = None
+
+        self.last_evolution_metric = None
 
     def execute(
         self,
@@ -136,6 +141,11 @@ class CognitiveRuntime:
         if hasattr(self.learning, "update"):
             self.learning.update(reflection)
 
+        evolution_metric = self.evolution.evaluate(
+            memory_count=self.memory.count(),
+            learning_score=self.learning.score(),
+        )
+
         self.goal_runtime.complete(
             goal,
             score=cognitive_decision.confidence,
@@ -158,6 +168,8 @@ class CognitiveRuntime:
         self.last_autonomy_result = autonomy_result
 
         self.last_feedback = feedback
+
+        self.last_evolution_metric = evolution_metric
 
         return cognitive_decision
 
@@ -214,7 +226,18 @@ class CognitiveRuntime:
             "feedback_loop": {
                 "score": self.feedback_loop.score(),
                 "history": self.feedback_loop.all(),
-        },
+            },
+
+
+            "feedback_loop": {
+                "score": self.feedback_loop.score(),
+                "history": self.feedback_loop.all(),
+            },
+
+            "evolution": {
+                "latest": self.evolution.latest(),
+                "last_metric": self.last_evolution_metric,
+            },
 
             "last_reflection": self.last_reflection,
         }
