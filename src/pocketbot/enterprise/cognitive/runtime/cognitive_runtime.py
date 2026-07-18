@@ -1,14 +1,15 @@
 from datetime import UTC, datetime
 
+from ...intelligence.runtime import IntelligenceRuntime
 from ..autonomy import CognitiveAutonomyOrchestrator
 from ..core.cognitive_engine import CognitiveEngine
 from ..decision.cognitive_decision import CognitiveDecision
 from ..goals import CognitiveGoalManager
+from ..goals.runtime import GoalRuntime
 from ..learning.cognitive_learning import CognitiveLearning
 from ..memory.cognitive_memory import CognitiveMemory
 from ..planning import CognitivePlanning
-from ...intelligence.runtime import IntelligenceRuntime
-from ..goals.runtime import GoalRuntime
+from ..reflection.self_reflection import SelfReflection
 
 
 class CognitiveRuntime:
@@ -33,6 +34,8 @@ class CognitiveRuntime:
 
         self.autonomy = CognitiveAutonomyOrchestrator()
 
+        self.self_reflection = SelfReflection()
+
         self.started_at = datetime.now(UTC)
 
         self.last_decision = None
@@ -53,6 +56,7 @@ class CognitiveRuntime:
 
         self.last_feedback = None
 
+        self.last_reflection = None
 
     def execute(
         self,
@@ -96,7 +100,6 @@ class CognitiveRuntime:
 
         self.goal_runtime.execute(goal)
 
-
         final_decision = self.decision.decide(
             cognitive_state=cognitive_decision.action,
             memory_score=cognitive_decision.confidence,
@@ -113,6 +116,16 @@ class CognitiveRuntime:
         )
 
         feedback = autonomy_result["feedback"]
+
+        reflection = self.self_reflection.reflect(
+            decision_confidence=cognitive_decision.confidence,
+            feedback=feedback,
+        )
+
+        self.last_reflection = reflection
+
+        if hasattr(self.learning, "update"):
+            self.learning.update(reflection)
 
         self.goal_runtime.complete(
             goal,
@@ -137,46 +150,28 @@ class CognitiveRuntime:
 
         self.last_feedback = feedback
 
-
         return cognitive_decision
-
 
     def status(self):
 
         return {
             "started_at": self.started_at,
-
             "last_decision": self.last_decision,
-
             "last_intelligence_decision": self.last_intelligence_decision,
-
             "last_memory_entry": self.last_memory_entry,
-
             "memory": self.memory.all(),
-
             "last_learning_experience": self.last_learning_experience,
-
             "learning_score": self.learning.score(),
-
             "last_goal": self.last_goal,
-
             "goals": self.goals.get_active_goals(),
-
             "goal_runtime": self.goal_runtime.status(),
-
             "last_plan": self.last_plan,
-
             "planning": self.planning.status(),
-
             "engine": self.engine.status(),
-
             "intelligence": self.intelligence.status(),
-
             "last_final_decision": self.last_final_decision,
-
             "decision": self.decision.status(),
-
             "last_autonomy_result": self.last_autonomy_result,
-
             "last_feedback": self.last_feedback,
+            "last_reflection": self.last_reflection,
         }
