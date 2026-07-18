@@ -13,6 +13,7 @@ from ..learning.cognitive_learning import CognitiveLearning
 from ..memory.cognitive_memory import CognitiveMemory
 from ..planning import CognitivePlanning
 from ..reflection.self_reflection import SelfReflection
+from ..persistence import CognitiveStorage
 
 
 class CognitiveRuntime:
@@ -42,6 +43,8 @@ class CognitiveRuntime:
         self.autonomy = CognitiveAutonomyOrchestrator()
 
         self.self_reflection = SelfReflection()
+
+        self.storage = CognitiveStorage()
 
         self.started_at = datetime.now(UTC)
 
@@ -97,7 +100,7 @@ class CognitiveRuntime:
             self.failed_cycles += 1
             self.cycles_executed += 1
 
-            self.last_error = str(error)
+            self.last_error = repr(error)
 
             return None
 
@@ -124,6 +127,11 @@ class CognitiveRuntime:
 
         cognitive_decision = self.engine.process()
 
+        self.storage.save_decision(
+            cognitive_decision.action,
+            cognitive_decision.confidence,
+        )
+
         intelligence_decision = self.intelligence.evaluate(
             health_score
         )
@@ -132,6 +140,10 @@ class CognitiveRuntime:
             cycle=cognitive_decision.action,
             action=cognitive_decision.action,
             confidence=cognitive_decision.confidence,
+        )
+
+        self.storage.save_memory(
+            memory_entry
         )
 
         learning_experience = self.learning.learn(
@@ -222,6 +234,16 @@ class CognitiveRuntime:
 
         self.last_evolution_metric = evolution_metric
 
+        self.storage.save_metric(
+            "evolution_score",
+            self.learning.score(),
+        )
+
+        self.storage.save_metric(
+            "confidence",
+            cognitive_decision.confidence,
+        )
+
         return cognitive_decision
 
 
@@ -258,6 +280,8 @@ class CognitiveRuntime:
 
         return {
             "health": self.health(),
+
+            "storage": self.storage.health(),
 
             "started_at": self.started_at,
 
