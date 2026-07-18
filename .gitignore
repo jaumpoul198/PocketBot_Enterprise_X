@@ -42,3 +42,4 @@ logs/
 
 # Bytecode
 *.pyc
+cognitive_decision.confidence
