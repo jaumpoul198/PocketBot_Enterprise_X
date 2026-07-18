@@ -1,5 +1,5 @@
-from .reflection_memory import ReflectionMemory
 from .reflection_analyzer import ReflectionAnalyzer
+from .reflection_memory import ReflectionMemory
 from .reflection_score import ReflectionScore
 
 
@@ -12,7 +12,6 @@ class SelfReflection:
         self.analyzer = ReflectionAnalyzer()
 
         self.score = ReflectionScore()
-
 
     def reflect(
         self,
