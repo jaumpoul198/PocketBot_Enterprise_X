@@ -8,6 +8,7 @@ from ..learning.cognitive_learning import CognitiveLearning
 from ..memory.cognitive_memory import CognitiveMemory
 from ..planning import CognitivePlanning
 from ...intelligence.runtime import IntelligenceRuntime
+from ..goals.runtime import GoalRuntime
 
 
 class CognitiveRuntime:
@@ -23,6 +24,8 @@ class CognitiveRuntime:
         self.learning = CognitiveLearning()
 
         self.goals = CognitiveGoalManager()
+
+        self.goal_runtime = GoalRuntime()
 
         self.planning = CognitivePlanning()
 
@@ -87,6 +90,13 @@ class CognitiveRuntime:
 
         self.goals.engine.activate(goal)
 
+        self.goal_runtime.register(goal)
+
+        self.goal_runtime.prepare(goal)
+
+        self.goal_runtime.execute(goal)
+
+
         final_decision = self.decision.decide(
             cognitive_state=cognitive_decision.action,
             memory_score=cognitive_decision.confidence,
@@ -104,6 +114,10 @@ class CognitiveRuntime:
 
         feedback = autonomy_result["feedback"]
 
+        self.goal_runtime.complete(
+            goal,
+            score=cognitive_decision.confidence,
+        )
 
         self.last_decision = cognitive_decision
 
@@ -147,6 +161,8 @@ class CognitiveRuntime:
             "last_goal": self.last_goal,
 
             "goals": self.goals.get_active_goals(),
+
+            "goal_runtime": self.goal_runtime.status(),
 
             "last_plan": self.last_plan,
 
