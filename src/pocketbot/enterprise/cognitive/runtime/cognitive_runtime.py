@@ -4,6 +4,7 @@ from ...intelligence.runtime import IntelligenceRuntime
 from ..autonomy import CognitiveAutonomyOrchestrator
 from ..core.cognitive_engine import CognitiveEngine
 from ..decision.cognitive_decision import CognitiveDecision
+from ..feedback.cognitive_feedback_loop import CognitiveFeedbackLoop
 from ..goals import CognitiveGoalManager
 from ..goals.runtime import GoalRuntime
 from ..learning.cognitive_learning import CognitiveLearning
@@ -31,6 +32,8 @@ class CognitiveRuntime:
         self.planning = CognitivePlanning()
 
         self.decision = CognitiveDecision()
+
+        self.feedback_loop = CognitiveFeedbackLoop()
 
         self.autonomy = CognitiveAutonomyOrchestrator()
 
@@ -122,6 +125,12 @@ class CognitiveRuntime:
             feedback=feedback,
         )
 
+        self.feedback_loop.evaluate(
+            decision=str(final_decision),
+            outcome=str(feedback),
+            score=cognitive_decision.confidence,
+        )
+
         self.last_reflection = reflection
 
         if hasattr(self.learning, "update"):
@@ -201,6 +210,11 @@ class CognitiveRuntime:
             "last_autonomy_result": self.last_autonomy_result,
 
             "last_feedback": self.last_feedback,
+
+            "feedback_loop": {
+                "score": self.feedback_loop.score(),
+                "history": self.feedback_loop.all(),
+        },
 
             "last_reflection": self.last_reflection,
         }
