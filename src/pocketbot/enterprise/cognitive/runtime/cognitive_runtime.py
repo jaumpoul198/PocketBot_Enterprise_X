@@ -158,20 +158,49 @@ class CognitiveRuntime:
             "started_at": self.started_at,
             "last_decision": self.last_decision,
             "last_intelligence_decision": self.last_intelligence_decision,
+
             "last_memory_entry": self.last_memory_entry,
             "memory": self.memory.all(),
+
             "last_learning_experience": self.last_learning_experience,
+
             "learning_score": self.learning.score(),
+
+            "learning_status": {
+                "experiences": len(
+                    self.learning.history()
+                ),
+                "feedback_entries": len(
+                    self.learning.feedback()
+                ),
+                "score": self.learning.score(),
+            },
+
+            "feedback_metrics": {
+                "feedback_score": self.learning.feedback_score(),
+                "feedback_history": self.learning.feedback(),
+            },
+
             "last_goal": self.last_goal,
             "goals": self.goals.get_active_goals(),
+
             "goal_runtime": self.goal_runtime.status(),
+
             "last_plan": self.last_plan,
+
             "planning": self.planning.status(),
+
             "engine": self.engine.status(),
+
             "intelligence": self.intelligence.status(),
+
             "last_final_decision": self.last_final_decision,
+
             "decision": self.decision.status(),
+
             "last_autonomy_result": self.last_autonomy_result,
+
             "last_feedback": self.last_feedback,
+
             "last_reflection": self.last_reflection,
         }
