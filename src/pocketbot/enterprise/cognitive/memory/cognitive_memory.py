@@ -1,5 +1,7 @@
 from datetime import datetime, UTC
 
+from .consolidation import MemoryConsolidation
+
 from .memory_models import (
     CognitiveKnowledge,
     CognitiveMemoryEntry,
@@ -13,6 +15,8 @@ class CognitiveMemory:
         self._memory = []
 
         self._knowledge = []
+
+        self.consolidator = MemoryConsolidation()
 
     def remember(
         self,
@@ -84,3 +88,19 @@ class CognitiveMemory:
         return len(
             self._knowledge
         )
+
+    def consolidate_experiences(self):
+
+        memories = self.consolidator.evaluate(
+            self._memory
+        )
+
+        for memory in memories:
+
+            self.consolidate(
+                source="memory",
+                pattern=memory.action,
+                score=memory.confidence,
+            )
+
+        return memories
