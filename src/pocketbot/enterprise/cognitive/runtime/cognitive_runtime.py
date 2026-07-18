@@ -3,6 +3,7 @@ from datetime import UTC, datetime
 from ..autonomy import CognitiveAutonomyOrchestrator
 from ..core.cognitive_engine import CognitiveEngine
 from ..decision.cognitive_decision import CognitiveDecision
+from ..goals import CognitiveGoalManager
 from ..learning.cognitive_learning import CognitiveLearning
 from ..memory.cognitive_memory import CognitiveMemory
 from ..planning import CognitivePlanning
@@ -21,6 +22,8 @@ class CognitiveRuntime:
 
         self.learning = CognitiveLearning()
 
+        self.goals = CognitiveGoalManager()
+
         self.planning = CognitivePlanning()
 
         self.decision = CognitiveDecision()
@@ -37,6 +40,8 @@ class CognitiveRuntime:
 
         self.last_learning_experience = None
 
+        self.last_goal = None
+
         self.last_plan = None
 
         self.last_final_decision = None
@@ -44,6 +49,7 @@ class CognitiveRuntime:
         self.last_autonomy_result = None
 
         self.last_feedback = None
+
 
     def execute(
         self,
@@ -73,6 +79,14 @@ class CognitiveRuntime:
             evolution_score=self.learning.score(),
         )
 
+        goal = self.goals.create_goal(
+            name="autonomous_cycle",
+            objective=plan.strategy,
+            priority=1,
+        )
+
+        self.goals.engine.activate(goal)
+
         final_decision = self.decision.decide(
             cognitive_state=cognitive_decision.action,
             memory_score=cognitive_decision.confidence,
@@ -83,11 +97,13 @@ class CognitiveRuntime:
             action={
                 "decision": final_decision,
                 "plan": plan.strategy,
+                "goal": goal.name,
             },
             confidence=cognitive_decision.confidence,
         )
 
         feedback = autonomy_result["feedback"]
+
 
         self.last_decision = cognitive_decision
 
@@ -97,6 +113,8 @@ class CognitiveRuntime:
 
         self.last_learning_experience = learning_experience
 
+        self.last_goal = goal
+
         self.last_plan = plan
 
         self.last_final_decision = final_decision
@@ -105,24 +123,44 @@ class CognitiveRuntime:
 
         self.last_feedback = feedback
 
+
         return cognitive_decision
+
 
     def status(self):
 
         return {
             "started_at": self.started_at,
+
             "last_decision": self.last_decision,
+
             "last_intelligence_decision": self.last_intelligence_decision,
+
             "last_memory_entry": self.last_memory_entry,
+
             "memory": self.memory.all(),
+
             "last_learning_experience": self.last_learning_experience,
+
             "learning_score": self.learning.score(),
+
+            "last_goal": self.last_goal,
+
+            "goals": self.goals.get_active_goals(),
+
             "last_plan": self.last_plan,
+
             "planning": self.planning.status(),
+
             "engine": self.engine.status(),
+
             "intelligence": self.intelligence.status(),
+
             "last_final_decision": self.last_final_decision,
+
             "decision": self.decision.status(),
+
             "last_autonomy_result": self.last_autonomy_result,
+
             "last_feedback": self.last_feedback,
         }
