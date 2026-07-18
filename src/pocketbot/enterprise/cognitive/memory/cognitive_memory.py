@@ -1,12 +1,18 @@
 from datetime import datetime, UTC
 
-from .memory_models import CognitiveMemoryEntry
+from .memory_models import (
+    CognitiveKnowledge,
+    CognitiveMemoryEntry,
+)
 
 
 class CognitiveMemory:
 
     def __init__(self):
+
         self._memory = []
+
+        self._knowledge = []
 
     def remember(
         self,
@@ -48,3 +54,33 @@ class CognitiveMemory:
     def clear(self):
 
         self._memory.clear()
+
+    def consolidate(
+        self,
+        source: str,
+        pattern: str,
+        score: float,
+    ):
+
+        knowledge = CognitiveKnowledge(
+            source=source,
+            pattern=pattern,
+            score=score,
+            created_at=datetime.now(UTC),
+        )
+
+        self._knowledge.append(
+            knowledge
+        )
+
+        return knowledge
+
+    def knowledge(self):
+
+        return self._knowledge
+
+    def knowledge_count(self):
+
+        return len(
+            self._knowledge
+        )
