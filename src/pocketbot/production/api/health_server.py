@@ -16,6 +16,10 @@ from pocketbot.production.api.intelligence_routes import (
     IntelligenceAPI,
 )
 
+from pocketbot.production.api.cognitive_routes import (
+    CognitiveAPI,
+)
+
 
 class HealthRequestHandler(BaseHTTPRequestHandler):
     """
@@ -24,6 +28,7 @@ class HealthRequestHandler(BaseHTTPRequestHandler):
 
     health_service: ProductionHealthService | None = None
     intelligence_api: IntelligenceAPI | None = None
+    cognitive_api: CognitiveAPI | None = None
 
     def do_GET(self) -> None:
 
@@ -73,6 +78,10 @@ class HealthRequestHandler(BaseHTTPRequestHandler):
         elif self.path == "/api/intelligence/autonomy":
 
             response = self.intelligence_api.autonomy()
+
+        elif self.path == "/cognitive/status":
+
+            response = self.cognitive_api.status()
 
 
         else:
@@ -160,6 +169,10 @@ class HealthServer:
         )
 
 
+        HealthRequestHandler.cognitive_api = (
+            CognitiveAPI()
+        )
+
         self._server = HTTPServer(
             (
                 "0.0.0.0",
@@ -189,3 +202,25 @@ class HealthServer:
         self._server.server_close()
 
         self._started = False
+
+
+    def do_POST(self) -> None:
+
+        if self.path == "/cognitive/execute":
+
+            result = self.cognitive_api.execute()
+
+            self._send_response(
+                200,
+                result,
+            )
+
+            return
+
+
+        self._send_response(
+            404,
+            {
+                "status": "not_found",
+            },
+         )
